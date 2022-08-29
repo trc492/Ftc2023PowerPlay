@@ -43,9 +43,6 @@ import TrcFtcLib.ftclib.FtcVuforia;
  */
 public class VuforiaVision
 {
-    private static final int IMAGE_WIDTH = 640;     //in pixels
-    private static final int IMAGE_HEIGHT = 480;    //in pixels
-    private static final int FRAME_QUEUE_CAPACITY = 2;
     //
     // Since ImageTarget trackables use mm to specify their dimensions, we must use mm for all the physical
     // dimension. We will define some constants and conversions here.
@@ -69,7 +66,8 @@ public class VuforiaVision
     {
         this.vuforia = vuforia;
         this.blinkin = blinkin;
-        vuforia.configVideoSource(IMAGE_WIDTH, IMAGE_HEIGHT, FRAME_QUEUE_CAPACITY);
+        vuforia.configVideoSource(
+            RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT, RobotParams.FRAME_QUEUE_CAPACITY);
         /*
          * Create a transformation matrix describing where the camera is on the robot.
          *

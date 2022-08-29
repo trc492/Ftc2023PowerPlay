@@ -153,15 +153,25 @@ public class RobotParams
     static final double PPD_FOLLOWING_DISTANCE                  = 6.0;
     static final double PPD_POS_TOLERANCE                       = 2.0;
     static final double PPD_TURN_TOLERANCE                      = 1.0;
+    //
+    // Vision subsystem.
+    //
+    static final String TRACKABLE_IMAGES_FILE                   = "FreightFrenzy";
+    static final double CAMERA_FRONT_OFFSET                     = 7.5;  //Camera offset from front of robot in inches
+    static final double CAMERA_HEIGHT_OFFSET                    = 16.0; //Camera offset from floor in inches
+    static final double CAMERA_LEFT_OFFSET                      = 6.0;  //Camera offset from left of robot in inches
+    static final int CAMERA_IMAGE_WIDTH                         = 320;
+    static final int CAMERA_IMAGE_HEIGHT                        = 240;
+    static final int FRAME_QUEUE_CAPACITY                       = 2;
 
     static final double HOMOGRAPHY_CAMERA_TOPLEFT_X             = 0.0;
     static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y             = 0.0;
-    static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X            = 639.0;
+    static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X            = CAMERA_IMAGE_WIDTH - 1;
     static final double HOMOGRAPHY_CAMERA_TOPRIGHT_Y            = 0.0;
     static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_X          = 0.0;
-    static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y          = 479.0;
-    static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X         = 639.0;
-    static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y         = 479.0;
+    static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y          = CAMERA_IMAGE_HEIGHT - 1;
+    static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X         = CAMERA_IMAGE_WIDTH - 1;
+    static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y         = CAMERA_IMAGE_HEIGHT - 1;
 
     // These should be in real-world robot coordinates. Needs calibration after camera is actually mounted in position.
     // Measurement unit: inches
@@ -184,14 +194,5 @@ public class RobotParams
         RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_X, RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_Y,
         RobotParams.HOMOGRAPHY_WORLD_BOTTOMLEFT_X, RobotParams.HOMOGRAPHY_WORLD_BOTTOMLEFT_Y,
         RobotParams.HOMOGRAPHY_WORLD_BOTTOMRIGHT_X, RobotParams.HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y);
-    //
-    // Vision subsystem.
-    //
-    static final String TRACKABLE_IMAGES_FILE                   = "FreightFrenzy";
-    static final double CAMERA_FRONT_OFFSET                     = 7.5;  //Camera offset from front of robot in inches
-    static final double CAMERA_HEIGHT_OFFSET                    = 16.0; //Camera offset from floor in inches
-    static final double CAMERA_LEFT_OFFSET                      = 6.0;  //Camera offset from left of robot in inches
-    static final int IMAGE_WIDTH                                = 320;
-    static final int IMAGE_HEIGHT                               = 240;
 
 }   //class RobotParams

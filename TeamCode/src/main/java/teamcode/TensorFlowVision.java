@@ -63,7 +63,7 @@ public class TensorFlowVision
                 new TFObjectDetector.Parameters() : new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParams.minResultConfidence = TFOD_MIN_CONFIDENCE;
         tfodParams.isModelTensorFlow2 = true;
-        tfodParams.inputSize = 320;
+        tfodParams.inputSize = RobotParams.CAMERA_IMAGE_WIDTH;
 
         this.tracer = tracer;
         tensorFlow = new FtcTensorFlow(

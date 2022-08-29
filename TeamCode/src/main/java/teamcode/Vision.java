@@ -74,7 +74,7 @@ public class Vision
                 OpenCvCameraFactory.getInstance().createWebcam(
                     opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM), cameraViewId);
             eocvVision = new EocvVision(
-                "EocvVision", RobotParams.IMAGE_WIDTH, RobotParams.IMAGE_HEIGHT,
+                "EocvVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
                 RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
                 RobotParams.Preferences.showEasyOpenCvView, null);
         }
