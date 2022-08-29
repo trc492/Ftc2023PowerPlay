@@ -161,8 +161,9 @@ public class RobotDrive
         pidDrive.setBeep(robot.androidTone);
 
         purePursuitDrive = new TrcPurePursuitDrive(
-            "purePursuitDrive", driveBase, RobotParams.PPD_FOLLOWING_DISTANCE, RobotParams.PPD_POS_TOLERANCE,
-            RobotParams.PPD_TURN_TOLERANCE, xPosPidCoeff, yPosPidCoeff, turnPidCoeff, velPidCoeff);
+            "purePursuitDrive", driveBase,
+            RobotParams.PPD_FOLLOWING_DISTANCE, RobotParams.PPD_POS_TOLERANCE, RobotParams.PPD_TURN_TOLERANCE,
+            xPosPidCoeff, yPosPidCoeff, turnPidCoeff, velPidCoeff);
         purePursuitDrive.setStallDetectionEnabled(true);
         pidDrive.setBeep(robot.androidTone);
     }   //RobotDrive

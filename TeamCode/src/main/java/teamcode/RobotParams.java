@@ -28,8 +28,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import TrcCommonLib.trclib.TrcHomographyMapper;
 
+/**
+ * This class contains robot and subsystem constants and parameters.
+ */
 public class RobotParams
 {
+    /**
+     * This class contains robot preferences. It controls enabling/disabling of various robot features.
+     */
     public static class Preferences
     {
         static boolean noRobot = false;
@@ -41,7 +47,7 @@ public class RobotParams
         static boolean useTensorFlow = false;
         static boolean showTensorFlowView = false;
         static boolean useEasyOpenCV = false;
-        static boolean showEocvView = false;
+        static boolean showEasyOpenCvView = false;
         static boolean useTraceLog = true;
         static boolean useBatteryMonitor = false;
         static boolean useLoopPerformanceMonitor = true;

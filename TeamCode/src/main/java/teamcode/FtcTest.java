@@ -36,7 +36,6 @@ import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
-import TrcCommonLib.trclib.TrcTone;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
@@ -317,8 +316,7 @@ public class FtcTest extends FtcTeleOp
             testCommand.cancel();
         }
 
-        if (robot.vision != null &&
-            (testChoices.test == Test.SENSORS_TEST || testChoices.test == Test.SUBSYSTEMS_TEST))
+        if (robot.vision != null)
         {
             //
             // Vision generally will impact performance, so we only enable it if it's needed.
@@ -576,6 +574,18 @@ public class FtcTest extends FtcTeleOp
             robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed ? "Pressed" : "Released");
             switch (button)
             {
+                case FtcGamepad.GAMEPAD_A:
+                    break;
+
+                case FtcGamepad.GAMEPAD_B:
+                    break;
+
+                case FtcGamepad.GAMEPAD_X:
+                    break;
+
+                case FtcGamepad.GAMEPAD_Y:
+                    break;
+
                 case FtcGamepad.GAMEPAD_DPAD_UP:
                     break;
 
@@ -843,19 +853,17 @@ public class FtcTest extends FtcTeleOp
 
                 if (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null)
                 {
-//                    TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedDucksInfo();
-//
-//                    if (targetsInfo != null)
-//                    {
-//                        numTargets = Math.min(targetsInfo.length, maxNumLines);
-//                        for (int i = 0; i < numTargets; i++)
-//                        {
-//                            robot.dashboard.displayPrintf(
-//                                lineIndex, "[%d] %s (pos=%d)",
-//                                i, targetsInfo[i], robot.vision.determineDuckPosition(targetsInfo[i]));
-//                            lineIndex++;
-//                        }
-//                    }
+                    TrcVisionTargetInfo<?>[] targetsInfo = null;    //TODO: Call vision to detect targets.
+
+                    if (targetsInfo != null)
+                    {
+                        numTargets = Math.min(targetsInfo.length, maxNumLines);
+                        for (int i = 0; i < numTargets; i++)
+                        {
+                            robot.dashboard.displayPrintf(lineIndex, "[%d] %s", i, targetsInfo[i]);
+                            lineIndex++;
+                        }
+                    }
                 }
 
                 while (lineIndex < endLine)

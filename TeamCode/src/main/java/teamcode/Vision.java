@@ -76,7 +76,7 @@ public class Vision
             eocvVision = new EocvVision(
                 "EocvVision", RobotParams.IMAGE_WIDTH, RobotParams.IMAGE_HEIGHT,
                 RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
-                RobotParams.Preferences.showEocvView, null);
+                RobotParams.Preferences.showEasyOpenCvView, null);
         }
         else
         {
