@@ -115,22 +115,25 @@ public class RobotParams
     //
     static final double DRIVE_MOTOR_MAX_VELOCITY_PPS            = GOBILDA_5203_312_MAX_VELOCITY_PPS;
 
-    static final double ENCODER_X_KP                            = 0.095;
-    static final double ENCODER_X_KI                            = 0.0;
-    static final double ENCODER_X_KD                            = 0.0;
-    static final double ENCODER_X_TOLERANCE                     = 1.0;
-    static final double ENCODER_X_INCHES_PER_COUNT              = 0.01924724265461924299065420560748;
+    static final double MECANUM_X_KP                            = 0.095;
+    static final double MECANUM_X_KI                            = 0.0;
+    static final double MECANUM_X_KD                            = 0.0;
+    static final double MECANUM_X_KF                            = 0.0;
+    static final double MECANUM_X_TOLERANCE                     = 1.0;
+    static final double MECANUM_X_INCHES_PER_COUNT              = 0.01924724265461924299065420560748;
 
-    static final double ENCODER_Y_KP                            = 0.04;
-    static final double ENCODER_Y_KI                            = 0.0;
-    static final double ENCODER_Y_KD                            = 0.005;
-    static final double ENCODER_Y_TOLERANCE                     = 1.0;
-    static final double ENCODER_Y_INCHES_PER_COUNT              = 0.02166184604662450653409090909091;
+    static final double MECANUM_Y_KP                            = 0.04;
+    static final double MECANUM_Y_KI                            = 0.0;
+    static final double MECANUM_Y_KD                            = 0.005;
+    static final double MECANUM_Y_KF                            = 0.0;
+    static final double MECANUM_Y_TOLERANCE                     = 1.0;
+    static final double MECANUM_Y_INCHES_PER_COUNT              = 0.02166184604662450653409090909091;
 
-    static final double GYRO_KP                                 = 0.013;
-    static final double GYRO_KI                                 = 0.0;
-    static final double GYRO_KD                                 = 0.0;
-    static final double GYRO_TOLERANCE                          = 1.0;
+    static final double GYRO_TURN_KP                            = 0.013;
+    static final double GYRO_TURN_KI                            = 0.0;
+    static final double GYRO_TURN_KD                            = 0.0;
+    static final double GYRO_TURN_KF                            = 0.0;
+    static final double GYRO_TURN_TOLERANCE                     = 1.0;
 
     static final double ODWHEEL_X_INCHES_PER_COUNT              = 7.6150160901199168116026724971383e-4;
     static final double ODWHEEL_Y_INCHES_PER_COUNT              = 7.6301149255006038191364659148717e-4;

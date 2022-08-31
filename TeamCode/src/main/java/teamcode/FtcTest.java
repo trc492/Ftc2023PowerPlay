@@ -150,8 +150,8 @@ public class FtcTest extends FtcTeleOp
                 if (!RobotParams.Preferences.noRobot)
                 {
                     testCommand = new CmdDriveMotorsTest(
-                        new FtcDcMotor[] {robot.robotDrive.leftFrontWheel, robot.robotDrive.rightFrontWheel,
-                                          robot.robotDrive.leftBackWheel, robot.robotDrive.rightBackWheel},
+                        new FtcDcMotor[] {robot.robotDrive.lfDriveMotor, robot.robotDrive.rfDriveMotor,
+                                          robot.robotDrive.lbDriveMotor, robot.robotDrive.rbDriveMotor},
                         5.0, 0.5);
                 }
                 break;
@@ -406,8 +406,8 @@ public class FtcTest extends FtcTeleOp
                         robot.robotDrive.driveBase.getHeading());
                     robot.dashboard.displayPrintf(
                         10, "raw=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
-                        robot.robotDrive.leftFrontWheel.getPosition(), robot.robotDrive.rightFrontWheel.getPosition(),
-                        robot.robotDrive.leftBackWheel.getPosition(), robot.robotDrive.rightBackWheel.getPosition());
+                        robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
+                        robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
                 }
                 break;
 
@@ -428,8 +428,8 @@ public class FtcTest extends FtcTeleOp
                         8, "xPos=%.1f,yPos=%.1f,heading=%.1f,raw=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
                         robot.robotDrive.driveBase.getXPosition(), robot.robotDrive.driveBase.getYPosition(),
                         robot.robotDrive.driveBase.getHeading(),
-                        robot.robotDrive.leftFrontWheel.getPosition(), robot.robotDrive.rightFrontWheel.getPosition(),
-                        robot.robotDrive.leftBackWheel.getPosition(), robot.robotDrive.rightBackWheel.getPosition());
+                        robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
+                        robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
                     if (robot.robotDrive.encoderXPidCtrl != null)
                     {
                         robot.robotDrive.encoderXPidCtrl.displayPidInfo(9);
@@ -438,9 +438,9 @@ public class FtcTest extends FtcTeleOp
                     {
                         robot.robotDrive.encoderYPidCtrl.displayPidInfo(11);
                     }
-                    if (robot.robotDrive.gyroPidCtrl != null)
+                    if (robot.robotDrive.gyroTurnPidCtrl != null)
                     {
-                        robot.robotDrive.gyroPidCtrl.displayPidInfo(13);
+                        robot.robotDrive.gyroTurnPidCtrl.displayPidInfo(13);
                     }
                 }
                 break;
@@ -449,11 +449,11 @@ public class FtcTest extends FtcTeleOp
                 if (!RobotParams.Preferences.noRobot)
                 {
                     robot.dashboard.displayPrintf(
-                        8, "xPos=%.1f,yPos=%.1f,heading=%.1f,rawEnc=lf:%.0f,rf:%.0f,rb:%.0f",
+                        8, "xPos=%.1f,yPos=%.1f,heading=%.1f,rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
                         robot.robotDrive.driveBase.getXPosition(), robot.robotDrive.driveBase.getYPosition(),
                         robot.robotDrive.driveBase.getHeading(),
-                        robot.robotDrive.leftFrontWheel.getPosition(), robot.robotDrive.rightFrontWheel.getPosition(),
-                        robot.robotDrive.rightBackWheel.getPosition());
+                        robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
+                        robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
                 }
                 break;
         }
@@ -728,7 +728,7 @@ public class FtcTest extends FtcTeleOp
                 break;
 
             case TUNE_TURN_PID:
-                pidCtrl = robot.robotDrive.gyroPidCtrl;
+                pidCtrl = robot.robotDrive.gyroTurnPidCtrl;
                 break;
 
             default:
@@ -825,8 +825,8 @@ public class FtcTest extends FtcTeleOp
         {
             robot.dashboard.displayPrintf(
                 8, "Enc: lf=%.0f,rf=%.0f,lb=%.0f,rb=%.0f",
-                robot.robotDrive.leftFrontWheel.getPosition(), robot.robotDrive.rightFrontWheel.getPosition(),
-                robot.robotDrive.leftBackWheel.getPosition(), robot.robotDrive.rightBackWheel.getPosition());
+                robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
+                robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
         }
 
         if (robot.robotDrive.gyro != null)

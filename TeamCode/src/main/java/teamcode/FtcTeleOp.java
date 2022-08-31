@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
+import TrcCommonLib.trclib.TrcUtil;
 import TrcFtcLib.ftclib.FtcGamepad;
 import TrcFtcLib.ftclib.FtcOpMode;
 
@@ -35,11 +36,28 @@ import TrcFtcLib.ftclib.FtcOpMode;
 @TeleOp(name="FtcTeleOp", group="FtcTeleOp")
 public class FtcTeleOp extends FtcOpMode
 {
+    public enum DriveOrientation
+    {
+        ROBOT(0), FIELD(1), INVERTED(2);
+
+        int value;
+
+        DriveOrientation(int val)
+        {
+            this.value = val;
+        }
+
+        void increment()
+        {
+            value = (value + 1) % 3;
+        }
+    }   //enum DriveOrientation
+
     protected Robot robot;
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
-    private boolean invertedDrive = false;
     private double drivePowerScale = 1.0;
+    private DriveOrientation driveOrientation = DriveOrientation.FIELD;
 
     //
     // Implements FtcOpMode abstract method.
@@ -119,40 +137,15 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (robot.robotDrive != null)
         {
-            switch (RobotParams.ROBOT_DRIVE_MODE)
+            double[] inputs = getDriveInputs();
+
+            if (robot.robotDrive.driveBase.supportsHolonomicDrive())
             {
-                case TANK_MODE:
-                {
-                    double leftPower = driverGamepad.getLeftStickY(true)*drivePowerScale;
-                    double rightPower = driverGamepad.getRightStickY(true)*drivePowerScale;
-                    robot.robotDrive.driveBase.tankDrive(leftPower, rightPower, invertedDrive);
-                    robot.dashboard.displayPrintf(1, "Tank:left=%.1f,right=%.1f,inv=%s",
-                                                  leftPower, rightPower, invertedDrive);
-                    break;
-                }
-
-                case HOLONOMIC_MODE:
-                {
-                    double x = driverGamepad.getLeftStickX(true)*drivePowerScale;
-                    double y = driverGamepad.getRightStickY(true)*drivePowerScale;
-                    double rot = (driverGamepad.getRightTrigger(true) - driverGamepad.getLeftTrigger(true))*
-                                 drivePowerScale;
-                    robot.robotDrive.driveBase.holonomicDrive(x, y, rot, invertedDrive);
-                    robot.dashboard.displayPrintf(1, "Holonomic:x=%.1f,y=%.1f,rot=%.1f,inv=%s",
-                                                  x, y, rot, invertedDrive);
-                    break;
-                }
-
-                case ARCADE_MODE:
-                {
-                    double x = driverGamepad.getRightStickX(true)*drivePowerScale;
-                    double y = driverGamepad.getRightStickY(true)*drivePowerScale;
-                    double rot = driverGamepad.getLeftStickX(true)*drivePowerScale;
-                    robot.robotDrive.driveBase.holonomicDrive(x, y, rot, invertedDrive);
-                    robot.dashboard.displayPrintf(1, "Arcade:x=%.1f,y=%.1f,rot=%.1f,inv=%s",
-                                                  x, y, rot, invertedDrive);
-                    break;
-                }
+                robot.robotDrive.driveBase.holonomicDrive(null, inputs[0], inputs[1], inputs[2], getDriveGyroAngle());
+            }
+            else
+            {
+                robot.robotDrive.driveBase.arcadeDrive(inputs[1], inputs[2]);
             }
 
             robot.dashboard.displayPrintf(2, "Pose:%s", robot.robotDrive.driveBase.getFieldPosition());
@@ -162,6 +155,85 @@ public class FtcTeleOp extends FtcOpMode
         //
 
     }   //slowPeriodic
+
+    /**
+     * This method reads various joystick/gamepad control values and returns the drive powers for all three degrees
+     * of robot movement.
+     *
+     * @return an array of 3 values for x, y and rotation power.
+     */
+    public double[] getDriveInputs()
+    {
+        double x = 0.0, y = 0.0, rot = 0.0;
+        double mag;
+        double newMag;
+
+        switch (RobotParams.ROBOT_DRIVE_MODE)
+        {
+            case HOLONOMIC_MODE:
+                x = driverGamepad.getLeftStickX(false);
+                y = driverGamepad.getRightStickY(false);
+                rot = (driverGamepad.getRightTrigger(true) - driverGamepad.getLeftTrigger(true));
+                robot.dashboard.displayPrintf(1, "Holonomic:x=%.1f,y=%.1f,rot=%.1f", x, y, rot);
+                break;
+
+            case ARCADE_MODE:
+                x = driverGamepad.getRightStickX(false);
+                y = driverGamepad.getRightStickY(false);
+                rot = driverGamepad.getLeftStickX(true);
+                robot.dashboard.displayPrintf(1, "Arcade:x=%.1f,y=%.1f,rot=%.1f", x, y, rot);
+                break;
+
+            case TANK_MODE:
+                double leftPower = driverGamepad.getLeftStickY(false);
+                double rightPower = driverGamepad.getRightStickY(false);
+                x = 0.0;
+                y = (leftPower + rightPower)/2.0;
+                rot = (leftPower - rightPower)/2.0;
+                robot.dashboard.displayPrintf(1, "Tank:left=%.1f,right=%.1f", leftPower, rightPower);
+                break;
+        }
+        mag = TrcUtil.magnitude(x, y);
+        if (mag > 1.0)
+        {
+            x /= mag;
+            y /= mag;
+            mag = 1.0;
+        }
+        newMag = Math.pow(mag, 3);
+
+        newMag *= drivePowerScale;
+        rot *= drivePowerScale;
+
+        if (mag != 0.0)
+        {
+            x *= newMag / mag;
+            y *= newMag / mag;
+        }
+
+        return new double[] { x, y, rot };
+    }   //getDriveInput
+
+    /**
+     * This method returns robot heading to be maintained in teleop drive according to drive orientation mode.
+     *
+     * @return robot heading to be maintained.
+     */
+    private double getDriveGyroAngle()
+    {
+        switch (driveOrientation)
+        {
+            case ROBOT:
+                return 0.0;
+
+            case INVERTED:
+                return 180.0;
+
+            default:
+            case FIELD:
+                return robot.robotDrive.driveBase.getHeading();
+        }
+    }   //getDriveGyroAngle
 
     //
     // Implements TrcGameController.ButtonHandler interface.
@@ -196,8 +268,7 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_LBUMPER:
                 if (pressed)
                 {
-                    // Toggle inverted drive.
-                    invertedDrive = !invertedDrive;
+                    driveOrientation.increment();
                 }
                 break;
 
@@ -210,6 +281,15 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
+                break;
+
+            case FtcGamepad.GAMEPAD_DPAD_LEFT:
+                break;
+
+            case FtcGamepad.GAMEPAD_DPAD_RIGHT:
+                break;
+
+            case FtcGamepad.GAMEPAD_BACK:
                 break;
         }
     }   //driverButtonEvent
