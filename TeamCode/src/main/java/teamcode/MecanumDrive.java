@@ -46,10 +46,10 @@ public class MecanumDrive extends RobotDrive
     {
         super(robot);
 
-        lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LEFT_FRONT_WHEEL, RobotParams.LEFT_WHEEL_INVERTED);
-        lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LEFT_BACK_WHEEL, RobotParams.LEFT_WHEEL_INVERTED);
-        rfDriveMotor = createDriveMotor(RobotParams.HWNAME_RIGHT_FRONT_WHEEL, RobotParams.RIGHT_WHEEL_INVERTED);
-        rbDriveMotor = createDriveMotor(RobotParams.HWNAME_RIGHT_BACK_WHEEL, RobotParams.RIGHT_WHEEL_INVERTED);
+        lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, RobotParams.LEFT_WHEEL_INVERTED);
+        lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, RobotParams.LEFT_WHEEL_INVERTED);
+        rfDriveMotor = createDriveMotor(RobotParams.HWNAME_RFDRIVE_MOTOR, RobotParams.RIGHT_WHEEL_INVERTED);
+        rbDriveMotor = createDriveMotor(RobotParams.HWNAME_RBDRIVE_MOTOR, RobotParams.RIGHT_WHEEL_INVERTED);
 
         driveBase = new TrcMecanumDriveBase(lfDriveMotor, lbDriveMotor, rfDriveMotor, rbDriveMotor, gyro);
 
@@ -94,7 +94,6 @@ public class MecanumDrive extends RobotDrive
             "encoderYPidCtrl", yPosPidCoeff, RobotParams.MECANUM_Y_TOLERANCE, driveBase::getYPosition);
         gyroTurnPidCtrl = new TrcPidController(
             "gyroPidCtrl", turnPidCoeff, RobotParams.GYRO_TURN_TOLERANCE, driveBase::getHeading);
-
         gyroTurnPidCtrl.setAbsoluteSetPoint(true);
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.
         // If the robot turns too fast, PID will cause oscillation. By limiting turn power, the robot turns slower.
@@ -111,6 +110,7 @@ public class MecanumDrive extends RobotDrive
             "purePursuitDrive", driveBase, RobotParams.PPD_FOLLOWING_DISTANCE, RobotParams.PPD_POS_TOLERANCE,
             RobotParams.PPD_TURN_TOLERANCE, xPosPidCoeff, yPosPidCoeff, turnPidCoeff, velPidCoeff);
         purePursuitDrive.setStallDetectionEnabled(true);
+        purePursuitDrive.setFastModeEnabled(true);
         purePursuitDrive.setMsgTracer(robot.globalTracer, true, true);
     }   //MecanumDrive
 
