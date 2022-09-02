@@ -22,8 +22,6 @@
 
 package teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcUtil;
@@ -33,7 +31,6 @@ import TrcFtcLib.ftclib.FtcOpMode;
 /**
  * This class contains the TeleOp Mode program.
  */
-@TeleOp(name="FtcTeleOp", group="FtcTeleOp")
 public class FtcTeleOp extends FtcOpMode
 {
     public enum DriveOrientation
@@ -57,7 +54,7 @@ public class FtcTeleOp extends FtcOpMode
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
     private double drivePowerScale = 1.0;
-    private DriveOrientation driveOrientation = DriveOrientation.FIELD;
+    private final DriveOrientation driveOrientation = DriveOrientation.FIELD;
 
     //
     // Implements FtcOpMode abstract method.
@@ -70,10 +67,6 @@ public class FtcTeleOp extends FtcOpMode
     @Override
     public void initRobot()
     {
-        //
-        // Create and initialize robot object.
-        //
-        robot = new Robot(TrcRobot.getRunMode());
         //
         // Create and initialize Gamepads.
         //
@@ -150,10 +143,6 @@ public class FtcTeleOp extends FtcOpMode
 
             robot.dashboard.displayPrintf(2, "Pose:%s", robot.robotDrive.driveBase.getFieldPosition());
         }
-        //
-        // Other subsystems.
-        //
-
     }   //slowPeriodic
 
     /**
@@ -168,7 +157,7 @@ public class FtcTeleOp extends FtcOpMode
         double mag;
         double newMag;
 
-        switch (RobotParams.ROBOT_DRIVE_MODE)
+        switch (RobotParams.robotDriveMode)
         {
             case HOLONOMIC_MODE:
                 x = driverGamepad.getLeftStickX(false);
@@ -274,7 +263,7 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_RBUMPER:
                 // Press and hold for slow drive.
-                drivePowerScale = pressed? RobotParams.SLOW_DRIVE_POWER_SCALE: 1.0;
+                drivePowerScale = pressed? RobotParams.slowDrivePowerScale: 1.0;
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:

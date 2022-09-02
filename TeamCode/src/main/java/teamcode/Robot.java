@@ -43,7 +43,6 @@ public class Robot
     //
     // Global objects.
     //
-    private static final String ROBOT_NAME = "Robot2023";
     public FtcOpMode opMode;
     public FtcDashboard dashboard;
     public TrcDbgTrace globalTracer;
@@ -60,7 +59,7 @@ public class Robot
     //
     // Subsystems.
     //
-    public RobotDrive robotDrive = null;
+    public RobotDrive robotDrive;
 
     /**
      * Constructor: Create an instance of the object.
@@ -119,19 +118,7 @@ public class Robot
             }
 
             androidTone = new FtcAndroidTone("androidTone");
-            //
-            // Create and initialize RobotDrive.
-            //
-            robotDrive = new MecanumDrive(this);
-            //
-            // Create and initialize other subsystems.
-            //
-            if (RobotParams.Preferences.initSubsystems)
-            {
-            }
         }
-
-        speak("Init complete");
     }   //Robot
 
     /**
@@ -142,7 +129,7 @@ public class Robot
     @Override
     public String toString()
     {
-        return ROBOT_NAME;
+        return RobotParams.robotName;
     }   //toString
 
     /**
@@ -153,8 +140,6 @@ public class Robot
      */
     public void startMode(TrcRobot.RunMode runMode)
     {
-        final String funcName = "startMode";
-
         if (robotDrive != null)
         {
             //

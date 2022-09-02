@@ -22,8 +22,6 @@
 
 package teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import java.util.Locale;
 
 import TrcCommonLib.command.CmdDriveMotorsTest;
@@ -32,7 +30,6 @@ import TrcCommonLib.command.CmdPurePursuitDrive;
 import TrcCommonLib.command.CmdTimedDrive;
 
 import TrcCommonLib.trclib.TrcElapsedTimer;
-import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
@@ -40,7 +37,6 @@ import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
 import TrcFtcLib.ftclib.FtcDcMotor;
-import TrcFtcLib.ftclib.FtcGamepad;
 import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcPidCoeffCache;
 import TrcFtcLib.ftclib.FtcValueMenu;
@@ -48,8 +44,7 @@ import TrcFtcLib.ftclib.FtcValueMenu;
 /**
  * This class contains the Test Mode program.
  */
-@TeleOp(name="FtcTest", group="FtcTest")
-public class FtcTest extends FtcTeleOp
+public class FtcTest
 {
     private static final boolean logEvents = true;
     private static final boolean debugPid = true;
@@ -106,8 +101,9 @@ public class FtcTest extends FtcTeleOp
 
     }   //class TestChoices
 
+    private Robot robot;
     private final FtcPidCoeffCache pidCoeffCache =
-        new FtcPidCoeffCache("PIDTuning", RobotParams.LOG_PATH_FOLDER);
+        new FtcPidCoeffCache("PIDTuning", RobotParams.logPathFolder);
     private final TestChoices testChoices = new TestChoices();
     private TrcElapsedTimer elapsedTimer = null;
     private FtcChoiceMenu<Test> testMenu = null;
@@ -118,21 +114,13 @@ public class FtcTest extends FtcTeleOp
     private double prevTime = 0.0;
     private double prevVelocity = 0.0;
 
-    //
-    // Overrides FtcOpMode abstract method.
-    //
-
     /**
      * This method is called to initialize the robot. In FTC, this is called when the "Init" button on the Driver
      * Station is pressed.
      */
-    @Override
-    public void initRobot()
+    public void init(Robot robot)
     {
-        //
-        // TeleOp initialization.
-        //
-        super.initRobot();
+        this.robot = robot;
         if (RobotParams.Preferences.useLoopPerformanceMonitor)
         {
             elapsedTimer = new TrcElapsedTimer("TestLoopMonitor", 2.0);
@@ -214,8 +202,8 @@ public class FtcTest extends FtcTeleOp
                 if (!RobotParams.Preferences.noRobot)
                 {
                     testCommand = new CmdPurePursuitDrive(
-                        robot.robotDrive.driveBase, robot.robotDrive.xPosPidCoeff, robot.robotDrive.yPosPidCoeff,
-                        robot.robotDrive.turnPidCoeff, robot.robotDrive.velPidCoeff);
+                        robot.robotDrive.driveBase, RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff,
+                        RobotParams.turnPidCoeff, RobotParams.velPidCoeff);
                 }
                 break;
         }
@@ -228,7 +216,7 @@ public class FtcTest extends FtcTeleOp
             robot.globalTracer.traceInfo("TestInit", "Shutting down TensorFlow.");
             robot.vision.tensorFlowShutdown();
         }
-    }   //initRobot
+    }   //init
 
     //
     // Overrides TrcRobot.RobotMode methods.
@@ -241,12 +229,10 @@ public class FtcTest extends FtcTeleOp
      * @param prevMode specifies the previous RunMode it is coming from (always null for FTC).
      * @param nextMode specifies the next RunMode it is going into.
      */
-    @Override
     public void startMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
         final String funcName = "startMode";
 
-        super.startMode(prevMode, nextMode);
         switch (testChoices.test)
         {
             case SENSORS_TEST:
@@ -306,7 +292,6 @@ public class FtcTest extends FtcTeleOp
      * @param prevMode specifies the previous RunMode it is coming from.
      * @param nextMode specifies the next RunMode it is going into (always null for FTC).
      */
-    @Override
     public void stopMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
         final String funcName = "stopMode";
@@ -338,8 +323,6 @@ public class FtcTest extends FtcTeleOp
                 robot.vision.eocvVision.setEnabled(false);
             }
         }
-
-        super.stopMode(prevMode, nextMode);
     }   //stopMode
 
     /**
@@ -349,7 +332,6 @@ public class FtcTest extends FtcTeleOp
      *
      * @param elapsedTime specifies the elapsed time since the mode started.
      */
-    @Override
     public void fastPeriodic(double elapsedTime)
     {
         //
@@ -475,17 +457,8 @@ public class FtcTest extends FtcTeleOp
      *
      * @param elapsedTime specifies the elapsed time since the mode started.
      */
-    @Override
     public void slowPeriodic(double elapsedTime)
     {
-        if (allowTeleOp())
-        {
-            //
-            // Allow TeleOp to run so we can control the robot in subsystem test or drive speed test modes.
-            //
-            super.slowPeriodic(elapsedTime);
-        }
-
         switch (testChoices.test)
         {
             case SENSORS_TEST:
@@ -495,118 +468,6 @@ public class FtcTest extends FtcTeleOp
                 break;
         }
     }   //slowPeriodic
-
-    //
-    // Overrides TrcGameController.ButtonHandler in TeleOp.
-    //
-
-    /**
-     * This method is called when a driver gamepad button event occurs.
-     *
-     * @param gamepad specifies the game controller object that generated the event.
-     * @param button specifies the button ID that generates the event
-     * @param pressed specifies true if the button is pressed, false otherwise.
-     */
-    @Override
-    public void driverButtonEvent(TrcGameController gamepad, int button, boolean pressed)
-    {
-        if (allowTeleOp())
-        {
-            boolean processed = false;
-            //
-            // In addition to or instead of the gamepad controls handled by FtcTeleOp, we can add to or override the
-            // FtcTeleOp gamepad actions.
-            //
-            robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed ? "Pressed" : "Released");
-            switch (button)
-            {
-                case FtcGamepad.GAMEPAD_A:
-                    break;
-
-                case FtcGamepad.GAMEPAD_B:
-                    break;
-
-                case FtcGamepad.GAMEPAD_X:
-                    break;
-
-                case FtcGamepad.GAMEPAD_Y:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_UP:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                    break;
-            }
-            //
-            // If the control was not processed by this method, pass it back to TeleOp.
-            //
-            if (!processed)
-            {
-                super.driverButtonEvent(gamepad, button, pressed);
-            }
-        }
-    }   //driverButtonEvent
-
-    /**
-     * This method is called when an operator gamepad button event occurs.
-     *
-     * @param gamepad specifies the game controller object that generated the event.
-     * @param button specifies the button ID that generates the event
-     * @param pressed specifies true if the button is pressed, false otherwise.
-     */
-    @Override
-    public void operatorButtonEvent(TrcGameController gamepad, int button, boolean pressed)
-    {
-        if (allowTeleOp())
-        {
-            boolean processed = false;
-            //
-            // In addition to or instead of the gamepad controls handled by FtcTeleOp, we can add to or override the
-            // FtcTeleOp gamepad actions.
-            //
-            robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed ? "Pressed" : "Released");
-            switch (button)
-            {
-                case FtcGamepad.GAMEPAD_A:
-                    break;
-
-                case FtcGamepad.GAMEPAD_B:
-                    break;
-
-                case FtcGamepad.GAMEPAD_X:
-                    break;
-
-                case FtcGamepad.GAMEPAD_Y:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_UP:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                    break;
-
-                case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                    break;
-            }
-            //
-            // If the control was not processed by this method, pass it back to TeleOp.
-            //
-            if (!processed)
-            {
-                super.operatorButtonEvent(gamepad, button, pressed);
-            }
-        }
-    }   //operatorButtonEvent
 
     /**
      * This method creates and displays the test menus and record the selected choices.
@@ -887,7 +748,7 @@ public class FtcTest extends FtcTeleOp
      *
      * @return true to allow and false otherwise.
      */
-    private boolean allowTeleOp()
+    public boolean allowTeleOp()
     {
         return !RobotParams.Preferences.noRobot &&
                (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST);

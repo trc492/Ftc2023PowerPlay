@@ -38,6 +38,13 @@ import TrcFtcLib.ftclib.FtcDcMotor;
  */
 public class RobotDrive
 {
+    public enum DriveMode
+    {
+        TANK_MODE,
+        HOLONOMIC_MODE,
+        ARCADE_MODE
+    }   //enum DriveMode
+
     //
     // Global objects.
     //
@@ -59,7 +66,6 @@ public class RobotDrive
     //
     // PID Coefficients and Controllers.
     //
-    public TrcPidController.PidCoefficients xPosPidCoeff, yPosPidCoeff, turnPidCoeff, velPidCoeff;
     public TrcPidController encoderXPidCtrl, encoderYPidCtrl, gyroTurnPidCtrl;
     //
     // Drive Controllers.
@@ -106,8 +112,8 @@ public class RobotDrive
     {
         FtcDcMotor driveMotor = new FtcDcMotor(name);
 
-        driveMotor.motor.setMode(RobotParams.DRIVE_MOTOR_MODE);
-        driveMotor.setBrakeModeEnabled(RobotParams.DRIVE_WHEEL_BRAKE_MODE);
+        driveMotor.motor.setMode(RobotParams.driveMotorMode);
+        driveMotor.setBrakeModeEnabled(RobotParams.driveWheelBrakeModeOn);
         driveMotor.setInverted(inverted);
 
         if (RobotParams.Preferences.useVelocityControl)

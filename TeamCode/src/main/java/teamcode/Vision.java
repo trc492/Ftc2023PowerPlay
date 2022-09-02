@@ -28,7 +28,6 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcOpenCVDetector;
 import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
@@ -47,7 +46,6 @@ public class Vision
     private final TrcRevBlinkin.Pattern[] ledPatternPriorities = {};
 
     private final Robot robot;
-    private final TrcDbgTrace tracer;
     public VuforiaVision vuforiaVision;
     public TensorFlowVision tensorFlowVision;
     public EocvVision eocvVision;
@@ -66,7 +64,6 @@ public class Vision
                 "cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
 
         this.robot = robot;
-        this.tracer = TrcDbgTrace.getGlobalTracer();
 
         if (RobotParams.Preferences.useEasyOpenCV)
         {

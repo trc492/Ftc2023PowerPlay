@@ -88,11 +88,11 @@ public class VuforiaVision
          * Finally the camera can be translated to its actual mounting position on the robot.
          */
         final float CAMERA_FORWARD_DISPLACEMENT =
-            (float)((RobotParams.ROBOT_LENGTH/2.0 - RobotParams.CAMERA_FRONT_OFFSET)*TrcUtil.MM_PER_INCH);
+            (float)((RobotParams.robotLength/2.0 - RobotParams.cameraFrontOffset)*TrcUtil.MM_PER_INCH);
         final float CAMERA_VERTICAL_DISPLACEMENT =
-            (float)(RobotParams.CAMERA_HEIGHT_OFFSET*TrcUtil.MM_PER_INCH);
+            (float)(RobotParams.cameraHeightOffset*TrcUtil.MM_PER_INCH);
         final float CAMERA_LEFT_DISPLACEMENT =
-            (float)((RobotParams.ROBOT_WIDTH/2.0 - RobotParams.CAMERA_LEFT_OFFSET)*TrcUtil.MM_PER_INCH);
+            (float)((RobotParams.robotWidth/2.0 - RobotParams.cameraLeftOffset)*TrcUtil.MM_PER_INCH);
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
             .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
             .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, 90, 90, 0));

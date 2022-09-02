@@ -22,8 +22,6 @@
 
 package teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
 import TrcCommonLib.command.CmdPidDrive;
 import TrcCommonLib.command.CmdTimedDrive;
 
@@ -37,12 +35,14 @@ import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcValueMenu;
 
-/**
- * This class contains the Autonomous Mode program.
- */
-@Autonomous(name="FtcAutonomous", group="FtcAuto")
 public class FtcAuto extends FtcOpMode
 {
+    public enum Alliance
+    {
+        RED_ALLIANCE,
+        BLUE_ALLIANCE
+    }   //enum Alliance
+
     public enum AutoStrategy
     {
         PID_DRIVE,
@@ -50,25 +50,19 @@ public class FtcAuto extends FtcOpMode
         DO_NOTHING
     }   //enum AutoStrategy
 
-    public enum Alliance
-    {
-        RED_ALLIANCE,
-        BLUE_ALLIANCE
-    }   //enum Alliance
-
     /**
      * This class stores the autonomous menu choices.
      */
     public static class AutoChoices
     {
-        double startDelay = 0.0;
-        Alliance alliance = Alliance.RED_ALLIANCE;
-        AutoStrategy strategy = AutoStrategy.DO_NOTHING;
-        double xTarget = 0.0;
-        double yTarget = 0.0;
-        double turnTarget = 0.0;
-        double driveTime = 0.0;
-        double drivePower = 0.0;
+        public double startDelay = 0.0;
+        public Alliance alliance = Alliance.RED_ALLIANCE;
+        public AutoStrategy strategy = AutoStrategy.DO_NOTHING;
+        public double xTarget = 0.0;
+        public double yTarget = 0.0;
+        public double turnTarget = 0.0;
+        public double driveTime = 0.0;
+        public double drivePower = 0.0;
 
         @Override
         public String toString()
@@ -88,14 +82,11 @@ public class FtcAuto extends FtcOpMode
 
     }   //class AutoChoices
 
-    private static final String moduleName = "FtcAuto";
-    private static final boolean logEvents = true;
-    private static final boolean debugPid = true;
-
-    private Robot robot;
+    protected Robot robot;
+    private String moduleName;
     private FtcMatchInfo matchInfo;
-    private final AutoChoices autoChoices = new AutoChoices();
-    private TrcRobot.RobotCommand autoCommand = null;
+    protected final AutoChoices autoChoices = new AutoChoices();
+    protected TrcRobot.RobotCommand autoCommand;
 
     //
     // Implements FtcOpMode abstract method.
@@ -105,14 +96,13 @@ public class FtcAuto extends FtcOpMode
      * This method is called to initialize the robot. In FTC, this is called when the "Init" button on the Driver
      * Station is pressed.
      */
-    @Override
     public void initRobot()
     {
         final String funcName = "initRobot";
         //
         // Create and initialize robot object.
         //
-        robot = new Robot(TrcRobot.getRunMode());
+        moduleName = RobotParams.robotName + ".auto";
         //
         // Open trace log.
         //
@@ -120,7 +110,7 @@ public class FtcAuto extends FtcOpMode
         {
             matchInfo = FtcMatchInfo.getMatchInfo();
             String filePrefix = String.format(Locale.US, "%s%02d", matchInfo.matchType, matchInfo.matchNumber);
-            robot.globalTracer.openTraceLog(RobotParams.LOG_PATH_FOLDER, filePrefix);
+            robot.globalTracer.openTraceLog(RobotParams.logPathFolder, filePrefix);
         }
         //
         // Create and run choice menus.
@@ -151,13 +141,16 @@ public class FtcAuto extends FtcOpMode
                 break;
 
             case DO_NOTHING:
-            default:
                 autoCommand = null;
+                break;
+
+            default:
                 break;
         }
 
         if (robot.vision != null)
         {
+            // Enabling vision early so we can detect objects before match starts.
             if (robot.vision.vuforiaVision != null)
             {
                 robot.globalTracer.traceInfo(funcName, "Enabling Vuforia.");
@@ -188,6 +181,7 @@ public class FtcAuto extends FtcOpMode
     @Override
     public void initPeriodic()
     {
+        // Add code to detect object before match starts.
     }   //initPeriodic
 
     /**
@@ -222,9 +216,6 @@ public class FtcAuto extends FtcOpMode
         {
             robot.battery.setEnabled(true);
         }
-
-        robot.robotDrive.pidDrive.setMsgTracer(robot.globalTracer, logEvents, debugPid);
-        robot.robotDrive.purePursuitDrive.setMsgTracer(robot.globalTracer, logEvents, debugPid);
     }   //startMode
 
     /**
