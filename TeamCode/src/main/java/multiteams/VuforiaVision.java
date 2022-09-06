@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -115,11 +115,26 @@ public class VuforiaVision
          * Before being transformed, each target image is conceptually located at the origin of the field's
          * coordinate system (the center of the field), facing up.
          */
-
+        OpenGLMatrix image1Location = OpenGLMatrix
+            .translation(-halfField, oneAndHalfTile, mmTargetHeight)
+            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90));
+        OpenGLMatrix image2Location = OpenGLMatrix
+            .translation(halfTile, halfField, mmTargetHeight)
+            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0));
+        OpenGLMatrix image3Location = OpenGLMatrix
+            .translation(-halfField, -oneAndHalfTile, mmTargetHeight)
+            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90));
+        OpenGLMatrix image4Location = OpenGLMatrix
+            .translation(halfTile, -halfField, mmTargetHeight)
+            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180));
         //
         // Create and initialize all image targets.
         //
         FtcVuforia.TargetInfo[] imageTargetsInfo = {
+            new FtcVuforia.TargetInfo(0, Vision.IMAGE1_NAME, false, image1Location),
+            new FtcVuforia.TargetInfo(1, Vision.IMAGE2_NAME, false, image2Location),
+            new FtcVuforia.TargetInfo(2, Vision.IMAGE3_NAME, false, image3Location),
+            new FtcVuforia.TargetInfo(3, Vision.IMAGE4_NAME, false, image4Location)
         };
         vuforia.addTargetList(RobotParams.TRACKABLE_IMAGES_FILE, imageTargetsInfo, cameraLocationOnRobot);
 

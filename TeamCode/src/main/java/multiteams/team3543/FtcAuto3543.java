@@ -20,49 +20,46 @@
  * SOFTWARE.
  */
 
-package teamcode.team3543;
+package multiteams.team3543;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import TrcCommonLib.trclib.TrcRobot;
-import teamcode.Robot;
-import teamcode.RobotParams;
-import teamcode.SwerveDrive;
+import multiteams.FtcAuto;
 
 /**
- * This class creates the robot object that consists of sensors, indicators, drive base and all the subsystems.
+ * This class contains the Autonomous Mode program.
  */
-public class Robot3543 extends Robot
+@Autonomous(name="FtcAuto3543", group="FtcAuto")
+public class FtcAuto3543 extends FtcAuto
 {
-    @SuppressWarnings("unused")
-    RobotParams3543 robotParams = new RobotParams3543();
+    //
+    // Implements FtcOpMode abstract method.
+    //
 
     /**
-     * Constructor: Create an instance of the object.
-     *
-     * @param runMode specifies robot running mode (Auto, TeleOp, Test), can be used to create and initialize mode
-     *                specific sensors and subsystems if necessary.
+     * This method is called to initialize the robot. In FTC, this is called when the "Init" button on the Driver
+     * Station is pressed.
      */
-    public Robot3543(TrcRobot.RunMode runMode)
+    @Override
+    public void initRobot()
     {
-        super(runMode);
         //
-        // If noRobot is true, the robot controller is disconnected from the robot for testing vision.
-        // In this case, we should not instantiate any robot hardware.
+        // Create and initialize team specific robot object.
         //
-        if (!RobotParams.Preferences.noRobot)
+        robot = new Robot3543(TrcRobot.getRunMode());
+        //
+        // Do common init.
+        //
+        super.initRobot();
+        //
+        // Create team specific autonomous command according to chosen strategy.
+        //
+        switch (autoChoices.strategy)
         {
-            //
-            // Create and initialize RobotDrive.
-            //
-            robotDrive = new SwerveDrive(this);
-            //
-            // Create and initialize other subsystems.
-            //
-            if (RobotParams.Preferences.initSubsystems)
-            {
-            }
+            default:
+                break;
         }
+    }   //initRobot
 
-        speak("Init complete");
-    }   //Robot3543
-
-}   //class Robot3543
+}   //class FtcAuto3543

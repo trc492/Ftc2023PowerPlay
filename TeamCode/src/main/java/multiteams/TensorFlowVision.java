@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.opencv.core.Point;
@@ -39,8 +39,8 @@ import TrcFtcLib.ftclib.FtcVuforia;
  */
 public class TensorFlowVision
 {
-    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
-    private static final float TFOD_MIN_CONFIDENCE = 0.2f;
+    private static final String TFOD_MODEL_ASSET = "Targets.tflite";
+    private static final float TFOD_MIN_CONFIDENCE = 0.8f;
 
     private final TrcDbgTrace tracer;
     private FtcTensorFlow tensorFlow;
@@ -68,7 +68,7 @@ public class TensorFlowVision
         this.tracer = tracer;
         tensorFlow = new FtcTensorFlow(
             vuforia, tfodParams, TFOD_MODEL_ASSET,
-            new String[] {},
+            new String[] {Vision.LABEL_TARGET},
             RobotParams.cameraRect, RobotParams.worldRect, tracer);
     }   //TensorFlowVision
 
@@ -154,19 +154,5 @@ public class TensorFlowVision
     {
         return mapPoint(new Point(x, y));
     }   //mapPoint
-
-    /**
-     * This method is called by the Arrays.sort to sort the target object by decreasing confidence.
-     *
-     * @param a specifies the first target
-     * @param b specifies the second target.
-     * @return negative value if a has higher confidence than b, 0 if a and b have equal confidence, positive value
-     *         if a has lower confidence than b.
-     */
-    private int compareConfidence(
-        TrcVisionTargetInfo<FtcTensorFlow.DetectedObject> a, TrcVisionTargetInfo<FtcTensorFlow.DetectedObject> b)
-    {
-        return (int)((b.detectedObj.confidence - a.detectedObj.confidence)*100);
-    }   //compareConfidence
 
 }   //class TensorFlowVision

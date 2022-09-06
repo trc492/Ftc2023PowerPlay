@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-package teamcode.team3543;
+package multiteams.team3543;
 
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcGamepad;
-import teamcode.FtcTest;
+import multiteams.FtcTest;
 
 /**
  * This class contains the Test Mode program.

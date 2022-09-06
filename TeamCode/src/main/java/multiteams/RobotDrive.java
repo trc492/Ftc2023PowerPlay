@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import org.opencv.core.Point;
 
@@ -46,10 +46,6 @@ public class RobotDrive
     }   //enum DriveMode
 
     //
-    // Global objects.
-    //
-    protected final Robot robot;
-    //
     // Sensors.
     //
     public final FtcBNO055Imu imu;
@@ -57,8 +53,7 @@ public class RobotDrive
     //
     // Drive motors.
     //
-    public FtcDcMotor lfDriveMotor, lbDriveMotor;
-    public FtcDcMotor rfDriveMotor, rbDriveMotor;
+    public FtcDcMotor lfDriveMotor, lbDriveMotor, rfDriveMotor, rbDriveMotor;
     //
     // Drive Base.
     //
@@ -66,7 +61,7 @@ public class RobotDrive
     //
     // PID Coefficients and Controllers.
     //
-    public TrcPidController encoderXPidCtrl, encoderYPidCtrl, gyroTurnPidCtrl;
+    public TrcPidController xPosPidCtrl, yPosPidCtrl, turnPidCtrl;
     //
     // Drive Controllers.
     //
@@ -76,9 +71,8 @@ public class RobotDrive
     /**
      * Constructor: Create an instance of the object.
      */
-    public RobotDrive(Robot robot)
+    public RobotDrive()
     {
-        this.robot = robot;
         imu = new FtcBNO055Imu(RobotParams.HWNAME_IMU);
         gyro = imu.gyro;
     }   //RobotDrive

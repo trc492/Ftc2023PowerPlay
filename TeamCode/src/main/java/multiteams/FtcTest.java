@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import java.util.Locale;
 
@@ -148,8 +148,7 @@ public class FtcTest
                 if (!RobotParams.Preferences.noRobot)
                 {
                     testCommand = new CmdTimedDrive(
-                        robot.robotDrive.driveBase, 0.0, testChoices.driveTime,
-                        testChoices.drivePower, 0.0, 0.0);
+                        robot.robotDrive.driveBase, 0.0, testChoices.driveTime, testChoices.drivePower, 0.0, 0.0);
                 }
                 break;
 
@@ -157,8 +156,7 @@ public class FtcTest
                 if (!RobotParams.Preferences.noRobot)
                 {
                     testCommand = new CmdTimedDrive(
-                        robot.robotDrive.driveBase, 0.0, testChoices.driveTime,
-                        0.0, testChoices.drivePower, 0.0);
+                        robot.robotDrive.driveBase, 0.0, testChoices.driveTime, 0.0, testChoices.drivePower, 0.0);
                 }
                 break;
 
@@ -412,17 +410,17 @@ public class FtcTest
                         robot.robotDrive.driveBase.getHeading(),
                         robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
                         robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
-                    if (robot.robotDrive.encoderXPidCtrl != null)
+                    if (robot.robotDrive.xPosPidCtrl != null)
                     {
-                        robot.robotDrive.encoderXPidCtrl.displayPidInfo(9);
+                        robot.robotDrive.xPosPidCtrl.displayPidInfo(9);
                     }
-                    if (robot.robotDrive.encoderYPidCtrl != null)
+                    if (robot.robotDrive.yPosPidCtrl != null)
                     {
-                        robot.robotDrive.encoderYPidCtrl.displayPidInfo(11);
+                        robot.robotDrive.yPosPidCtrl.displayPidInfo(11);
                     }
-                    if (robot.robotDrive.gyroTurnPidCtrl != null)
+                    if (robot.robotDrive.turnPidCtrl != null)
                     {
-                        robot.robotDrive.gyroTurnPidCtrl.displayPidInfo(13);
+                        robot.robotDrive.turnPidCtrl.displayPidInfo(13);
                     }
                 }
                 break;
@@ -581,15 +579,15 @@ public class FtcTest
         switch (test)
         {
             case TUNE_X_PID:
-                pidCtrl = robot.robotDrive.encoderXPidCtrl;
+                pidCtrl = robot.robotDrive.xPosPidCtrl;
                 break;
 
             case TUNE_Y_PID:
-                pidCtrl = robot.robotDrive.encoderYPidCtrl;
+                pidCtrl = robot.robotDrive.yPosPidCtrl;
                 break;
 
             case TUNE_TURN_PID:
-                pidCtrl = robot.robotDrive.gyroTurnPidCtrl;
+                pidCtrl = robot.robotDrive.turnPidCtrl;
                 break;
 
             default:
@@ -714,7 +712,7 @@ public class FtcTest
 
                 if (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null)
                 {
-                    TrcVisionTargetInfo<?>[] targetsInfo = null;    //TODO: Call vision to detect targets.
+                    TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(Vision.LABEL_TARGET);
 
                     if (targetsInfo != null)
                     {

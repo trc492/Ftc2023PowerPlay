@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode.team3543;
+package multiteams.team6541;
 
 import android.os.Environment;
 
@@ -29,15 +29,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import TrcCommonLib.trclib.TrcHomographyMapper;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
-import teamcode.RobotDrive;
-import teamcode.RobotParams;
+import multiteams.RobotDrive;
+import multiteams.RobotParams;
 
 /**
  * This class initializes the robot and subsystem constants and parameters.
  */
-public class RobotParams3543
+public class RobotParams6541
 {
-    public RobotParams3543()
+    public RobotParams6541()
     {
         // Preferences.
         RobotParams.Preferences.noRobot = false;
@@ -55,8 +55,8 @@ public class RobotParams3543
         RobotParams.Preferences.useLoopPerformanceMonitor = true;
         RobotParams.Preferences.useVelocityControl = false;
 
-        RobotParams.robotName = "Ftc3543";
-        RobotParams.logPathFolder = Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftc3543";
+        RobotParams.robotName = "Ftc6541";
+        RobotParams.logPathFolder = Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftc6541";
         //
         // Robot dimensions.
         //
@@ -123,6 +123,6 @@ public class RobotParams3543
         //
         // Subsystem parameters.
         //
-    }   //RobotParams3543
+    }   //RobotParams6541
 
-}   //class RobotParams3543
+}   //class RobotParams6541

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;

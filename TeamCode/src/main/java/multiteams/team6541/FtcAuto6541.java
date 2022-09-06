@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-package teamcode.team6541;
+package multiteams.team6541;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import TrcCommonLib.trclib.TrcRobot;
-import teamcode.FtcAuto;
+import multiteams.FtcAuto;
 
 /**
  * This class contains the Autonomous Mode program.

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;

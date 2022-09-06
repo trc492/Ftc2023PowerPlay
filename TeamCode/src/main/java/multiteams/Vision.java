@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -32,6 +32,7 @@ import TrcCommonLib.trclib.TrcOpenCVDetector;
 import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcOpMode;
+import TrcFtcLib.ftclib.FtcTensorFlow;
 import TrcFtcLib.ftclib.FtcVuforia;
 
 /**
@@ -42,8 +43,18 @@ import TrcFtcLib.ftclib.FtcVuforia;
 public class Vision
 {
     public static final String OPENCV_NATIVE_LIBRARY_NAME = "EasyOpenCV";
+    public static final String IMAGE1_NAME = "Image1";
+    public static final String IMAGE2_NAME = "Image2";
+    public static final String IMAGE3_NAME = "Image3";
+    public static final String IMAGE4_NAME = "Image4";
+    public static final String LABEL_TARGET = "Target";
+    public static final String GOT_TARGET = "GotTarget";
+    public static final String SAW_TARGET = "SawTarget";
 
-    private final TrcRevBlinkin.Pattern[] ledPatternPriorities = {};
+    private final TrcRevBlinkin.Pattern[] ledPatternPriorities = {
+        new TrcRevBlinkin.Pattern(SAW_TARGET, TrcRevBlinkin.RevLedPattern.SolidViolet),
+        new TrcRevBlinkin.Pattern(GOT_TARGET, TrcRevBlinkin.RevLedPattern.SolidAqua)
+    };
 
     private final Robot robot;
     public VuforiaVision vuforiaVision;
@@ -64,7 +75,6 @@ public class Vision
                 "cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
 
         this.robot = robot;
-
         if (RobotParams.Preferences.useEasyOpenCV)
         {
             OpenCvCamera webcam =
@@ -113,9 +123,83 @@ public class Vision
      */
     public void tensorFlowShutdown()
     {
-        tensorFlowVision.shutdown();
-        tensorFlowVision = null;
+        if (tensorFlowVision != null)
+        {
+            tensorFlowVision.shutdown();
+            tensorFlowVision = null;
+        }
     }   //tensorFlowShutdown
+
+    /**
+     * This method returns an array of the detected targets info.
+     *
+     * @param label specifies the target label, only valid for TensorFlowVision, null for others.
+     * @return an array of detected targets info.
+     */
+    public TrcVisionTargetInfo<?>[] getDetectedTargetsInfo(String label)
+    {
+        TrcVisionTargetInfo<?>[] targets = null;
+
+        if (tensorFlowVision != null)
+        {
+            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareConfidence, false);
+        }
+        else if (eocvVision != null)
+        {
+            targets = eocvVision.getDetectedTargetsInfo(null, this::compareObjectSize);
+        }
+
+        return targets;
+    }   //getDetectedTargetsInfo
+
+    /**
+     * This method returns the best detected target info.
+     *
+     * @param label specifies the target label, only valid for TensorFlowVision, null for others.
+     * @return best detected target info.
+     */
+    public TrcVisionTargetInfo<?> getBestDetectedTargetInfo(String label)
+    {
+        TrcVisionTargetInfo<?>[] targets = getDetectedTargetsInfo(label);
+
+        return targets != null? targets[0]: null;
+    }   //getDetectedTargetsInfo
+
+    /**
+     * This method returns info of the closest detected target to image center.
+     *
+     * @param label specifies the target label, only valid for TensorFlowVision, null for others.
+     * @return closest detected target info.
+     */
+    public TrcVisionTargetInfo<?> getClosestTargetInfo(String label)
+    {
+        TrcVisionTargetInfo<?>[] targets = null;
+
+        if (tensorFlowVision != null)
+        {
+            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareDistanceFromCamera, false);
+        }
+        else if (eocvVision != null)
+        {
+            targets = eocvVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera);
+        }
+
+        return targets != null? targets[0]: null;
+    }   //getClosestTargetInfo
+
+    /**
+     * This method is called by the Arrays.sort to sort the target object by decreasing confidence.
+     *
+     * @param a specifies the first target
+     * @param b specifies the second target.
+     * @return negative value if a has higher confidence than b, 0 if a and b have equal confidence, positive value
+     *         if a has lower confidence than b.
+     */
+    private int compareConfidence(
+        TrcVisionTargetInfo<FtcTensorFlow.DetectedObject> a, TrcVisionTargetInfo<FtcTensorFlow.DetectedObject> b)
+    {
+        return (int)((b.detectedObj.confidence - a.detectedObj.confidence)*100);
+    }   //compareConfidence
 
     /**
      * This method is called by the Arrays.sort to sort the target object by increasing object distance.

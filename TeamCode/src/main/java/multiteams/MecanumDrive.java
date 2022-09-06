@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import TrcCommonLib.trclib.TrcDriveBaseOdometry;
 import TrcCommonLib.trclib.TrcMecanumDriveBase;
@@ -44,7 +44,7 @@ public class MecanumDrive extends RobotDrive
      */
     public MecanumDrive(Robot robot)
     {
-        super(robot);
+        super();
 
         lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, RobotParams.leftWheelInverted);
         lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, RobotParams.leftWheelInverted);
@@ -80,18 +80,18 @@ public class MecanumDrive extends RobotDrive
         //
         // Create and initialize PID controllers.
         //
-        encoderXPidCtrl = new TrcPidController(
-            "encoderXPidCtrl", RobotParams.xPosPidCoeff, RobotParams.xPosTolerance, driveBase::getXPosition);
-        encoderYPidCtrl = new TrcPidController(
-            "encoderYPidCtrl", RobotParams.yPosPidCoeff, RobotParams.yPosTolerance, driveBase::getYPosition);
-        gyroTurnPidCtrl = new TrcPidController(
-            "gyroPidCtrl", RobotParams.turnPidCoeff, RobotParams.turnTolerance, driveBase::getHeading);
-        gyroTurnPidCtrl.setAbsoluteSetPoint(true);
+        xPosPidCtrl = new TrcPidController(
+            "xPosPidCtrl", RobotParams.xPosPidCoeff, RobotParams.xPosTolerance, driveBase::getXPosition);
+        yPosPidCtrl = new TrcPidController(
+            "yPosPidCtrl", RobotParams.yPosPidCoeff, RobotParams.yPosTolerance, driveBase::getYPosition);
+        turnPidCtrl = new TrcPidController(
+            "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.turnTolerance, driveBase::getHeading);
+        turnPidCtrl.setAbsoluteSetPoint(true);
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.
         // If the robot turns too fast, PID will cause oscillation. By limiting turn power, the robot turns slower.
-        gyroTurnPidCtrl.setOutputLimit(RobotParams.turnPowerLimit);
+        turnPidCtrl.setOutputLimit(RobotParams.turnPowerLimit);
 
-        pidDrive = new TrcPidDrive("pidDrive", driveBase, encoderXPidCtrl, encoderYPidCtrl, gyroTurnPidCtrl);
+        pidDrive = new TrcPidDrive("pidDrive", driveBase, xPosPidCtrl, yPosPidCtrl, turnPidCtrl);
         // AbsoluteTargetMode eliminates cumulative errors on multi-segment runs because drive base is keeping track
         // of the absolute target position.
         pidDrive.setAbsoluteTargetModeEnabled(true);
@@ -99,9 +99,9 @@ public class MecanumDrive extends RobotDrive
         pidDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
 
         purePursuitDrive = new TrcPurePursuitDrive(
-            "purePursuitDrive", driveBase, RobotParams.ppdFollowingDistance, RobotParams.ppdPosTolerance,
-            RobotParams.ppdTurnTolerance, RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff, RobotParams.turnPidCoeff,
-            RobotParams.velPidCoeff);
+            "purePursuitDrive", driveBase,
+            RobotParams.ppdFollowingDistance, RobotParams.ppdPosTolerance, RobotParams.ppdTurnTolerance,
+            RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff, RobotParams.turnPidCoeff, RobotParams.velPidCoeff);
         purePursuitDrive.setStallDetectionEnabled(true);
         purePursuitDrive.setFastModeEnabled(true);
         purePursuitDrive.setMsgTracer(robot.globalTracer, true, true);

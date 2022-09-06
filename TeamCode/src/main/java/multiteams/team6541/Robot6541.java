@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-package teamcode.team6541;
+package multiteams.team6541;
 
 import TrcCommonLib.trclib.TrcRobot;
-import teamcode.MecanumDrive;
-import teamcode.Robot;
-import teamcode.RobotParams;
+import multiteams.MecanumDrive;
+import multiteams.Robot;
+import multiteams.RobotParams;
 
 /**
  * This class creates the robot object that consists of sensors, indicators, drive base and all the subsystems.

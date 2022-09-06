@@ -20,14 +20,14 @@
  * SOFTWARE.
  */
 
-package teamcode.team3543;
+package multiteams.team3543;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcGamepad;
-import teamcode.FtcTeleOp;
+import multiteams.FtcTeleOp;
 
 /**
  * This class contains the TeleOp Mode program.

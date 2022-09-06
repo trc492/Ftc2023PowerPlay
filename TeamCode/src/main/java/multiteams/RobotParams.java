@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -102,23 +102,8 @@ public class RobotParams
     // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
     public static final double GOBILDA_5203_312_ENCODER_PPR     = ((((1.0 + (46.0/17.0)))*(1.0 + (46.0/11.0)))*28.0);
     public static final double GOBILDA_5203_312_RPM             = 312.0;
-    public static final double GOBILDA_5203_312_MAX_VELOCITY_PPS= GOBILDA_5203_312_ENCODER_PPR*GOBILDA_5203_312_RPM/60.0; // 2795.987 pps
-    //
-    // Vision subsystem.
-    //
-    public static final String TRACKABLE_IMAGES_FILE            = "FreightFrenzy";
-    public static double cameraFrontOffset;
-    public static double cameraLeftOffset;
-    public static double cameraHeightOffset;
-    public static final int CAMERA_IMAGE_WIDTH                  = 320;
-    public static final int CAMERA_IMAGE_HEIGHT                 = 240;
-    public static final int FRAME_QUEUE_CAPACITY                = 2;
-    public static final TrcHomographyMapper.Rectangle cameraRect = new TrcHomographyMapper.Rectangle(
-        // topLeftX, topLeftY, topRightX, topRightY
-        0.0, 0.0, CAMERA_IMAGE_WIDTH - 1, 0.0,
-        // bottomLeftX, bottomLeftY, bottomRightX, bottomRightY
-        0.0, CAMERA_IMAGE_HEIGHT - 1, CAMERA_IMAGE_WIDTH - 1, CAMERA_IMAGE_HEIGHT - 1);
-    public static TrcHomographyMapper.Rectangle worldRect;
+    public static final double GOBILDA_5203_312_MAX_VELOCITY_PPS=
+        GOBILDA_5203_312_ENCODER_PPR*GOBILDA_5203_312_RPM/60.0; // 2795.987 pps
     //
     // DriveBase subsystem.
     //
@@ -165,5 +150,21 @@ public class RobotParams
     public static double ppdFollowingDistance;
     public static double ppdPosTolerance;
     public static double ppdTurnTolerance;
+    //
+    // Vision subsystem.
+    //
+    public static final String TRACKABLE_IMAGES_FILE            = "TrackableImagesFileName";
+    public static double cameraFrontOffset;
+    public static double cameraLeftOffset;
+    public static double cameraHeightOffset;
+    public static final int CAMERA_IMAGE_WIDTH                  = 320;
+    public static final int CAMERA_IMAGE_HEIGHT                 = 240;
+    public static final int FRAME_QUEUE_CAPACITY                = 2;
+    public static final TrcHomographyMapper.Rectangle cameraRect = new TrcHomographyMapper.Rectangle(
+        // topLeftX, topLeftY, topRightX, topRightY
+        0.0, 0.0, CAMERA_IMAGE_WIDTH - 1, 0.0,
+        // bottomLeftX, bottomLeftY, bottomRightX, bottomRightY
+        0.0, CAMERA_IMAGE_HEIGHT - 1, CAMERA_IMAGE_WIDTH - 1, CAMERA_IMAGE_HEIGHT - 1);
+    public static TrcHomographyMapper.Rectangle worldRect;
 
 }   //class RobotParams

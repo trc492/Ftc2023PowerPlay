@@ -20,13 +20,12 @@
  * SOFTWARE.
  */
 
-package teamcode;
-
-import TrcCommonLib.command.CmdPidDrive;
-import TrcCommonLib.command.CmdTimedDrive;
+package multiteams;
 
 import java.util.Locale;
 
+import TrcCommonLib.command.CmdPidDrive;
+import TrcCommonLib.command.CmdTimedDrive;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
@@ -35,6 +34,9 @@ import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcValueMenu;
 
+/**
+ * This class contains the Autonomous Mode program.
+ */
 public class FtcAuto extends FtcOpMode
 {
     public enum Alliance
@@ -82,8 +84,8 @@ public class FtcAuto extends FtcOpMode
 
     }   //class AutoChoices
 
+    private static final String moduleName = "FtcAuto";
     protected Robot robot;
-    private String moduleName;
     private FtcMatchInfo matchInfo;
     protected final AutoChoices autoChoices = new AutoChoices();
     protected TrcRobot.RobotCommand autoCommand;
@@ -96,13 +98,10 @@ public class FtcAuto extends FtcOpMode
      * This method is called to initialize the robot. In FTC, this is called when the "Init" button on the Driver
      * Station is pressed.
      */
+    @Override
     public void initRobot()
     {
         final String funcName = "initRobot";
-        //
-        // Create and initialize robot object.
-        //
-        moduleName = RobotParams.robotName + ".auto";
         //
         // Open trace log.
         //

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package multiteams;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
