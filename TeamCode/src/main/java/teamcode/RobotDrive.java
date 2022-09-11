@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package multiteams;
+package teamcode;
 
 import org.opencv.core.Point;
 
@@ -106,8 +106,8 @@ public class RobotDrive
     {
         FtcDcMotor driveMotor = new FtcDcMotor(name);
 
-        driveMotor.motor.setMode(RobotParams.driveMotorMode);
-        driveMotor.setBrakeModeEnabled(RobotParams.driveWheelBrakeModeOn);
+        driveMotor.motor.setMode(RobotParams.DRIVE_MOTOR_MODE);
+        driveMotor.setBrakeModeEnabled(RobotParams.DRIVE_WHEEL_BRAKE_MODE_ON);
         driveMotor.setInverted(inverted);
 
         if (RobotParams.Preferences.useVelocityControl)

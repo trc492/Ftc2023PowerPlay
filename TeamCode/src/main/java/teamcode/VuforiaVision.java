@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package multiteams;
+package teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -88,11 +88,11 @@ public class VuforiaVision
          * Finally the camera can be translated to its actual mounting position on the robot.
          */
         final float CAMERA_FORWARD_DISPLACEMENT =
-            (float)((RobotParams.robotLength/2.0 - RobotParams.cameraFrontOffset)*TrcUtil.MM_PER_INCH);
+            (float)((RobotParams.ROBOT_LENGTH/2.0 - RobotParams.CAMERA_FRONT_OFFSET)*TrcUtil.MM_PER_INCH);
         final float CAMERA_VERTICAL_DISPLACEMENT =
-            (float)(RobotParams.cameraHeightOffset*TrcUtil.MM_PER_INCH);
+            (float)(RobotParams.CAMERA_HEIGHT_OFFSET*TrcUtil.MM_PER_INCH);
         final float CAMERA_LEFT_DISPLACEMENT =
-            (float)((RobotParams.robotWidth/2.0 - RobotParams.cameraLeftOffset)*TrcUtil.MM_PER_INCH);
+            (float)((RobotParams.ROBOT_WIDTH/2.0 - RobotParams.CAMERA_LEFT_OFFSET)*TrcUtil.MM_PER_INCH);
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
             .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
             .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, 90, 90, 0));

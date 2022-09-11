@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-package multiteams;
+package teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import java.util.Locale;
 
@@ -37,6 +39,7 @@ import TrcFtcLib.ftclib.FtcValueMenu;
 /**
  * This class contains the Autonomous Mode program.
  */
+@Autonomous(name="FtcAutonomous", group="Ftcxxxx")
 public class FtcAuto extends FtcOpMode
 {
     public enum Alliance
@@ -85,10 +88,10 @@ public class FtcAuto extends FtcOpMode
     }   //class AutoChoices
 
     private static final String moduleName = "FtcAuto";
-    protected Robot robot;
+    private Robot robot;
     private FtcMatchInfo matchInfo;
-    protected final AutoChoices autoChoices = new AutoChoices();
-    protected TrcRobot.RobotCommand autoCommand;
+    private final AutoChoices autoChoices = new AutoChoices();
+    private TrcRobot.RobotCommand autoCommand;
 
     //
     // Implements FtcOpMode abstract method.
@@ -103,13 +106,17 @@ public class FtcAuto extends FtcOpMode
     {
         final String funcName = "initRobot";
         //
+        // Create and initialize robot object.
+        //
+        robot = new Robot(TrcRobot.getRunMode());
+        //
         // Open trace log.
         //
         if (RobotParams.Preferences.useTraceLog)
         {
             matchInfo = FtcMatchInfo.getMatchInfo();
             String filePrefix = String.format(Locale.US, "%s%02d", matchInfo.matchType, matchInfo.matchNumber);
-            robot.globalTracer.openTraceLog(RobotParams.logPathFolder, filePrefix);
+            robot.globalTracer.openTraceLog(RobotParams.LOG_PATH_FOLDER, filePrefix);
         }
         //
         // Create and run choice menus.
@@ -140,10 +147,8 @@ public class FtcAuto extends FtcOpMode
                 break;
 
             case DO_NOTHING:
-                autoCommand = null;
-                break;
-
             default:
+                autoCommand = null;
                 break;
         }
 

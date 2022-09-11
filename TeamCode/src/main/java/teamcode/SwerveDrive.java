@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package multiteams;
+package teamcode;
 
 import TrcCommonLib.trclib.TrcDriveBaseOdometry;
 import TrcCommonLib.trclib.TrcEnhancedServo;
@@ -82,7 +82,7 @@ public class SwerveDrive extends RobotDrive
 
         driveBase = new TrcSwerveDriveBase(
             lfSwerveModule, lbSwerveModule, rfSwerveModule, rbSwerveModule, gyro,
-            RobotParams.driveBaseWidth, RobotParams.driveBaseLength);
+            RobotParams.DRIVE_BASE_WIDTH, RobotParams.DRIVE_BASE_LENGTH);
         driveBase.setSynchronizeOdometriesEnabled(false);
 
          if (RobotParams.Preferences.useExternalOdometry)
@@ -93,36 +93,36 @@ public class SwerveDrive extends RobotDrive
              // odometry.
              //
              TrcDriveBaseOdometry driveBaseOdometry = new TrcDriveBaseOdometry(
-                 new TrcDriveBaseOdometry.AxisSensor(rbDriveMotor, RobotParams.xOdometryWheelOffset),
+                 new TrcDriveBaseOdometry.AxisSensor(rbDriveMotor, RobotParams.X_ODOMETRY_WHEEL_OFFSET),
                  new TrcDriveBaseOdometry.AxisSensor[] {
-                     new TrcDriveBaseOdometry.AxisSensor(lfDriveMotor, RobotParams.yLeftOdometryWheelOffset),
-                     new TrcDriveBaseOdometry.AxisSensor(rfDriveMotor, RobotParams.yRightOdometryWheelOffset)},
+                     new TrcDriveBaseOdometry.AxisSensor(lfDriveMotor, RobotParams.Y_LEFT_ODOMETRY_WHEEL_OFFSET),
+                     new TrcDriveBaseOdometry.AxisSensor(rfDriveMotor, RobotParams.Y_RIGHT_ODOMETRY_WHEEL_OFFSET)},
                  gyro);
              //
              // Set the drive base to use the external odometry device overriding the built-in one.
              //
              driveBase.setDriveBaseOdometry(driveBaseOdometry);
              driveBase.setOdometryScales(
-                 RobotParams.xOdometryWheelInchesPerCount, RobotParams.yOdometryWheelInchesPerCount);
+                 RobotParams.X_ODWHEEL_INCHES_PER_COUNT, RobotParams.Y_ODWHEEL_INCHES_PER_COUNT);
          }
          else
          {
-             driveBase.setOdometryScales(RobotParams.xPosInchesPerCount, RobotParams.yPosInchesPerCount);
+             driveBase.setOdometryScales(RobotParams.XPOS_INCHES_PER_COUNT, RobotParams.YPOS_INCHES_PER_COUNT);
          }
 
         //
         // Create and initialize PID controllers.
         //
         xPosPidCtrl = new TrcPidController(
-            "xPosPidCtrl", RobotParams.xPosPidCoeff, RobotParams.xPosTolerance, driveBase::getXPosition);
+            "xPosPidCtrl", RobotParams.xPosPidCoeff, RobotParams.XPOS_TOLERANCE, driveBase::getXPosition);
         yPosPidCtrl = new TrcPidController(
-            "yPosPidCtrl", RobotParams.yPosPidCoeff, RobotParams.yPosTolerance, driveBase::getYPosition);
+            "yPosPidCtrl", RobotParams.yPosPidCoeff, RobotParams.YPOS_TOLERANCE, driveBase::getYPosition);
         turnPidCtrl = new TrcPidController(
-            "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.turnTolerance, driveBase::getHeading);
+            "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, driveBase::getHeading);
         turnPidCtrl.setAbsoluteSetPoint(true);
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.
         // If the robot turns too fast, PID will cause oscillation. By limiting turn power, the robot turns slower.
-        turnPidCtrl.setOutputLimit(RobotParams.turnPowerLimit);
+        turnPidCtrl.setOutputLimit(RobotParams.TURN_POWER_LIMIT);
 
         pidDrive = new TrcPidDrive("pidDrive", driveBase, xPosPidCtrl, yPosPidCtrl, turnPidCtrl);
         // AbsoluteTargetMode eliminates cumulative errors on multi-segment runs because drive base is keeping track
@@ -133,7 +133,7 @@ public class SwerveDrive extends RobotDrive
 
         purePursuitDrive = new TrcPurePursuitDrive(
             "purePursuitDrive", driveBase,
-            RobotParams.ppdFollowingDistance, RobotParams.ppdPosTolerance, RobotParams.ppdTurnTolerance,
+            RobotParams.PPD_FOLLOWING_DISTANCE, RobotParams.PPD_POS_TOLERANCE, RobotParams.PPD_TURN_TOLERANCE,
             RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff, RobotParams.turnPidCoeff, RobotParams.velPidCoeff);
         purePursuitDrive.setStallDetectionEnabled(true);
         purePursuitDrive.setFastModeEnabled(true);

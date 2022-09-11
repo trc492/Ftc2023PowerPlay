@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package multiteams;
+package teamcode;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
@@ -118,7 +118,19 @@ public class Robot
             }
 
             androidTone = new FtcAndroidTone("androidTone");
+            //
+            // Create and initialize RobotDrive.
+            //
+            robotDrive = new MecanumDrive(this);
+            //
+            // Create and initialize other subsystems.
+            //
+            if (RobotParams.Preferences.initSubsystems)
+            {
+            }
         }
+
+        speak("Init complete");
     }   //Robot
 
     /**
@@ -129,7 +141,7 @@ public class Robot
     @Override
     public String toString()
     {
-        return RobotParams.robotName;
+        return RobotParams.ROBOT_NAME;
     }   //toString
 
     /**

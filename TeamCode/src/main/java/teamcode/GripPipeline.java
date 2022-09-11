@@ -1,4 +1,4 @@
-package multiteams;
+package teamcode;
 
 import java.io.File;
 import java.io.FileWriter;
