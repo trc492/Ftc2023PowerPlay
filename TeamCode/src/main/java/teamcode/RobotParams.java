@@ -56,7 +56,7 @@ public class RobotParams
         public static boolean useVelocityControl = false;
     }   //class Preferences
 
-    public static final String ROBOT_NAME                       = "Robotxxxx";
+    public static final String ROBOT_NAME                       = "Robot3543";
     public static final String LOG_PATH_FOLDER                  =
         Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftclogs";
     //
@@ -118,7 +118,7 @@ public class RobotParams
     public static final double X_ODOMETRY_WHEEL_OFFSET          = ROBOT_LENGTH/2.0 - (3.875 + 9.5); //behind centroid
     public static final double Y_LEFT_ODOMETRY_WHEEL_OFFSET     = -15.25/2.0;
     public static final double Y_RIGHT_ODOMETRY_WHEEL_OFFSET    = 15.25/2.0;
-    public static final RobotDrive.DriveMode ROBOT_DRIVE_MODE   = RobotDrive.DriveMode.ARCADE_MODE;
+    public static final RobotDrive.DriveMode ROBOT_DRIVE_MODE   = RobotDrive.DriveMode.HOLONOMIC_MODE;
     //
     // Velocity controlled constants.
     //
