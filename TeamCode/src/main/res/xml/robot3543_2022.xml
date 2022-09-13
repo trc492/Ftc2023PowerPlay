@@ -23,8 +23,8 @@ SOFTWARE.
 <Robot type="FirstInspires-FTC" name="Robot3543_2022">
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Control Hub" port="173">
-            <goBILDA5202SeriesMotor name="rbWheel" port="0" />
-            <goBILDA5202SeriesMotor name="rfWheel" port="1" />
+            <goBILDA5202SeriesMotor name="rbDriveMotor" port="0" />
+            <goBILDA5202SeriesMotor name="rfDriveMotor" port="1" />
             <goBILDA5202SeriesMotor name="arm.motor" port="2" />
             <DigitalDevice name="arm.lowerLimit" port="0" />
             <DigitalDevice name="arm.upperLimit" port="1" />
@@ -35,8 +35,8 @@ SOFTWARE.
         <LynxModule name="Expansion Hub 3" port="3">
             <RevRoboticsCoreHexMotor name="intake.motor" port="0" />
             <goBILDA5202SeriesMotor name="spinnerMotor" port="1" />
-            <goBILDA5202SeriesMotor name="lfWheel" port="2" />
-            <goBILDA5202SeriesMotor name="lbWheel" port="3" />
+            <goBILDA5202SeriesMotor name="lfDriveMotor" port="2" />
+            <goBILDA5202SeriesMotor name="lbDriveMotor" port="3" />
             <Servo name="yLeftOdwServo" port="0" />
             <Servo name="pickupHookServo" port="1" />
             <RevColorSensorV3 name="intake.sensor" port="0" bus="1"/>

@@ -220,18 +220,25 @@ public class FtcTeleOp extends FtcOpMode
      */
     private double getDriveGyroAngle()
     {
+        double angle;
+
         switch (driveOrientation)
         {
             case ROBOT:
-                return 0.0;
+                angle = 0.0;
+                break;
 
             case INVERTED:
-                return 180.0;
+                angle = 180.0;
+                break;
 
             default:
             case FIELD:
-                return robot.robotDrive.driveBase.getHeading();
+                angle = robot.robotDrive.gyro != null? robot.robotDrive.gyro.getZHeading().value: 0.0;
+                break;
         }
+
+        return angle;
     }   //getDriveGyroAngle
 
     //

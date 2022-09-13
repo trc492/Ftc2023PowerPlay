@@ -121,7 +121,7 @@ public class Robot
             //
             // Create and initialize RobotDrive.
             //
-            robotDrive = new SwerveDrive(this);
+            robotDrive = new MecanumDrive(this);
             //
             // Create and initialize other subsystems.
             //
