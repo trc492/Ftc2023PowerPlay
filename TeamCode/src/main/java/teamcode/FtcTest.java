@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
+import TrcCommonLib.trclib.TrcSwerveDriveBase;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
@@ -48,7 +49,7 @@ import TrcFtcLib.ftclib.FtcValueMenu;
 /**
  * This class contains the Test Mode program.
  */
-@TeleOp(name="FtcTest", group="Ftcxxxx")
+@TeleOp(name="FtcTest", group="Ftc3543")
 public class FtcTest extends FtcTeleOp
 {
     private static final boolean logEvents = true;
@@ -66,7 +67,8 @@ public class FtcTest extends FtcTeleOp
         TUNE_X_PID,
         TUNE_Y_PID,
         TUNE_TURN_PID,
-        PURE_PURSUIT_DRIVE
+        PURE_PURSUIT_DRIVE,
+        CALIBRATE_SWERVE_STEERING
     }   //enum Test
 
     /**
@@ -117,6 +119,8 @@ public class FtcTest extends FtcTeleOp
     private double maxDriveAcceleration = 0.0;
     private double prevTime = 0.0;
     private double prevVelocity = 0.0;
+    private double steerServoAngle = 0.0;
+    private double calibrateStepSize = 0.1;
 
     //
     // Overrides FtcOpMode abstract method.
@@ -277,23 +281,33 @@ public class FtcTest extends FtcTeleOp
             case TUNE_X_PID:
             case TUNE_Y_PID:
             case TUNE_TURN_PID:
-                robot.robotDrive.pidDrive.setMsgTracer(robot.globalTracer, logEvents, debugPid);
+                if (robot.robotDrive != null)
+                {
+                    robot.robotDrive.pidDrive.setMsgTracer(robot.globalTracer, logEvents, debugPid);
+                }
                 break;
 
             case PURE_PURSUIT_DRIVE:
-                robot.robotDrive.purePursuitDrive.setMsgTracer(robot.globalTracer, logEvents, debugPid);
-                //
-                // Doing a 48x48-inch square box with robot heading always pointing to the center of the box.
-                //
-                // Set the current position as the absolute field origin so the path can be an absolute path.
-                robot.robotDrive.driveBase.setFieldPosition(new TrcPose2D(0.0, 0.0, 0.0));
-                ((CmdPurePursuitDrive)testCommand).start(
-                    robot.robotDrive.driveBase.getFieldPosition(), false,
-                    new TrcPose2D(-24.0, 0, 45.0),
-                    new TrcPose2D(-24.0, 48.0, 135.0),
-                    new TrcPose2D(24.0, 48.0, 225.0),
-                    new TrcPose2D(24.0, 0.0, 315.0),
-                    new TrcPose2D(0.0, 0.0, 0.0));
+                if (robot.robotDrive != null)
+                {
+                    robot.robotDrive.purePursuitDrive.setMsgTracer(robot.globalTracer, logEvents, debugPid);
+                    //
+                    // Doing a 48x48-inch square box with robot heading always pointing to the center of the box.
+                    //
+                    // Set the current position as the absolute field origin so the path can be an absolute path.
+                    robot.robotDrive.driveBase.setFieldPosition(new TrcPose2D(0.0, 0.0, 0.0));
+                    ((CmdPurePursuitDrive)testCommand).start(
+                        robot.robotDrive.driveBase.getFieldPosition(), false,
+                        new TrcPose2D(-24.0, 0, 45.0),
+                        new TrcPose2D(-24.0, 48.0, 135.0),
+                        new TrcPose2D(24.0, 48.0, 225.0),
+                        new TrcPose2D(24.0, 0.0, 315.0),
+                        new TrcPose2D(0.0, 0.0, 0.0));
+                }
+                break;
+
+            case CALIBRATE_SWERVE_STEERING:
+                steerServoAngle = 0.0;
                 break;
         }
     }   //startMode
@@ -491,6 +505,18 @@ public class FtcTest extends FtcTeleOp
                 doSensorsTest();
                 doVisionTest();
                 break;
+
+            case CALIBRATE_SWERVE_STEERING:
+                if (robot.robotDrive != null && (robot.robotDrive.driveBase instanceof TrcSwerveDriveBase))
+                {
+                    SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
+                    swerveDrive.lfSwerveModule.setSteerAngle()
+                    ((TrcSwerveDriveBase) robot.robotDrive.driveBase).setSteerAngle(steerServoAngle, false);
+                    robot.dashboard.displayPrintf(
+                        4, "SteerAngle=%.3f, LogicalPos=%.3f",
+                        steerServoAngle, ((TrcSwerveDriveBase) robot.robotDrive.driveBase).get;
+                }
+                break;
         }
     }   //slowPeriodic
 
@@ -531,15 +557,47 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_UP:
+                    if (pressed)
+                    {
+                        if (steerServoAngle + calibrateStepSize <= 90.0)
+                        {
+                            steerServoAngle += calibrateStepSize;
+                        }
+                    }
+                    processed = true;
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_DOWN:
+                    if (pressed)
+                    {
+                        if (steerServoAngle - calibrateStepSize >= -90.0)
+                        {
+                            steerServoAngle -= calibrateStepSize;
+                        }
+                    }
+                    processed = true;
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_LEFT:
+                    if (pressed)
+                    {
+                        if (calibrateStepSize < 10.0)
+                        {
+                            calibrateStepSize *= 10.0;
+                        }
+                    }
+                    processed = true;
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_RIGHT:
+                    if (pressed)
+                    {
+                        if (calibrateStepSize > 0.001)
+                        {
+                            calibrateStepSize /= 10.0;
+                        }
+                    }
+                    processed = true;
                     break;
             }
             //
