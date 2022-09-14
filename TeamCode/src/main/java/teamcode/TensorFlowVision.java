@@ -39,8 +39,8 @@ import TrcFtcLib.ftclib.FtcVuforia;
  */
 public class TensorFlowVision
 {
-    private static final String TFOD_MODEL_ASSET = "Targets.tflite";
-    private static final float TFOD_MIN_CONFIDENCE = 0.8f;
+    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final float TFOD_MIN_CONFIDENCE = 0.75f;
 
     private final TrcDbgTrace tracer;
     private FtcTensorFlow tensorFlow;
@@ -67,8 +67,7 @@ public class TensorFlowVision
 
         this.tracer = tracer;
         tensorFlow = new FtcTensorFlow(
-            vuforia, tfodParams, TFOD_MODEL_ASSET,
-            new String[] {Vision.LABEL_TARGET},
+            vuforia, tfodParams, TFOD_MODEL_ASSET, Vision.TARGET_LABELS,
             RobotParams.cameraRect, RobotParams.worldRect, tracer);
     }   //TensorFlowVision
 

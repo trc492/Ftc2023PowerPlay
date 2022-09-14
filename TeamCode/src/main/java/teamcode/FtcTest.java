@@ -119,7 +119,7 @@ public class FtcTest extends FtcTeleOp
     private double maxDriveAcceleration = 0.0;
     private double prevTime = 0.0;
     private double prevVelocity = 0.0;
-    private double steerServoAngle = 0.0;
+    private double steerServoPosition = 0.5;
     private double calibrateStepSize = 0.1;
 
     //
@@ -307,7 +307,7 @@ public class FtcTest extends FtcTeleOp
                 break;
 
             case CALIBRATE_SWERVE_STEERING:
-                steerServoAngle = 0.0;
+                steerServoPosition = 0.5;
                 break;
         }
     }   //startMode
@@ -510,11 +510,23 @@ public class FtcTest extends FtcTeleOp
                 if (robot.robotDrive != null && (robot.robotDrive.driveBase instanceof TrcSwerveDriveBase))
                 {
                     SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
-                    swerveDrive.lfSwerveModule.setSteerAngle()
-                    ((TrcSwerveDriveBase) robot.robotDrive.driveBase).setSteerAngle(steerServoAngle, false);
+                    swerveDrive.lfSwerveModule.setSteerAngle(steerServoPosition);
+                    swerveDrive.rfSwerveModule.setSteerAngle(steerServoPosition);
+                    swerveDrive.lbSwerveModule.setSteerAngle(steerServoPosition);
+                    swerveDrive.rbSwerveModule.setSteerAngle(steerServoPosition);
+
                     robot.dashboard.displayPrintf(
-                        4, "SteerAngle=%.3f, LogicalPos=%.3f",
-                        steerServoAngle, ((TrcSwerveDriveBase) robot.robotDrive.driveBase).get;
+                        4, "lf: SteerAngle=%.3f, SteerPosition=%.3f",
+                        swerveDrive.lfSwerveModule.getSteerAngle(), swerveDrive.lfSwerveModule.getLogicalPosition());
+                    robot.dashboard.displayPrintf(
+                        5, "rf: SteerAngle=%.3f, SteerPosition=%.3f",
+                        swerveDrive.rfSwerveModule.getSteerAngle(), swerveDrive.rfSwerveModule.getLogicalPosition());
+                    robot.dashboard.displayPrintf(
+                        6, "lb: SteerAngle=%.3f, SteerPosition=%.3f",
+                        swerveDrive.lbSwerveModule.getSteerAngle(), swerveDrive.lbSwerveModule.getLogicalPosition());
+                    robot.dashboard.displayPrintf(
+                        7, "rb: SteerAngle=%.3f, SteerPosition=%.3f",
+                        swerveDrive.rbSwerveModule.getSteerAngle(), swerveDrive.rbSwerveModule.getLogicalPosition());
                 }
                 break;
         }
@@ -559,9 +571,10 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_DPAD_UP:
                     if (pressed)
                     {
-                        if (steerServoAngle + calibrateStepSize <= 90.0)
+                        // Do not increment beyond 1.0.
+                        if (steerServoPosition + calibrateStepSize <= 1.0)
                         {
-                            steerServoAngle += calibrateStepSize;
+                            steerServoPosition += calibrateStepSize;
                         }
                     }
                     processed = true;
@@ -570,9 +583,10 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_DPAD_DOWN:
                     if (pressed)
                     {
-                        if (steerServoAngle - calibrateStepSize >= -90.0)
+                        // Do not decrement below 0.001.
+                        if (steerServoPosition - calibrateStepSize >= 0.001)
                         {
-                            steerServoAngle -= calibrateStepSize;
+                            steerServoPosition -= calibrateStepSize;
                         }
                     }
                     processed = true;
@@ -581,7 +595,8 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_DPAD_LEFT:
                     if (pressed)
                     {
-                        if (calibrateStepSize < 10.0)
+                        // Maximum step size is 0.1.
+                        if (calibrateStepSize * 10.0 <= 0.1)
                         {
                             calibrateStepSize *= 10.0;
                         }
@@ -592,7 +607,8 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_DPAD_RIGHT:
                     if (pressed)
                     {
-                        if (calibrateStepSize > 0.001)
+                        // Minimum step size is 0.001.
+                        if (calibrateStepSize / 10.0 >= 0.001)
                         {
                             calibrateStepSize /= 10.0;
                         }
@@ -909,7 +925,7 @@ public class FtcTest extends FtcTeleOp
 
                 if (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null)
                 {
-                    TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(Vision.LABEL_TARGET);
+                    TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(null);
 
                     if (targetsInfo != null)
                     {

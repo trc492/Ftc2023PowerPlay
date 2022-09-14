@@ -43,6 +43,7 @@ import TrcFtcLib.ftclib.FtcVuforia;
  */
 public class VuforiaVision
 {
+    private static final String TRACKABLE_IMAGES_FILE = "PowerPlay";
     //
     // Since ImageTarget trackables use mm to specify their dimensions, we must use mm for all the physical
     // dimension. We will define some constants and conversions here.
@@ -51,7 +52,6 @@ public class VuforiaVision
     private static final float mmTargetHeight = 6.0f * (float)TrcUtil.MM_PER_INCH;
     private static final float halfField = (float)(RobotParams.HALF_FIELD_INCHES*TrcUtil.MM_PER_INCH);
     private static final float fullTile = (float)(RobotParams.FULL_TILE_INCHES*TrcUtil.MM_PER_INCH);
-    private static final float halfTile = (float)(RobotParams.HALF_TILE_INCHES*TrcUtil.MM_PER_INCH);
     private static final float oneAndHalfTile = (float)(fullTile*1.5);
 
     private final FtcVuforia vuforia;
@@ -115,28 +115,24 @@ public class VuforiaVision
          * Before being transformed, each target image is conceptually located at the origin of the field's
          * coordinate system (the center of the field), facing up.
          */
-        OpenGLMatrix image1Location = OpenGLMatrix
-            .translation(-halfField, oneAndHalfTile, mmTargetHeight)
-            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90));
-        OpenGLMatrix image2Location = OpenGLMatrix
-            .translation(halfTile, halfField, mmTargetHeight)
-            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0));
-        OpenGLMatrix image3Location = OpenGLMatrix
-            .translation(-halfField, -oneAndHalfTile, mmTargetHeight)
-            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90));
-        OpenGLMatrix image4Location = OpenGLMatrix
-            .translation(halfTile, -halfField, mmTargetHeight)
-            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180));
         //
         // Create and initialize all image targets.
         //
         FtcVuforia.TargetInfo[] imageTargetsInfo = {
-            new FtcVuforia.TargetInfo(0, Vision.IMAGE1_NAME, false, image1Location),
-            new FtcVuforia.TargetInfo(1, Vision.IMAGE2_NAME, false, image2Location),
-            new FtcVuforia.TargetInfo(2, Vision.IMAGE3_NAME, false, image3Location),
-            new FtcVuforia.TargetInfo(3, Vision.IMAGE4_NAME, false, image4Location)
+            new FtcVuforia.TargetInfo(
+                0, Vision.IMAGE1_NAME, false,
+                createImageLocation(-halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90)),
+            new FtcVuforia.TargetInfo(
+                1, Vision.IMAGE2_NAME, false,
+                createImageLocation(halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90)),
+            new FtcVuforia.TargetInfo(
+                2, Vision.IMAGE3_NAME, false,
+                createImageLocation(-halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90)),
+            new FtcVuforia.TargetInfo(
+                3, Vision.IMAGE4_NAME, false,
+                createImageLocation(halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90))
         };
-        vuforia.addTargetList(RobotParams.TRACKABLE_IMAGES_FILE, imageTargetsInfo, cameraLocationOnRobot);
+        vuforia.addTargetList(TRACKABLE_IMAGES_FILE, imageTargetsInfo, cameraLocationOnRobot);
 
         vuforiaImageTargets = new VuforiaTrackable[imageTargetsInfo.length];
         for (int i = 0; i < vuforiaImageTargets.length; i++)
@@ -154,6 +150,23 @@ public class VuforiaVision
     {
         vuforia.setTrackingEnabled(enabled);
     }   //setEnabled
+
+    /**
+     * This method creates an OpenGLMatrix as the image location.
+     *
+     * @param dx specifies translation coordinate in X.
+     * @param dy specifies translation coordinate in Y.
+     * @param dz specifies translation coordinate in Z.
+     * @param rx specifies rotation in the x-axis.
+     * @param ry specifies rotation in the y-axis.
+     * @param rz specifies rotation in the z-axis.
+     * @return generated image location.
+     */
+    private OpenGLMatrix createImageLocation(float dx, float dy, float dz, float rx, float ry, float rz)
+    {
+        return OpenGLMatrix.translation(dx, dy, dz)
+                           .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, rx, ry, rz));
+    }   //createImageLocation
 
     /**
      * This method returns the robot location computed with the detected target.

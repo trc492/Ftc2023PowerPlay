@@ -43,17 +43,27 @@ import TrcFtcLib.ftclib.FtcVuforia;
 public class Vision
 {
     public static final String OPENCV_NATIVE_LIBRARY_NAME = "EasyOpenCV";
-    public static final String IMAGE1_NAME = "Image1";
-    public static final String IMAGE2_NAME = "Image2";
-    public static final String IMAGE3_NAME = "Image3";
-    public static final String IMAGE4_NAME = "Image4";
-    public static final String LABEL_TARGET = "Target";
+    public static final String IMAGE1_NAME = "Red Audience Wall";
+    public static final String IMAGE2_NAME = "Red Rear Wall";
+    public static final String IMAGE3_NAME = "Blue Audience Wall";
+    public static final String IMAGE4_NAME = "Blue Rear Wall";
+    public static final String LABEL_BOLT = "1 Bolt";
+    public static final String LABEL_BULB = "2 Bulb";
+    public static final String LABEL_PANEL = "3 Panel";
+    public static final String[] TARGET_LABELS = {LABEL_BOLT, LABEL_BULB, LABEL_PANEL};
     public static final String GOT_TARGET = "GotTarget";
     public static final String SAW_TARGET = "SawTarget";
 
     private final TrcRevBlinkin.Pattern[] ledPatternPriorities = {
+        new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
+        new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
+        new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
         new TrcRevBlinkin.Pattern(SAW_TARGET, TrcRevBlinkin.RevLedPattern.SolidViolet),
-        new TrcRevBlinkin.Pattern(GOT_TARGET, TrcRevBlinkin.RevLedPattern.SolidAqua)
+        new TrcRevBlinkin.Pattern(GOT_TARGET, TrcRevBlinkin.RevLedPattern.SolidAqua),
+        new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
+        new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
+        new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
+        new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue)
     };
 
     private final Robot robot;
