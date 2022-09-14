@@ -83,7 +83,6 @@ public class RobotParams
     public static final double FULL_FIELD_INCHES                = 141.0;
     public static final double HALF_FIELD_INCHES                = FULL_FIELD_INCHES/2.0;
     public static final double FULL_TILE_INCHES                 = 23.75;
-    public static final double HALF_TILE_INCHES                 = FULL_TILE_INCHES/2.0;
     //
     // Robot dimensions.
     //
@@ -94,10 +93,16 @@ public class RobotParams
     //
     // Game positions.
     //
-    public static TrcPose2D STARTPOS_RED1 = new TrcPose2D();
-    public static TrcPose2D STARTPOS_RED2 = new TrcPose2D();
-    public static TrcPose2D STARTPOS_BLUE1 = new TrcPose2D();
-    public static TrcPose2D STARTPOS_BLUE2 = new TrcPose2D();
+    public static final double STARTPOS_FROM_FIELDCENTER_X      = 1.5 * FULL_TILE_INCHES;
+    public static final double STARTPOS_FROM_FIELDCENTER_Y      = HALF_FIELD_INCHES - ROBOT_LENGTH/2.0;
+    public static TrcPose2D STARTPOS_RED_LEFT = new TrcPose2D(
+        -STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D STARTPOS_RED_RIGHT = new TrcPose2D(
+        STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D STARTPOS_BLUE_LEFT = new TrcPose2D(
+        STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
+    public static TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
+        -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
     //
     // Motor Odometries.
     //
