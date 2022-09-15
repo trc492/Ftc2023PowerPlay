@@ -536,12 +536,12 @@ public class FtcTest extends FtcTeleOp
                 {
                     setSteeringServoPosition(posIndex);
                     robot.dashboard.displayPrintf(
-                        3, "State: pos=%s, wheel=%s", posNames[posIndex], wheelNames[wheelIndex]);
+                        1, "State: pos=%s, wheel=%s", posNames[posIndex], wheelNames[wheelIndex]);
                     robot.dashboard.displayPrintf(
-                        4, "Front Steer: lfPos=%.2f, rfPos=%.2f",
+                        2, "Front Steer: lfPos=%.2f, rfPos=%.2f",
                         servoPositions[0][posIndex], servoPositions[1][posIndex]);
                     robot.dashboard.displayPrintf(
-                        5, "Back Steer: lbPos=%.2f, rbPos=%.2f",
+                        3, "Back Steer: lbPos=%.2f, rbPos=%.2f",
                         servoPositions[2][posIndex], servoPositions[3][posIndex]);
                 }
                 break;
@@ -975,7 +975,8 @@ public class FtcTest extends FtcTeleOp
     private boolean allowTeleOp()
     {
         return !RobotParams.Preferences.noRobot &&
-               (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST);
+               (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST ||
+                testChoices.test == Test.CALIBRATE_SWERVE_STEERING);
     }   //allowTeleOp
 
     /**

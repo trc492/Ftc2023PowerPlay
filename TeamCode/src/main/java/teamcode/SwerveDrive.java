@@ -55,10 +55,10 @@ public class SwerveDrive extends RobotDrive
     {
         super();
 
-        lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, false);
-        lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, false);
-        rfDriveMotor = createDriveMotor(RobotParams.HWNAME_RFDRIVE_MOTOR, false);
-        rbDriveMotor = createDriveMotor(RobotParams.HWNAME_RBDRIVE_MOTOR, false);
+        lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, RobotParams.LFDRIVE_INVERTED);
+        lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, RobotParams.LBDRIVE_INVERTED);
+        rfDriveMotor = createDriveMotor(RobotParams.HWNAME_RFDRIVE_MOTOR, RobotParams.RFDRIVE_INVERTED);
+        rbDriveMotor = createDriveMotor(RobotParams.HWNAME_RBDRIVE_MOTOR, RobotParams.RBDRIVE_INVERTED);
 
         lfSteerServo1 = createSteerServo(
             RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.LFSTEER_ZERO, RobotParams.LFSTEER_INVERTED);
@@ -113,7 +113,7 @@ public class SwerveDrive extends RobotDrive
          }
          else
          {
-             driveBase.setOdometryScales(RobotParams.XPOS_INCHES_PER_COUNT, RobotParams.YPOS_INCHES_PER_COUNT);
+             driveBase.setOdometryScales(RobotParams.YPOS_INCHES_PER_COUNT, RobotParams.YPOS_INCHES_PER_COUNT);
          }
 
         //
