@@ -114,6 +114,16 @@ public class RobotParams
     //
     // DriveBase subsystem.
     //
+    public static final double LFSTEER_ZERO                     = 0.54;
+    public static final double RFSTEER_ZERO                     = 0.50;
+    public static final double LBSTEER_ZERO                     = 0.54;
+    public static final double RBSTEER_ZERO                     = 0.48;
+    public static final double STEER_QUARTER_POS                = 0.34;
+    public static final boolean LFSTEER_INVERTED                = false;
+    public static final boolean RFSTEER_INVERTED                = false;
+    public static final boolean LBSTEER_INVERTED                = false;
+    public static final boolean RBSTEER_INVERTED                = false;
+
     public static final DcMotor.RunMode DRIVE_MOTOR_MODE        = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
     public static final boolean DRIVE_WHEEL_BRAKE_MODE_ON       = true;
     public static final boolean LEFT_WHEEL_INVERTED             = true;

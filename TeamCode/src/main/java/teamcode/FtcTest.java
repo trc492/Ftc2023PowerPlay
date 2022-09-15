@@ -119,8 +119,28 @@ public class FtcTest extends FtcTeleOp
     private double maxDriveAcceleration = 0.0;
     private double prevTime = 0.0;
     private double prevVelocity = 0.0;
-    private double steerServoPosition = 0.5;
-    private double calibrateStepSize = 0.1;
+    //
+    // Swerve Steering calibration.
+    //
+    private static final double STEER_CALIBRATE_STEP = 0.01;
+    private static final String[] posNames = {"Zero", "Plus90", "Minus90"};
+    private static final String[] wheelNames = {"Left Front", "Right Front", "Left Back", "Right Back"};
+    private double[][] servoPositions = {
+        {RobotParams.LFSTEER_ZERO,
+            RobotParams.LFSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
+            RobotParams.LFSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
+        {RobotParams.RFSTEER_ZERO,
+            RobotParams.RFSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
+            RobotParams.RFSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
+        {RobotParams.LBSTEER_ZERO,
+            RobotParams.LBSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
+            RobotParams.LBSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
+        {RobotParams.RBSTEER_ZERO,
+            RobotParams.RBSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
+            RobotParams.RBSTEER_ZERO - RobotParams.STEER_QUARTER_POS}
+    };
+    private int posIndex = 0;
+    private int wheelIndex = 0;
 
     //
     // Overrides FtcOpMode abstract method.
@@ -307,7 +327,12 @@ public class FtcTest extends FtcTeleOp
                 break;
 
             case CALIBRATE_SWERVE_STEERING:
-                steerServoPosition = 0.5;
+                if (robot.robotDrive != null && (robot.robotDrive.driveBase instanceof TrcSwerveDriveBase))
+                {
+                    posIndex = 0;
+                    wheelIndex = 0;
+                    setSteerServoPosition();
+                }
                 break;
         }
     }   //startMode
@@ -509,24 +534,15 @@ public class FtcTest extends FtcTeleOp
             case CALIBRATE_SWERVE_STEERING:
                 if (robot.robotDrive != null && (robot.robotDrive.driveBase instanceof TrcSwerveDriveBase))
                 {
-                    SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
-                    swerveDrive.lfSwerveModule.setSteerAngle(steerServoPosition);
-                    swerveDrive.rfSwerveModule.setSteerAngle(steerServoPosition);
-                    swerveDrive.lbSwerveModule.setSteerAngle(steerServoPosition);
-                    swerveDrive.rbSwerveModule.setSteerAngle(steerServoPosition);
-
+                    setSteerServoPosition();
                     robot.dashboard.displayPrintf(
-                        4, "lf: SteerAngle=%.3f, SteerPosition=%.3f",
-                        swerveDrive.lfSwerveModule.getSteerAngle(), swerveDrive.lfSwerveModule.getLogicalPosition());
+                        3, "State: pos=%s, wheel=%s", posNames[posIndex], wheelNames[wheelIndex]);
                     robot.dashboard.displayPrintf(
-                        5, "rf: SteerAngle=%.3f, SteerPosition=%.3f",
-                        swerveDrive.rfSwerveModule.getSteerAngle(), swerveDrive.rfSwerveModule.getLogicalPosition());
+                        4, "Front Steer: lfPos=%.2f, rfPos=%.2f",
+                        servoPositions[0][posIndex], servoPositions[1][posIndex]);
                     robot.dashboard.displayPrintf(
-                        6, "lb: SteerAngle=%.3f, SteerPosition=%.3f",
-                        swerveDrive.lbSwerveModule.getSteerAngle(), swerveDrive.lbSwerveModule.getLogicalPosition());
-                    robot.dashboard.displayPrintf(
-                        7, "rb: SteerAngle=%.3f, SteerPosition=%.3f",
-                        swerveDrive.rbSwerveModule.getSteerAngle(), swerveDrive.rbSwerveModule.getLogicalPosition());
+                        5, "Back Steer: lbPos=%.2f, rbPos=%.2f",
+                        servoPositions[2][posIndex], servoPositions[3][posIndex]);
                 }
                 break;
         }
@@ -557,6 +573,14 @@ public class FtcTest extends FtcTeleOp
             switch (button)
             {
                 case FtcGamepad.GAMEPAD_A:
+                    if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
+                    {
+                        if (pressed)
+                        {
+                            posIndex = (posIndex + 1) % servoPositions[0].length;
+                        }
+                        processed = true;
+                    }
                     break;
 
                 case FtcGamepad.GAMEPAD_B:
@@ -569,51 +593,39 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_UP:
-                    if (pressed)
+                    if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
                     {
-                        // Do not increment beyond 1.0.
-                        if (steerServoPosition + calibrateStepSize <= 1.0)
+                        if (servoPositions[wheelIndex][posIndex] + STEER_CALIBRATE_STEP <= 1.0)
                         {
-                            steerServoPosition += calibrateStepSize;
+                            servoPositions[wheelIndex][posIndex] += STEER_CALIBRATE_STEP;
                         }
+                        processed = true;
                     }
-                    processed = true;
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                    if (pressed)
+                    if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
                     {
-                        // Do not decrement below 0.001.
-                        if (steerServoPosition - calibrateStepSize >= 0.001)
+                        if (servoPositions[wheelIndex][posIndex] - STEER_CALIBRATE_STEP >= 0.0)
                         {
-                            steerServoPosition -= calibrateStepSize;
+                            servoPositions[wheelIndex][posIndex] -= STEER_CALIBRATE_STEP;
                         }
+                        processed = true;
                     }
-                    processed = true;
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                    if (pressed)
-                    {
-                        // Maximum step size is 0.1.
-                        if (calibrateStepSize * 10.0 <= 0.1)
-                        {
-                            calibrateStepSize *= 10.0;
-                        }
-                    }
-                    processed = true;
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                    if (pressed)
+                    if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
                     {
-                        // Minimum step size is 0.001.
-                        if (calibrateStepSize / 10.0 >= 0.001)
+                        if (pressed)
                         {
-                            calibrateStepSize /= 10.0;
+                            wheelIndex = (wheelIndex + 1) % servoPositions.length;
                         }
+                        processed = true;
                     }
-                    processed = true;
                     break;
             }
             //
@@ -965,5 +977,22 @@ public class FtcTest extends FtcTeleOp
         return !RobotParams.Preferences.noRobot &&
                (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST);
     }   //allowTeleOp
+
+    /**
+     * This method sets all the swerve steering servos to the selected angle.
+     */
+    private void setSteerServoPosition()
+    {
+        SwerveDrive robotDrive = (SwerveDrive) robot.robotDrive;
+
+        robotDrive.lfSteerServo1.setPosition(servoPositions[0][posIndex]);
+        robotDrive.lfSteerServo2.setPosition(servoPositions[0][posIndex]);
+        robotDrive.rfSteerServo1.setPosition(servoPositions[1][posIndex]);
+        robotDrive.rfSteerServo2.setPosition(servoPositions[1][posIndex]);
+        robotDrive.lbSteerServo1.setPosition(servoPositions[2][posIndex]);
+        robotDrive.lbSteerServo2.setPosition(servoPositions[2][posIndex]);
+        robotDrive.rbSteerServo1.setPosition(servoPositions[3][posIndex]);
+        robotDrive.rbSteerServo2.setPosition(servoPositions[3][posIndex]);
+    }  //setSteerServoPosition
 
 }   //class FtcTest
