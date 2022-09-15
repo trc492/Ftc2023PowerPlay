@@ -49,20 +49,51 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Calibrate Steering Servos", group="Test")
 public class CalibrateSteering extends LinearOpMode {
+   private static final double DEF_90STEP = 0.340;
+   private static final double LF_ZERO = 0.538;
+   private static final double RF_ZERO = 0.500;
+   private static final double LB_ZERO = 0.538;
+   private static final double RB_ZERO = 0.475;
+   private static final String[] wheelNames = {"lfWheel", "rfWheel", "lbWheel", "rbWheel"};
+   private static final String[] posNames = {"Zero", "Plus90", "Minus90"};
+   private double[][] servoPositions = {
+      {LF_ZERO, LF_ZERO + DEF_90STEP, LF_ZERO - DEF_90STEP},   // lfSteerServo
+      {RF_ZERO, RF_ZERO + DEF_90STEP, RF_ZERO - DEF_90STEP},   // rfSteerServo
+      {LB_ZERO, LB_ZERO + DEF_90STEP, LB_ZERO - DEF_90STEP},   // lbSteerServo
+      {RB_ZERO, RB_ZERO + DEF_90STEP, RB_ZERO - DEF_90STEP}    // rbSteerServo
+   };
+   private double stepSize = 0.01;
+   private int wheelIndex = 0;
+   private int posIndex = 0;
+
+   // A, B, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT
+   private boolean[] buttonWasPressed = {false, false, false, false, false, false};
 
    // Declare OpMode members.
    private ElapsedTime runtime = new ElapsedTime();
-   private Servo servo1, servo2, servo3, servo4;
-   private double servoPos = 0.0;
-   private boolean buttonWasPressed = false;
+   private Servo lfSteerServo1, lfSteerServo2, rfSteerServo1, rfSteerServo2;
+   private Servo lbSteerServo1, lbSteerServo2, rbSteerServo1, rbSteerServo2;
 
-   private void setServoPosition(double pos)
+   private void setServoPosition()
    {
-      servo1.setPosition(servoPos);
-      servo2.setPosition(servoPos);
-      servo3.setPosition(servoPos);
-      servo4.setPosition(servoPos);
-   }
+      lfSteerServo1.setPosition(servoPositions[0][posIndex]);
+      lfSteerServo2.setPosition(servoPositions[0][posIndex]);
+      rfSteerServo1.setPosition(servoPositions[1][posIndex]);
+      rfSteerServo2.setPosition(servoPositions[1][posIndex]);
+      lbSteerServo1.setPosition(servoPositions[2][posIndex]);
+      lbSteerServo2.setPosition(servoPositions[2][posIndex]);
+      rbSteerServo1.setPosition(servoPositions[3][posIndex]);
+      rbSteerServo2.setPosition(servoPositions[3][posIndex]);
+   }  //setServoPosition
+
+   private boolean buttonPressed(int index, boolean buttonState)
+   {
+      boolean buttonEvent = !buttonWasPressed[index] && buttonState || buttonWasPressed[index] && !buttonState;
+
+      if (buttonEvent) buttonWasPressed[index] = buttonState;
+
+      return buttonEvent && buttonState;
+   }  //buttonPressed
 
    @Override
    public void runOpMode() {
@@ -72,11 +103,15 @@ public class CalibrateSteering extends LinearOpMode {
       // Initialize the hardware variables. Note that the strings used here as parameters
       // to 'get' must correspond to the names assigned during the robot configuration
       // step (using the FTC Robot Controller app on the phone).
-      servo1 = hardwareMap.get(Servo.class, "servo1");
-      servo2 = hardwareMap.get(Servo.class, "servo2");
-      servo3 = hardwareMap.get(Servo.class, "servo3");
-      servo4 = hardwareMap.get(Servo.class, "servo4");
-      setServoPosition(servoPos);
+      lfSteerServo1 = hardwareMap.get(Servo.class, "lfSteerServo1");
+      lfSteerServo2 = hardwareMap.get(Servo.class, "lfSteerServo2");
+      rfSteerServo1 = hardwareMap.get(Servo.class, "rfSteerServo1");
+      rfSteerServo2 = hardwareMap.get(Servo.class, "rfSteerServo2");
+      lbSteerServo1 = hardwareMap.get(Servo.class, "lbSteerServo1");
+      lbSteerServo2 = hardwareMap.get(Servo.class, "lbSteerServo2");
+      rbSteerServo1 = hardwareMap.get(Servo.class, "rbSteerServo1");
+      rbSteerServo2 = hardwareMap.get(Servo.class, "rbSteerServo2");
+      setServoPosition();
 
       // Wait for the game to start (driver presses PLAY)
       waitForStart();
@@ -84,36 +119,60 @@ public class CalibrateSteering extends LinearOpMode {
 
       // run until the end of the match (driver presses STOP)
       while (opModeIsActive()) {
-         boolean buttonIsPressed = gamepad1.a;
-         boolean buttonHasEvent = false;
 
-         if (!buttonWasPressed && buttonIsPressed)
+         if (buttonPressed(0, gamepad1.a))
          {
-            // Button is pressed.
-            buttonHasEvent = true;
-         }
-         else if (buttonWasPressed && !buttonIsPressed)
-         {
-            // Button is released.
-            buttonHasEvent = true;
+            posIndex = (posIndex + 1) % servoPositions[0].length;
          }
 
-         if (buttonHasEvent)
+         if (buttonPressed(1, gamepad1.b))
          {
-            servoPos += 0.5;
-            if (servoPos > 1.0)
+            wheelIndex = (wheelIndex + 1) % servoPositions.length;
+         }
+
+         if (buttonPressed(2, gamepad1.dpad_up))
+         {
+            if (servoPositions[wheelIndex][posIndex] + stepSize <= 1.0)
             {
-               servoPos = 0.0;
+               servoPositions[wheelIndex][posIndex] += stepSize;
             }
-
-            setServoPosition(servoPos);
          }
 
-         buttonWasPressed = buttonIsPressed;
+         if (buttonPressed(3, gamepad1.dpad_down))
+         {
+            if (servoPositions[wheelIndex][posIndex] - stepSize >= 0.0)
+            {
+               servoPositions[wheelIndex][posIndex] -= stepSize;
+            }
+         }
+
+         if (buttonPressed(4, gamepad1.dpad_left))
+         {
+            if (stepSize * 10.0 <= 0.1)
+            {
+               stepSize *= 10.0;
+            }
+         }
+
+         if (buttonPressed(5, gamepad1.dpad_right))
+         {
+            if (stepSize / 10.0 >= 0.001)
+            {
+               stepSize /= 10.0;
+            }
+         }
+
+         setServoPosition();
 
          // Show the elapsed game time and wheel power.
          telemetry.addData("Status", "Run Time: " + runtime.toString());
-         telemetry.addData("Servos", "pos=%.1f", servoPos);
+         telemetry.addData(
+             "Selections", "Wheel: %s, Pos: %s, Step: %.3f",
+             wheelNames[wheelIndex], posNames[posIndex], stepSize);
+         telemetry.addData(
+             "FrontServos", "lfPos=%.3f, rfPos=%.3f", servoPositions[0][posIndex], servoPositions[1][posIndex]);
+         telemetry.addData(
+             "BackServos", "lbPos=%.3f, rbPos=%.3f", servoPositions[2][posIndex], servoPositions[3][posIndex]);
          telemetry.update();
       }
    }
