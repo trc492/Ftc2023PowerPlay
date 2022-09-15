@@ -125,7 +125,7 @@ public class FtcTest extends FtcTeleOp
     private static final double STEER_CALIBRATE_STEP = 0.01;
     private static final String[] posNames = {"Zero", "Plus90", "Minus90"};
     private static final String[] wheelNames = {"Left Front", "Right Front", "Left Back", "Right Back"};
-    private double[][] servoPositions = {
+    private final double[][] servoPositions = {
         {RobotParams.LFSTEER_ZERO,
             RobotParams.LFSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
             RobotParams.LFSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
@@ -331,7 +331,7 @@ public class FtcTest extends FtcTeleOp
                 {
                     posIndex = 0;
                     wheelIndex = 0;
-                    setSteerServoPosition();
+                    setSteeringServoPosition(0);
                 }
                 break;
         }
@@ -534,7 +534,7 @@ public class FtcTest extends FtcTeleOp
             case CALIBRATE_SWERVE_STEERING:
                 if (robot.robotDrive != null && (robot.robotDrive.driveBase instanceof TrcSwerveDriveBase))
                 {
-                    setSteerServoPosition();
+                    setSteeringServoPosition(posIndex);
                     robot.dashboard.displayPrintf(
                         3, "State: pos=%s, wheel=%s", posNames[posIndex], wheelNames[wheelIndex]);
                     robot.dashboard.displayPrintf(
@@ -980,19 +980,21 @@ public class FtcTest extends FtcTeleOp
 
     /**
      * This method sets all the swerve steering servos to the selected angle.
+     *
+     * @param index specifies the index in the servo position table.
      */
-    private void setSteerServoPosition()
+    private void setSteeringServoPosition(int index)
     {
         SwerveDrive robotDrive = (SwerveDrive) robot.robotDrive;
 
-        robotDrive.lfSteerServo1.setPosition(servoPositions[0][posIndex]);
-        robotDrive.lfSteerServo2.setPosition(servoPositions[0][posIndex]);
-        robotDrive.rfSteerServo1.setPosition(servoPositions[1][posIndex]);
-        robotDrive.rfSteerServo2.setPosition(servoPositions[1][posIndex]);
-        robotDrive.lbSteerServo1.setPosition(servoPositions[2][posIndex]);
-        robotDrive.lbSteerServo2.setPosition(servoPositions[2][posIndex]);
-        robotDrive.rbSteerServo1.setPosition(servoPositions[3][posIndex]);
-        robotDrive.rbSteerServo2.setPosition(servoPositions[3][posIndex]);
-    }  //setSteerServoPosition
+        robotDrive.lfSteerServo1.setLogicalPosition(servoPositions[0][index]);
+        robotDrive.lfSteerServo2.setLogicalPosition(servoPositions[0][index]);
+        robotDrive.rfSteerServo1.setLogicalPosition(servoPositions[1][index]);
+        robotDrive.rfSteerServo2.setLogicalPosition(servoPositions[1][index]);
+        robotDrive.lbSteerServo1.setLogicalPosition(servoPositions[2][index]);
+        robotDrive.lbSteerServo2.setLogicalPosition(servoPositions[2][index]);
+        robotDrive.rbSteerServo1.setLogicalPosition(servoPositions[3][index]);
+        robotDrive.rbSteerServo2.setLogicalPosition(servoPositions[3][index]);
+    }  //setSteeringServoPosition
 
 }   //class FtcTest
