@@ -24,6 +24,7 @@ package teamcode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -111,12 +112,13 @@ public class Vision
                 double cy = 221.506;
 
                 // UNITS ARE METERS
-                double tagsize = 0.166;
+                double tagSize = 0.166;
 
                 aprilTagVision = new FtcAprilTagDetector(
                     "AprilTagVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
                     RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
-                    RobotParams.Preferences.showEasyOpenCvView, null, tagsize, fx, fy, cx, cy);
+                    RobotParams.Preferences.showEasyOpenCvView, null,
+                    AprilTagDetectorJNI.TagFamily.TAG_36h11, tagSize, fx, fy, cx, cy);
             }
         }
         else
