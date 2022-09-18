@@ -226,6 +226,11 @@ public class Robot
                 globalTracer.traceInfo(funcName, "Disabling EocvVision.");
                 vision.eocvVision.setEnabled(false);
             }
+            else if (vision.aprilTagVision != null)
+            {
+                globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
+                vision.aprilTagVision.setEnabled(false);
+            }
         }
 
         if (robotDrive != null)
