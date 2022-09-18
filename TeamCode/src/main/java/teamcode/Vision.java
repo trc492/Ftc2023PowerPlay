@@ -102,23 +102,13 @@ public class Vision
             }
             else
             {
-                // Lens intrinsics
-                // UNITS ARE PIXELS
-                // NOTE: this calibration is for the C920 webcam at 800x448.
-                // You will need to do your own calibration for other configurations!
-                double fx = 578.272;
-                double fy = 578.272;
-                double cx = 402.145;
-                double cy = 221.506;
-
-                // UNITS ARE METERS
-                double tagSize = 0.166;
-
                 aprilTagVision = new FtcAprilTagDetector(
                     "AprilTagVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
                     RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
-                    RobotParams.Preferences.showEasyOpenCvView, null,
-                    AprilTagDetectorJNI.TagFamily.TAG_36h11, tagSize, fx, fy, cx, cy);
+                    RobotParams.Preferences.showAprilTagView, null,
+                    AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.CAMERA_TAGSIZE,
+                    RobotParams.CAMERA_FX, RobotParams.CAMERA_FY,
+                    RobotParams.CAMERA_CX, RobotParams.CAMERA_CY);
             }
         }
         else

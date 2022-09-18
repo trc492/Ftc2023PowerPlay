@@ -50,8 +50,8 @@ public class RobotParams
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = false;
         public static boolean showEasyOpenCvView = false;
-        public static boolean useAprilTag = false;
-        public static boolean showAprilTagView = false;
+        public static boolean useAprilTag = true;
+        public static boolean showAprilTagView = true;
         public static boolean useTraceLog = true;
         public static boolean useBatteryMonitor = false;
         public static boolean useLoopPerformanceMonitor = true;
@@ -195,8 +195,13 @@ public class RobotParams
     public static final double CAMERA_FRONT_OFFSET              = 7.5;  //Camera offset from front of robot in inches
     public static final double CAMERA_LEFT_OFFSET               = 8.875;//Camera offset from left of robot in inches
     public static final double CAMERA_HEIGHT_OFFSET             = 16.0; //Camera offset from floor in inches
-    public static final int CAMERA_IMAGE_WIDTH                  = 320;
-    public static final int CAMERA_IMAGE_HEIGHT                 = 240;
+    public static final int CAMERA_IMAGE_WIDTH                  = 640;
+    public static final int CAMERA_IMAGE_HEIGHT                 = 480;
+    public static final double CAMERA_TAGSIZE                   = 0.166;    // in meters
+    public static final double CAMERA_FX                        = 821.993;  // in pixels
+    public static final double CAMERA_FY                        = 821.993;  // in pixels
+    public static final double CAMERA_CX                        = 330.489;  // in pixels
+    public static final double CAMERA_CY                        = 248.997;  // in pixels
     public static final int FRAME_QUEUE_CAPACITY                = 2;
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
