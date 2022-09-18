@@ -61,8 +61,7 @@ public class EocvVision extends FtcEocvDetector
      * @param worldRect specifies the homography world coordinate rectangle, can be null if not provided.
      * @param openCvCam specifies the OpenCV camera object.
      * @param cameraRotation specifies the camera orientation.
-     * @param showEocvView specifies true to show the annotated image on robot controller screen, false to hide the
-     *        image.
+     * @param showEocvView specifies true to show the annotated image on robot controller screen, false to hide it.
      * @param tracer specifies the tracer for trace info, null if none provided.
      */
     public EocvVision(

@@ -50,6 +50,8 @@ public class RobotParams
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = false;
         public static boolean showEasyOpenCvView = false;
+        public static boolean useAprilTag = false;
+        public static boolean showAprilTagView = false;
         public static boolean useTraceLog = true;
         public static boolean useBatteryMonitor = false;
         public static boolean useLoopPerformanceMonitor = true;
@@ -114,15 +116,26 @@ public class RobotParams
     //
     // DriveBase subsystem.
     //
-    public static final double LFSTEER_ZERO                     = 0.54;
-    public static final double RFSTEER_ZERO                     = 0.50;
-    public static final double LBSTEER_ZERO                     = 0.54;
-    public static final double RBSTEER_ZERO                     = 0.48;
-    public static final double STEER_QUARTER_POS                = 0.34;
+    public static final double STEER_LOW_LIMIT                  = -90.0;
+    public static final double STEER_HIGH_LIMIT                 = 90.0;
+    public static final double LFSTEER_MINUS90                  = 0.20;
+    public static final double LFSTEER_PLUS90                   = 0.85;
+    public static final double RFSTEER_MINUS90                  = 0.21;
+    public static final double RFSTEER_PLUS90                   = 0.87;
+    public static final double LBSTEER_MINUS90                  = 0.26;
+    public static final double LBSTEER_PLUS90                   = 0.94;
+    public static final double RBSTEER_MINUS90                  = 0.18;
+    public static final double RBSTEER_PLUS90                   = 0.85;
+
+//    public static final double LFSTEER_ZERO                     = 0.54;
+//    public static final double RFSTEER_ZERO                     = 0.54;
+//    public static final double LBSTEER_ZERO                     = 0.61;
+//    public static final double RBSTEER_ZERO                     = 0.52;
+//    public static final double STEER_QUARTER_POS                = 0.33;
     public static final boolean LFDRIVE_INVERTED                = true;
-    public static final boolean RFDRIVE_INVERTED                = false;
+    public static final boolean RFDRIVE_INVERTED                = true;
     public static final boolean LBDRIVE_INVERTED                = true;
-    public static final boolean RBDRIVE_INVERTED                = false;
+    public static final boolean RBDRIVE_INVERTED                = true;
     public static final boolean LFSTEER_INVERTED                = false;
     public static final boolean RFSTEER_INVERTED                = false;
     public static final boolean LBSTEER_INVERTED                = false;

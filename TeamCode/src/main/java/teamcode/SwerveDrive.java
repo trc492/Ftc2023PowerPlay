@@ -23,7 +23,6 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcDriveBaseOdometry;
-import TrcCommonLib.trclib.TrcEnhancedServo;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPidDrive;
 import TrcCommonLib.trclib.TrcPurePursuitDrive;
@@ -61,30 +60,45 @@ public class SwerveDrive extends RobotDrive
         rbDriveMotor = createDriveMotor(RobotParams.HWNAME_RBDRIVE_MOTOR, RobotParams.RBDRIVE_INVERTED);
 
         lfSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.LFSTEER_ZERO, RobotParams.LFSTEER_INVERTED);
+            RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.LFSTEER_MINUS90, RobotParams.LFSTEER_PLUS90,
+            RobotParams.LFSTEER_INVERTED);
         lfSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_LFSTEER_SERVO2, RobotParams.LFSTEER_ZERO, RobotParams.LFSTEER_INVERTED);
-        lbSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_LBSTEER_SERVO1, RobotParams.LBSTEER_ZERO, RobotParams.LBSTEER_INVERTED);
-        lbSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_LBSTEER_SERVO2, RobotParams.LBSTEER_ZERO, RobotParams.LBSTEER_INVERTED);
-        rfSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_RFSTEER_SERVO1, RobotParams.RFSTEER_ZERO, RobotParams.RFSTEER_INVERTED);
-        rfSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_RFSTEER_SERVO2, RobotParams.RFSTEER_ZERO, RobotParams.RFSTEER_INVERTED);
-        rbSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_RBSTEER_SERVO1, RobotParams.RBSTEER_ZERO, RobotParams.RBSTEER_INVERTED);
-        rbSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_RBSTEER_SERVO2, RobotParams.RBSTEER_ZERO, RobotParams.RBSTEER_INVERTED);
+            RobotParams.HWNAME_LFSTEER_SERVO2, RobotParams.LFSTEER_MINUS90, RobotParams.LFSTEER_PLUS90,
+            RobotParams.LFSTEER_INVERTED);
+        lfSteerServo1.addFollower(lfSteerServo2);
 
-        lfSwerveModule = new TrcSwerveModule(
-            "lfSwerveModule", lfDriveMotor, new TrcEnhancedServo("lfSteerServo", lfSteerServo1, lfSteerServo2));
-        lbSwerveModule = new TrcSwerveModule(
-            "lbSwerveModule", lbDriveMotor, new TrcEnhancedServo("lbSteerServo", lbSteerServo1, lbSteerServo2));
-        rfSwerveModule = new TrcSwerveModule(
-            "rfSwerveModule", rfDriveMotor, new TrcEnhancedServo("rfSteerServo", rfSteerServo1, rfSteerServo2));
-        rbSwerveModule = new TrcSwerveModule(
-            "rbSwerveModule", rbDriveMotor, new TrcEnhancedServo("rbSteerServo", rbSteerServo1, rbSteerServo2));
+        lbSteerServo1 = createSteerServo(
+            RobotParams.HWNAME_LBSTEER_SERVO1, RobotParams.LBSTEER_MINUS90, RobotParams.LBSTEER_PLUS90,
+            RobotParams.LBSTEER_INVERTED);
+        lbSteerServo2 = createSteerServo(
+            RobotParams.HWNAME_LBSTEER_SERVO2, RobotParams.LBSTEER_MINUS90, RobotParams.LBSTEER_PLUS90,
+            RobotParams.LBSTEER_INVERTED);
+        lbSteerServo1.addFollower(lbSteerServo2);
+
+        rfSteerServo1 = createSteerServo(
+            RobotParams.HWNAME_RFSTEER_SERVO1, RobotParams.RFSTEER_MINUS90, RobotParams.RFSTEER_PLUS90,
+            RobotParams.RFSTEER_INVERTED);
+        rfSteerServo2 = createSteerServo(
+            RobotParams.HWNAME_RFSTEER_SERVO2, RobotParams.RFSTEER_MINUS90, RobotParams.RFSTEER_PLUS90,
+            RobotParams.RFSTEER_INVERTED);
+        rfSteerServo1.addFollower(rfSteerServo2);
+
+        rbSteerServo1 = createSteerServo(
+            RobotParams.HWNAME_RBSTEER_SERVO1, RobotParams.RBSTEER_MINUS90, RobotParams.RBSTEER_PLUS90,
+            RobotParams.RBSTEER_INVERTED);
+        rbSteerServo2 = createSteerServo(
+            RobotParams.HWNAME_RBSTEER_SERVO2, RobotParams.RBSTEER_MINUS90, RobotParams.RBSTEER_PLUS90,
+            RobotParams.RBSTEER_INVERTED);
+        rbSteerServo1.addFollower(rbSteerServo2);
+
+        lfSwerveModule = new TrcSwerveModule("lfSwerveModule", lfDriveMotor, lfSteerServo1);
+        lbSwerveModule = new TrcSwerveModule("lbSwerveModule", lbDriveMotor, lbSteerServo1);
+        rfSwerveModule = new TrcSwerveModule("rfSwerveModule", rfDriveMotor, rfSteerServo1);
+        rbSwerveModule = new TrcSwerveModule("rbSwerveModule", rbDriveMotor, rbSteerServo1);
+        lfSwerveModule.setSteeringLimits(RobotParams.STEER_LOW_LIMIT, RobotParams.STEER_HIGH_LIMIT);
+        lbSwerveModule.setSteeringLimits(RobotParams.STEER_LOW_LIMIT, RobotParams.STEER_HIGH_LIMIT);
+        rfSwerveModule.setSteeringLimits(RobotParams.STEER_LOW_LIMIT, RobotParams.STEER_HIGH_LIMIT);
+        rbSwerveModule.setSteeringLimits(RobotParams.STEER_LOW_LIMIT, RobotParams.STEER_HIGH_LIMIT);
 
         driveBase = new TrcSwerveDriveBase(
             lfSwerveModule, lbSwerveModule, rfSwerveModule, rbSwerveModule, gyro,
@@ -150,17 +164,18 @@ public class SwerveDrive extends RobotDrive
      * This method creates and configures a steering servo.
      *
      * @param servoName specifies the name of the servo.
-     * @param steerZero specifies the logical position of zero degree.
+     * @param steerMinus90 specifies the logical position of -90 degree.
+     * @param steerPlus90 specifies the logical position of +90 degree.
      * @param inverted specifies true if servo direction is reversed, false otherwise.
      * @return created steering servo.
      */
-    private FtcServo createSteerServo(String servoName, double steerZero, boolean inverted)
+    private FtcServo createSteerServo(String servoName, double steerMinus90, double steerPlus90, boolean inverted)
     {
         FtcServo servo = new FtcServo(servoName);
 
         servo.setInverted(inverted);
         servo.setPhysicalRange(-90.0, 90.0);
-        servo.setLogicalRange(steerZero - RobotParams.STEER_QUARTER_POS, steerZero + RobotParams.STEER_QUARTER_POS);
+        servo.setLogicalRange(steerMinus90, steerPlus90);
 
         return servo;
     }   //createSteerServo

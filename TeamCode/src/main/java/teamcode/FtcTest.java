@@ -126,18 +126,14 @@ public class FtcTest extends FtcTeleOp
     private static final String[] posNames = {"Zero", "Plus90", "Minus90"};
     private static final String[] wheelNames = {"Left Front", "Right Front", "Left Back", "Right Back"};
     private final double[][] servoPositions = {
-        {RobotParams.LFSTEER_ZERO,
-            RobotParams.LFSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
-            RobotParams.LFSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
-        {RobotParams.RFSTEER_ZERO,
-            RobotParams.RFSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
-            RobotParams.RFSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
-        {RobotParams.LBSTEER_ZERO,
-            RobotParams.LBSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
-            RobotParams.LBSTEER_ZERO - RobotParams.STEER_QUARTER_POS},
-        {RobotParams.RBSTEER_ZERO,
-            RobotParams.RBSTEER_ZERO + RobotParams.STEER_QUARTER_POS,
-            RobotParams.RBSTEER_ZERO - RobotParams.STEER_QUARTER_POS}
+        {(RobotParams.LFSTEER_MINUS90 + RobotParams.LFSTEER_PLUS90)/2.0,
+            RobotParams.LFSTEER_PLUS90, RobotParams.LFSTEER_MINUS90},
+        {(RobotParams.RFSTEER_MINUS90 + RobotParams.RFSTEER_PLUS90)/2.0,
+            RobotParams.RFSTEER_PLUS90, RobotParams.RFSTEER_MINUS90},
+        {(RobotParams.LBSTEER_MINUS90 + RobotParams.LBSTEER_PLUS90)/2.0,
+            RobotParams.LBSTEER_PLUS90, RobotParams.LBSTEER_MINUS90},
+        {(RobotParams.RBSTEER_MINUS90 + RobotParams.RBSTEER_PLUS90)/2.0,
+            RobotParams.RBSTEER_PLUS90, RobotParams.RBSTEER_MINUS90}
     };
     private int posIndex = 0;
     private int wheelIndex = 0;
@@ -294,6 +290,11 @@ public class FtcTest extends FtcTeleOp
                         robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
                         robot.vision.eocvVision.setEnabled(true);
                     }
+                    else if (robot.vision.aprilTagVision != null)
+                    {
+                        robot.globalTracer.traceInfo(funcName, "Enabling AprilTagVision.");
+                        robot.vision.aprilTagVision.setEnabled(true);
+                    }
                 }
                 break;
 
@@ -373,6 +374,11 @@ public class FtcTest extends FtcTeleOp
             {
                 robot.globalTracer.traceInfo(funcName, "Disabling EocvVision.");
                 robot.vision.eocvVision.setEnabled(false);
+            }
+            else if (robot.vision.aprilTagVision != null)
+            {
+                robot.globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
+                robot.vision.aprilTagVision.setEnabled(false);
             }
         }
 
@@ -562,7 +568,7 @@ public class FtcTest extends FtcTeleOp
     @Override
     public void driverButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
-        if (allowTeleOp())
+        if (allowTeleOp() || testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
         {
             boolean processed = false;
             //
@@ -593,7 +599,7 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_UP:
-                    if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
+                    if (pressed && testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
                     {
                         if (servoPositions[wheelIndex][posIndex] + STEER_CALIBRATE_STEP <= 1.0)
                         {
@@ -604,7 +610,7 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                    if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
+                    if (pressed && testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
                     {
                         if (servoPositions[wheelIndex][posIndex] - STEER_CALIBRATE_STEP >= 0.0)
                         {
@@ -936,7 +942,9 @@ public class FtcTest extends FtcTeleOp
                 int endLine = lineIndex + maxNumLines;
                 int numTargets;
 
-                if (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null)
+                if (robot.vision.tensorFlowVision != null ||
+                    robot.vision.eocvVision != null ||
+                    robot.vision.aprilTagVision != null)
                 {
                     TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(null);
 
@@ -975,8 +983,7 @@ public class FtcTest extends FtcTeleOp
     private boolean allowTeleOp()
     {
         return !RobotParams.Preferences.noRobot &&
-               (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST ||
-                testChoices.test == Test.CALIBRATE_SWERVE_STEERING);
+               (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST);
     }   //allowTeleOp
 
     /**
