@@ -324,6 +324,10 @@ public class FtcTest extends FtcTeleOp
                     wheelIndex = 0;
                     ((SwerveDrive) robot.robotDrive).setSteeringServoPosition(posDataIndices[posIndex]);
                 }
+                else
+                {
+                    throw new RuntimeException("Steering calibration can only be done on Swerve Drive.");
+                }
                 break;
         }
     }   //startMode
