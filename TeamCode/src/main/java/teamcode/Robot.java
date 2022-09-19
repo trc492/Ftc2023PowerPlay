@@ -86,7 +86,8 @@ public class Robot
         //
         if ((RobotParams.Preferences.useVuforia ||
              RobotParams.Preferences.useTensorFlow ||
-             RobotParams.Preferences.useEasyOpenCV) &&
+             RobotParams.Preferences.useEasyOpenCV ||
+             RobotParams.Preferences.useAprilTag) &&
             (runMode == TrcRobot.RunMode.AUTO_MODE || runMode == TrcRobot.RunMode.TEST_MODE))
         {
             vision = new Vision(this);
