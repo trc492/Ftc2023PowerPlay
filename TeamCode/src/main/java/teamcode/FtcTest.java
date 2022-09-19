@@ -949,27 +949,23 @@ public class FtcTest extends FtcTeleOp
     {
         if (robot.vision != null)
         {
-            if (RobotParams.Preferences.useTensorFlow || RobotParams.Preferences.useEasyOpenCV)
+            if (robot.vision.tensorFlowVision != null ||
+                robot.vision.eocvVision != null ||
+                robot.vision.aprilTagVision != null)
             {
                 final int maxNumLines = 3;
                 int lineIndex = 10;
                 int endLine = lineIndex + maxNumLines;
                 int numTargets;
+                TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(null);
 
-                if (robot.vision.tensorFlowVision != null ||
-                    robot.vision.eocvVision != null ||
-                    robot.vision.aprilTagVision != null)
+                if (targetsInfo != null)
                 {
-                    TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(null);
-
-                    if (targetsInfo != null)
+                    numTargets = Math.min(targetsInfo.length, maxNumLines);
+                    for (int i = 0; i < numTargets; i++)
                     {
-                        numTargets = Math.min(targetsInfo.length, maxNumLines);
-                        for (int i = 0; i < numTargets; i++)
-                        {
-                            robot.dashboard.displayPrintf(lineIndex, "[%d] %s", i, targetsInfo[i]);
-                            lineIndex++;
-                        }
+                        robot.dashboard.displayPrintf(lineIndex, "[%d] %s", i, targetsInfo[i]);
+                        lineIndex++;
                     }
                 }
 
@@ -980,7 +976,7 @@ public class FtcTest extends FtcTeleOp
                 }
             }
 
-            if (RobotParams.Preferences.useVuforia)
+            if (robot.vision.vuforiaVision != null)
             {
                 TrcPose2D robotPose = robot.vision.vuforiaVision.getRobotPose(null, false);
                 robot.dashboard.displayPrintf(13, "RobotLoc %s: %s",

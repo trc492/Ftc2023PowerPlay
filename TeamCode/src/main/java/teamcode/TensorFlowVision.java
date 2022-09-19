@@ -63,7 +63,7 @@ public class TensorFlowVision
                 new TFObjectDetector.Parameters() : new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParams.minResultConfidence = TFOD_MIN_CONFIDENCE;
         tfodParams.isModelTensorFlow2 = true;
-        tfodParams.inputSize = RobotParams.CAMERA_IMAGE_WIDTH;
+        tfodParams.inputSize = 300;
 
         this.tracer = tracer;
         tensorFlow = new FtcTensorFlow(
@@ -114,13 +114,13 @@ public class TensorFlowVision
      */
     public TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>[] getDetectedTargetsInfo(
         String label, FtcTensorFlow.FilterTarget filter,
-        Comparator<? super TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>> comparator, boolean traceTargets)
+        Comparator<? super TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>> comparator)
     {
         final String funcName = "getDetectedTargetsInfo";
         TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>[] targets =
             tensorFlow.getDetectedTargetsInfo(label, filter, comparator);
 
-        if (targets != null && traceTargets)
+        if (tracer != null && targets != null)
         {
             for (int i = 0; i < targets.length; i++)
             {

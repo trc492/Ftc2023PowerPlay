@@ -24,7 +24,7 @@ package teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -69,6 +69,7 @@ public class VuforiaVision
         vuforia.configVideoSource(
             RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT, RobotParams.FRAME_QUEUE_CAPACITY);
         /*
+        /*
          * Create a transformation matrix describing where the camera is on the robot.
          *
          * Info:  The coordinate frame for the robot looks the same as the field.
@@ -92,10 +93,11 @@ public class VuforiaVision
         final float CAMERA_VERTICAL_DISPLACEMENT =
             (float)(RobotParams.CAMERA_HEIGHT_OFFSET*TrcUtil.MM_PER_INCH);
         final float CAMERA_LEFT_DISPLACEMENT =
-            (float)((RobotParams.ROBOT_WIDTH/2.0 - RobotParams.CAMERA_LEFT_OFFSET)*TrcUtil.MM_PER_INCH);
+            (float)(-(RobotParams.ROBOT_WIDTH/2.0 - RobotParams.CAMERA_LEFT_OFFSET)*TrcUtil.MM_PER_INCH);
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
             .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-            .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, 90, 90, 0));
+            .multiplied(Orientation.getRotationMatrix(
+                EXTRINSIC, XZY, DEGREES, (float)(90 + RobotParams.CAMERA_TILT_DOWN), 90, 0));
         /*
          * In order for localization to work, we need to tell the system where each target is on the field,
          * and where the camera resides on the robot.  These specifications are in the form of

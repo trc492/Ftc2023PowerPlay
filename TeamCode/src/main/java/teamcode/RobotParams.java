@@ -89,10 +89,10 @@ public class RobotParams
     //
     // Robot dimensions.
     //
-    public static final double ROBOT_LENGTH                     = 18.0;
-    public static final double ROBOT_WIDTH                      = 18.0;
-    public static final double DRIVE_BASE_LENGTH                = 17.0;
-    public static final double DRIVE_BASE_WIDTH                 = 17.0;
+    public static final double ROBOT_LENGTH                     = 17.0;
+    public static final double ROBOT_WIDTH                      = 13.0;
+    public static final double DRIVE_BASE_LENGTH                = 13.25;
+    public static final double DRIVE_BASE_WIDTH                 = 11.25;
     //
     // Game positions.
     //
@@ -189,8 +189,10 @@ public class RobotParams
     // Vision subsystem.
     //
     public static final double CAMERA_FRONT_OFFSET              = 7.5;  //Camera offset from front of robot in inches
-    public static final double CAMERA_LEFT_OFFSET               = 8.875;//Camera offset from left of robot in inches
+    public static final double CAMERA_LEFT_OFFSET               = 6.0;  //Camera offset from left of robot in inches
     public static final double CAMERA_HEIGHT_OFFSET             = 16.0; //Camera offset from floor in inches
+    public static final double CAMERA_TILT_DOWN                 = 36.0; //Camera tilt down angle from horizontal in deg
+    // Camera: Logitech C310
     public static final int CAMERA_IMAGE_WIDTH                  = 640;
     public static final int CAMERA_IMAGE_HEIGHT                 = 480;
     public static final double CAMERA_TAGSIZE                   = 0.035;    // in meters

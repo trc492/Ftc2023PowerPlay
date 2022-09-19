@@ -168,7 +168,7 @@ public class Vision
 
         if (tensorFlowVision != null)
         {
-            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareConfidence, false);
+            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareConfidence);
         }
         else if (eocvVision != null)
         {
@@ -207,7 +207,7 @@ public class Vision
 
         if (tensorFlowVision != null)
         {
-            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareDistanceFromCamera, false);
+            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareDistanceFromCamera);
         }
         else if (eocvVision != null)
         {
