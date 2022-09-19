@@ -123,7 +123,8 @@ public class FtcTest extends FtcTeleOp
     // Swerve Steering calibration.
     //
     private static final double STEER_CALIBRATE_STEP = 0.01;
-    private static final String[] posNames = {"Zero", "Plus90", "Minus90"};
+    private static final String[] posNames = {"Zero", "Minus90", "Plus90"};
+    private static final int[] posDataIndices = {-1, 0, 1};
     private int posIndex = 0;
     private int wheelIndex = 0;
 
@@ -321,7 +322,7 @@ public class FtcTest extends FtcTeleOp
                 {
                     posIndex = 0;
                     wheelIndex = 0;
-                    ((SwerveDrive) robot.robotDrive).setSteeringServoPosition(0);
+                    ((SwerveDrive) robot.robotDrive).setSteeringServoPosition(posDataIndices[posIndex]);
                 }
                 break;
         }
@@ -527,19 +528,21 @@ public class FtcTest extends FtcTeleOp
                 break;
 
             case CALIBRATE_SWERVE_STEERING:
-                if (robot.robotDrive != null && (robot.robotDrive.driveBase instanceof TrcSwerveDriveBase))
+                if (robot.robotDrive != null && (robot.robotDrive instanceof SwerveDrive))
                 {
                     SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
 
-                    swerveDrive.setSteeringServoPosition(posIndex);
+                    swerveDrive.setSteeringServoPosition(posDataIndices[posIndex]);
                     robot.dashboard.displayPrintf(
                         1, "State: pos=%s, wheel=%s", posNames[posIndex], SwerveDrive.servoNames[wheelIndex]);
                     robot.dashboard.displayPrintf(
                         2, "Front Steer: lfPos=%.2f, rfPos=%.2f",
-                        swerveDrive.servoPositions[0][posIndex], swerveDrive.servoPositions[1][posIndex]);
+                        swerveDrive.getSteeringServoPosition(0, posDataIndices[posIndex]),
+                        swerveDrive.getSteeringServoPosition(1, posDataIndices[posIndex]));
                     robot.dashboard.displayPrintf(
                         3, "Back Steer: lbPos=%.2f, rbPos=%.2f",
-                        swerveDrive.servoPositions[2][posIndex], swerveDrive.servoPositions[3][posIndex]);
+                        swerveDrive.getSteeringServoPosition(2, posDataIndices[posIndex]),
+                        swerveDrive.getSteeringServoPosition(3, posDataIndices[posIndex]));
                 }
                 break;
         }
@@ -574,7 +577,7 @@ public class FtcTest extends FtcTeleOp
                     {
                         if (pressed)
                         {
-                            posIndex = (posIndex + 1) % ((SwerveDrive) robot.robotDrive).servoPositions[0].length;
+                            posIndex = (posIndex + 1) % posNames.length;
                         }
                         processed = true;
                     }
@@ -602,9 +605,11 @@ public class FtcTest extends FtcTeleOp
                     {
                         SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
 
-                        if (swerveDrive.servoPositions[wheelIndex][posIndex] + STEER_CALIBRATE_STEP <= 1.0)
+                        if (posDataIndices[posIndex] != -1 &&
+                            swerveDrive.servoPositions[wheelIndex][posDataIndices[posIndex]] + STEER_CALIBRATE_STEP
+                            <= 1.0)
                         {
-                            swerveDrive.servoPositions[wheelIndex][posIndex] += STEER_CALIBRATE_STEP;
+                            swerveDrive.servoPositions[wheelIndex][posDataIndices[posIndex]] += STEER_CALIBRATE_STEP;
                         }
                         processed = true;
                     }
@@ -615,9 +620,11 @@ public class FtcTest extends FtcTeleOp
                     {
                         SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
 
-                        if (swerveDrive.servoPositions[wheelIndex][posIndex] - STEER_CALIBRATE_STEP >= 0.0)
+                        if (posDataIndices[posIndex] != -1 &&
+                            swerveDrive.servoPositions[wheelIndex][posDataIndices[posIndex]] - STEER_CALIBRATE_STEP
+                            >= 0.0)
                         {
-                            swerveDrive.servoPositions[wheelIndex][posIndex] -= STEER_CALIBRATE_STEP;
+                            swerveDrive.servoPositions[wheelIndex][posDataIndices[posIndex]] -= STEER_CALIBRATE_STEP;
                         }
                         processed = true;
                     }
@@ -631,7 +638,7 @@ public class FtcTest extends FtcTeleOp
                     {
                         if (pressed)
                         {
-                            wheelIndex = (wheelIndex + 1) % ((SwerveDrive) robot.robotDrive).servoPositions.length;
+                            wheelIndex = (wheelIndex + 1) % ((SwerveDrive) robot.robotDrive).servoNames.length;
                         }
                         processed = true;
                     }

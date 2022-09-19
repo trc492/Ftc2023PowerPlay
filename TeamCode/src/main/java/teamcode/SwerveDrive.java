@@ -51,14 +51,10 @@ public class SwerveDrive extends RobotDrive
         RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.HWNAME_RFSTEER_SERVO1,
         RobotParams.HWNAME_LBSTEER_SERVO1, RobotParams.HWNAME_RBSTEER_SERVO1};
     public double[][] servoPositions = {
-        {(RobotParams.LFSTEER_MINUS90 + RobotParams.LFSTEER_PLUS90)/2.0,
-            RobotParams.LFSTEER_PLUS90, RobotParams.LFSTEER_MINUS90},
-        {(RobotParams.RFSTEER_MINUS90 + RobotParams.RFSTEER_PLUS90)/2.0,
-            RobotParams.RFSTEER_PLUS90, RobotParams.RFSTEER_MINUS90},
-        {(RobotParams.LBSTEER_MINUS90 + RobotParams.LBSTEER_PLUS90)/2.0,
-            RobotParams.LBSTEER_PLUS90, RobotParams.LBSTEER_MINUS90},
-        {(RobotParams.RBSTEER_MINUS90 + RobotParams.RBSTEER_PLUS90)/2.0,
-            RobotParams.RBSTEER_PLUS90, RobotParams.RBSTEER_MINUS90}
+        {RobotParams.LFSTEER_MINUS90, RobotParams.LFSTEER_PLUS90},
+        {RobotParams.RFSTEER_MINUS90, RobotParams.RFSTEER_PLUS90},
+        {RobotParams.LBSTEER_MINUS90, RobotParams.LBSTEER_PLUS90},
+        {RobotParams.RBSTEER_MINUS90, RobotParams.RBSTEER_PLUS90}
     };
     //
     // Swerve steering motors and modules.
@@ -233,20 +229,40 @@ public class SwerveDrive extends RobotDrive
     }   //setAntiDefenseEnabled
 
     /**
+     * This method returns the servo position value for the given wheel index and position index.
+     *
+     * @param wheelIndex specifies the wheel index.
+     * @param posIndex specifies -1 for zero position, 0 for minus90 and 1 for plus90.
+     * @return servo position value.
+     */
+    public double getSteeringServoPosition(int wheelIndex, int posIndex)
+    {
+        return posIndex == -1?
+            (servoPositions[wheelIndex][0] + servoPositions[wheelIndex][1])/2.0:
+            servoPositions[wheelIndex][posIndex];
+    }   //getSterringServoPosition
+
+    /**
      * This method sets all the swerve steering servos to the selected angle.
      *
-     * @param index specifies the index in the servo position table.
+     * @param posIndex specifies -1 for zero position, 0 for minus90 and 1 for plus90.
      */
-    public void setSteeringServoPosition(int index)
+    public void setSteeringServoPosition(int posIndex)
     {
-        lfSteerServo1.setLogicalPosition(servoPositions[0][index]);
-        lfSteerServo2.setLogicalPosition(servoPositions[0][index]);
-        rfSteerServo1.setLogicalPosition(servoPositions[1][index]);
-        rfSteerServo2.setLogicalPosition(servoPositions[1][index]);
-        lbSteerServo1.setLogicalPosition(servoPositions[2][index]);
-        lbSteerServo2.setLogicalPosition(servoPositions[2][index]);
-        rbSteerServo1.setLogicalPosition(servoPositions[3][index]);
-        rbSteerServo2.setLogicalPosition(servoPositions[3][index]);
+        double pos;
+
+        pos = getSteeringServoPosition(0, posIndex);
+        lfSteerServo1.setLogicalPosition(pos);
+        lfSteerServo2.setLogicalPosition(pos);
+        pos = getSteeringServoPosition(1, posIndex);
+        rfSteerServo1.setLogicalPosition(pos);
+        rfSteerServo2.setLogicalPosition(pos);
+        pos = getSteeringServoPosition(2, posIndex);
+        lbSteerServo1.setLogicalPosition(pos);
+        lbSteerServo2.setLogicalPosition(pos);
+        pos = getSteeringServoPosition(3, posIndex);
+        rbSteerServo1.setLogicalPosition(pos);
+        rbSteerServo2.setLogicalPosition(pos);
     }  //setSteeringServoPosition
 
     /**
