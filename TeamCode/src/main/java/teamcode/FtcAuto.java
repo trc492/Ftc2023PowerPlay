@@ -116,7 +116,7 @@ public class FtcAuto extends FtcOpMode
         {
             matchInfo = FtcMatchInfo.getMatchInfo();
             String filePrefix = String.format(Locale.US, "%s%02d", matchInfo.matchType, matchInfo.matchNumber);
-            robot.globalTracer.openTraceLog(RobotParams.LOG_PATH_FOLDER, filePrefix);
+            robot.globalTracer.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
         }
         //
         // Create and run choice menus.

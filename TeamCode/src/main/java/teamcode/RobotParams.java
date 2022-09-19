@@ -59,8 +59,9 @@ public class RobotParams
     }   //class Preferences
 
     public static final String ROBOT_NAME                       = "Robot3543";
-    public static final String LOG_PATH_FOLDER                  =
-        Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftclogs";
+    public static final String TEAM_FOLDER_PATH                 =
+        Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftc3543";
+    public static final String LOG_FOLDER_PATH                  = TEAM_FOLDER_PATH + "/logs";
     //
     // Hardware names.
     //
@@ -127,11 +128,6 @@ public class RobotParams
     public static final double RBSTEER_MINUS90                  = 0.18;
     public static final double RBSTEER_PLUS90                   = 0.85;
 
-//    public static final double LFSTEER_ZERO                     = 0.54;
-//    public static final double RFSTEER_ZERO                     = 0.54;
-//    public static final double LBSTEER_ZERO                     = 0.61;
-//    public static final double RBSTEER_ZERO                     = 0.52;
-//    public static final double STEER_QUARTER_POS                = 0.33;
     public static final boolean LFDRIVE_INVERTED                = true;
     public static final boolean RFDRIVE_INVERTED                = true;
     public static final boolean LBDRIVE_INVERTED                = true;
@@ -197,7 +193,7 @@ public class RobotParams
     public static final double CAMERA_HEIGHT_OFFSET             = 16.0; //Camera offset from floor in inches
     public static final int CAMERA_IMAGE_WIDTH                  = 640;
     public static final int CAMERA_IMAGE_HEIGHT                 = 480;
-    public static final double CAMERA_TAGSIZE                   = 0.166;    // in meters
+    public static final double CAMERA_TAGSIZE                   = 0.035;    // in meters
     public static final double CAMERA_FX                        = 821.993;  // in pixels
     public static final double CAMERA_FY                        = 821.993;  // in pixels
     public static final double CAMERA_CX                        = 330.489;  // in pixels

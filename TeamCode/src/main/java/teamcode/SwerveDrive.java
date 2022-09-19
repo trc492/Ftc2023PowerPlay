@@ -22,6 +22,13 @@
 
 package teamcode;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintStream;
+import java.util.Scanner;
+
+import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDriveBaseOdometry;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPidDrive;
@@ -38,6 +45,21 @@ public class SwerveDrive extends RobotDrive
 {
     private static final boolean logPoseEvents = false;
     private static final boolean tracePidInfo = false;
+
+    private static final String STEERING_CALIBRATION_DATA_FILE = "SteerCalibration.txt";
+    public static final String[] servoNames = {
+        RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.HWNAME_RFSTEER_SERVO1,
+        RobotParams.HWNAME_LBSTEER_SERVO1, RobotParams.HWNAME_RBSTEER_SERVO1};
+    public double[][] servoPositions = {
+        {(RobotParams.LFSTEER_MINUS90 + RobotParams.LFSTEER_PLUS90)/2.0,
+            RobotParams.LFSTEER_PLUS90, RobotParams.LFSTEER_MINUS90},
+        {(RobotParams.RFSTEER_MINUS90 + RobotParams.RFSTEER_PLUS90)/2.0,
+            RobotParams.RFSTEER_PLUS90, RobotParams.RFSTEER_MINUS90},
+        {(RobotParams.LBSTEER_MINUS90 + RobotParams.LBSTEER_PLUS90)/2.0,
+            RobotParams.LBSTEER_PLUS90, RobotParams.LBSTEER_MINUS90},
+        {(RobotParams.RBSTEER_MINUS90 + RobotParams.RBSTEER_PLUS90)/2.0,
+            RobotParams.RBSTEER_PLUS90, RobotParams.RBSTEER_MINUS90}
+    };
     //
     // Swerve steering motors and modules.
     //
@@ -60,34 +82,34 @@ public class SwerveDrive extends RobotDrive
         rbDriveMotor = createDriveMotor(RobotParams.HWNAME_RBDRIVE_MOTOR, RobotParams.RBDRIVE_INVERTED);
 
         lfSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.LFSTEER_MINUS90, RobotParams.LFSTEER_PLUS90,
+            RobotParams.HWNAME_LFSTEER_SERVO1, servoPositions[0][0], servoPositions[0][1],
             RobotParams.LFSTEER_INVERTED);
         lfSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_LFSTEER_SERVO2, RobotParams.LFSTEER_MINUS90, RobotParams.LFSTEER_PLUS90,
+            RobotParams.HWNAME_LFSTEER_SERVO2, servoPositions[0][0], servoPositions[0][1],
             RobotParams.LFSTEER_INVERTED);
         lfSteerServo1.addFollower(lfSteerServo2);
 
         lbSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_LBSTEER_SERVO1, RobotParams.LBSTEER_MINUS90, RobotParams.LBSTEER_PLUS90,
+            RobotParams.HWNAME_LBSTEER_SERVO1, servoPositions[1][0], servoPositions[1][1],
             RobotParams.LBSTEER_INVERTED);
         lbSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_LBSTEER_SERVO2, RobotParams.LBSTEER_MINUS90, RobotParams.LBSTEER_PLUS90,
+            RobotParams.HWNAME_LBSTEER_SERVO2, servoPositions[1][0], servoPositions[1][1],
             RobotParams.LBSTEER_INVERTED);
         lbSteerServo1.addFollower(lbSteerServo2);
 
         rfSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_RFSTEER_SERVO1, RobotParams.RFSTEER_MINUS90, RobotParams.RFSTEER_PLUS90,
+            RobotParams.HWNAME_RFSTEER_SERVO1, servoPositions[2][0], servoPositions[2][1],
             RobotParams.RFSTEER_INVERTED);
         rfSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_RFSTEER_SERVO2, RobotParams.RFSTEER_MINUS90, RobotParams.RFSTEER_PLUS90,
+            RobotParams.HWNAME_RFSTEER_SERVO2, servoPositions[2][0], servoPositions[2][1],
             RobotParams.RFSTEER_INVERTED);
         rfSteerServo1.addFollower(rfSteerServo2);
 
         rbSteerServo1 = createSteerServo(
-            RobotParams.HWNAME_RBSTEER_SERVO1, RobotParams.RBSTEER_MINUS90, RobotParams.RBSTEER_PLUS90,
+            RobotParams.HWNAME_RBSTEER_SERVO1, servoPositions[3][0], servoPositions[3][1],
             RobotParams.RBSTEER_INVERTED);
         rbSteerServo2 = createSteerServo(
-            RobotParams.HWNAME_RBSTEER_SERVO2, RobotParams.RBSTEER_MINUS90, RobotParams.RBSTEER_PLUS90,
+            RobotParams.HWNAME_RBSTEER_SERVO2, servoPositions[3][0], servoPositions[3][1],
             RobotParams.RBSTEER_INVERTED);
         rbSteerServo1.addFollower(rbSteerServo2);
 
@@ -209,5 +231,83 @@ public class SwerveDrive extends RobotDrive
             }
         }
     }   //setAntiDefenseEnabled
+
+    /**
+     * This method sets all the swerve steering servos to the selected angle.
+     *
+     * @param index specifies the index in the servo position table.
+     */
+    public void setSteeringServoPosition(int index)
+    {
+        lfSteerServo1.setLogicalPosition(servoPositions[0][index]);
+        lfSteerServo2.setLogicalPosition(servoPositions[0][index]);
+        rfSteerServo1.setLogicalPosition(servoPositions[1][index]);
+        rfSteerServo2.setLogicalPosition(servoPositions[1][index]);
+        lbSteerServo1.setLogicalPosition(servoPositions[2][index]);
+        lbSteerServo2.setLogicalPosition(servoPositions[2][index]);
+        rbSteerServo1.setLogicalPosition(servoPositions[3][index]);
+        rbSteerServo2.setLogicalPosition(servoPositions[3][index]);
+    }  //setSteeringServoPosition
+
+    /**
+     * This method saves the calibration data to a file on the Robot Controller.
+     */
+    public void saveSteeringCalibrationData()
+    {
+        final String funcName = "saveSteeringCalibrationData";
+
+        try (PrintStream out = new PrintStream(new FileOutputStream(
+            RobotParams.TEAM_FOLDER_PATH + "/" + STEERING_CALIBRATION_DATA_FILE)))
+        {
+            for (int i = 0; i < servoNames.length; i++)
+            {
+                out.printf("%s: %f, %f\n", servoNames[i], servoPositions[i][0], servoPositions[i][1]);
+            }
+            out.close();
+            TrcDbgTrace.getGlobalTracer().traceInfo(funcName, "Saved steering calibration data!");
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+    }   //saveSteeringCalibrationData
+
+    /**
+     * This method reads the steering calibration data from a file on the Robot Controller.
+     *
+     * @throws RuntimeException if file contains invalid data.
+     */
+    public void readSteeringCalibrationData()
+    {
+        final String funcName = "readSteeringCalibrationData";
+
+        try (Scanner in = new Scanner(new FileReader(
+            RobotParams.TEAM_FOLDER_PATH + "/" + STEERING_CALIBRATION_DATA_FILE)))
+        {
+            for (int i = 0; i < servoNames.length; i++)
+            {
+                String line = in.nextLine();
+                int colonPos = line.indexOf(':');
+                String name = colonPos == -1? null: line.substring(0, colonPos);
+
+                if (name == null || !name.equals(servoNames[i]))
+                {
+                    throw new RuntimeException("Invalid servo name in line " + line);
+                }
+
+                String[] numbers = line.substring(colonPos + 1).split(",", 2);
+
+                for (int j = 0; j < servoPositions[0].length; j++)
+                {
+                    servoPositions[i][j] = Double.parseDouble(numbers[j]);
+                }
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            TrcDbgTrace.getGlobalTracer().traceWarn(
+                funcName, "Steering calibration data file not found, using built-in defaults.");
+        }
+    }   //readSteeringCalibrationData
 
 }   //class SwerveDrive
