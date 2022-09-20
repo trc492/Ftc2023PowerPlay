@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import TrcCommonLib.trclib.TrcDbgTrace;
@@ -71,6 +72,8 @@ public class SwerveDrive extends RobotDrive
     public SwerveDrive(Robot robot)
     {
         super();
+
+        readSteeringCalibrationData();
 
         lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, RobotParams.LFDRIVE_INVERTED);
         lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, RobotParams.LBDRIVE_INVERTED);
@@ -296,6 +299,7 @@ public class SwerveDrive extends RobotDrive
     public void readSteeringCalibrationData()
     {
         final String funcName = "readSteeringCalibrationData";
+        TrcDbgTrace tracer = TrcDbgTrace.getGlobalTracer();
 
         try (Scanner in = new Scanner(new FileReader(
             RobotParams.TEAM_FOLDER_PATH + "/" + STEERING_CALIBRATION_DATA_FILE)))
@@ -317,12 +321,14 @@ public class SwerveDrive extends RobotDrive
                 {
                     servoPositions[i][j] = Double.parseDouble(numbers[j]);
                 }
+
+                tracer.traceInfo(
+                    funcName, "SteeringCalibrationData[%s]: %s", servoNames[i], Arrays.toString(servoPositions[i]));
             }
         }
         catch (FileNotFoundException e)
         {
-            TrcDbgTrace.getGlobalTracer().traceWarn(
-                funcName, "Steering calibration data file not found, using built-in defaults.");
+            tracer.traceWarn(funcName, "Steering calibration data file not found, using built-in defaults.");
         }
     }   //readSteeringCalibrationData
 

@@ -43,7 +43,7 @@ public class RobotParams
         public static boolean noRobot = false;
         public static boolean initSubsystems = true;
         public static boolean useExternalOdometry = false;
-        public static boolean useBlinkin = true;
+        public static boolean useBlinkin = false;
         public static boolean useVuforia = false;
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
