@@ -294,6 +294,10 @@ public class Vision
         {
             targets = eocvVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera);
         }
+        else if (aprilTagVision != null)
+        {
+            targets = aprilTagVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera);
+        }
 
         return targets != null? targets[0]: null;
     }   //getClosestTargetInfo

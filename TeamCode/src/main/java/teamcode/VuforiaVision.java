@@ -69,7 +69,6 @@ public class VuforiaVision
         vuforia.configVideoSource(
             RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT, RobotParams.FRAME_QUEUE_CAPACITY);
         /*
-        /*
          * Create a transformation matrix describing where the camera is on the robot.
          *
          * Info:  The coordinate frame for the robot looks the same as the field.
