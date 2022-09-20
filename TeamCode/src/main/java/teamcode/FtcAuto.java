@@ -185,7 +185,10 @@ public class FtcAuto extends FtcOpMode
     @Override
     public void initPeriodic()
     {
-        // Add code to detect object before match starts.
+        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.aprilTagVision != null))
+        {
+            robot.vision.getDetectedSignal();
+        }
     }   //initPeriodic
 
     /**

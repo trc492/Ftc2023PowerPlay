@@ -74,6 +74,8 @@ public class Vision
     public EocvVision eocvVision;
     public FtcAprilTagDetector aprilTagVision;
 
+    private int lastSignal = 0;
+
     /**
      * Constructor: Create an instance of the object. Vision is required by both Vuforia and TensorFlow and must be
      * instantiated if either is used. However, to use either Vuforia or TensorFlow, one must explicitly initialize
@@ -155,6 +157,63 @@ public class Vision
             tensorFlowVision = null;
         }
     }   //tensorFlowShutdown
+
+    /**
+     * This method does not initiate detection. It simply returns the signal detected by the last call to
+     * getDetectedSignal. This is typically used to get the last detected signal during the init period.
+     *
+     * @return last detected signal.
+     */
+    public int getLastSignal()
+    {
+        return lastSignal;
+    }   //getLastSignal
+
+    /**
+     * This method calls the appropriate vision detection to detect the signal position.
+     *
+     * @return detected signal position, 0 if none detected.
+     */
+    public int getDetectedSignal()
+    {
+        int detectedSignal = 0;
+        TrcVisionTargetInfo<?> target = getBestDetectedTargetInfo(null);
+
+        if (target != null)
+        {
+            if (tensorFlowVision != null)
+            {
+                FtcTensorFlow.DetectedObject detectedObj = (FtcTensorFlow.DetectedObject) target.detectedObj;
+
+                if (detectedObj.label.equals(LABEL_BOLT))
+                {
+                    detectedSignal = 1;
+                }
+                else if (detectedObj.label.equals(LABEL_BULB))
+                {
+                    detectedSignal = 2;
+                }
+                else if (detectedObj.label.equals(LABEL_PANEL))
+                {
+                    detectedSignal = 3;
+                }
+            }
+            else if (aprilTagVision != null)
+            {
+                FtcAprilTagDetector.DetectedObject detectedObj =
+                    (FtcAprilTagDetector.DetectedObject) target.detectedObj;
+
+                detectedSignal = detectedObj.aprilTagInfo.id;
+            }
+        }
+
+        if (detectedSignal != 0)
+        {
+            lastSignal = detectedSignal;
+        }
+
+        return detectedSignal;
+    }   //getDetectedSignal
 
     /**
      * This method returns an array of the detected targets info.
