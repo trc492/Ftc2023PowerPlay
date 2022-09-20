@@ -36,7 +36,6 @@ import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
-import TrcCommonLib.trclib.TrcSwerveDriveBase;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
@@ -566,7 +565,7 @@ public class FtcTest extends FtcTeleOp
     @Override
     public void driverButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
-        if (allowTeleOp() || testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
+        if (allowButtonControl())
         {
             boolean processed = false;
             //
@@ -642,7 +641,7 @@ public class FtcTest extends FtcTeleOp
                     {
                         if (pressed)
                         {
-                            wheelIndex = (wheelIndex + 1) % ((SwerveDrive) robot.robotDrive).servoNames.length;
+                            wheelIndex = (wheelIndex + 1) % SwerveDrive.servoNames.length;
                         }
                         processed = true;
                     }
@@ -668,7 +667,7 @@ public class FtcTest extends FtcTeleOp
     @Override
     public void operatorButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
-        if (allowTeleOp())
+        if (allowButtonControl())
         {
             boolean processed = false;
             //
@@ -995,5 +994,18 @@ public class FtcTest extends FtcTeleOp
         return !RobotParams.Preferences.noRobot &&
                (testChoices.test == Test.SUBSYSTEMS_TEST || testChoices.test == Test.DRIVE_SPEED_TEST);
     }   //allowTeleOp
+
+    /**
+     * This method is called to determine if Test mode is allowed to do button control of the robot.
+     *
+     * @return true to allow and false otherwise.
+     */
+    private boolean allowButtonControl()
+    {
+        return !RobotParams.Preferences.noRobot &&
+               (testChoices.test == Test.SUBSYSTEMS_TEST ||
+                testChoices.test == Test.DRIVE_SPEED_TEST ||
+                testChoices.test == Test.CALIBRATE_SWERVE_STEERING);
+    }   //allowButtonControl
 
 }   //class FtcTest

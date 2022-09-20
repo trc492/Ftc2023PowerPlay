@@ -43,7 +43,7 @@ public class RobotParams
         public static boolean noRobot = false;
         public static boolean initSubsystems = true;
         public static boolean useExternalOdometry = false;
-        public static boolean useBlinkin = false;
+        public static boolean useBlinkin = true;
         public static boolean useVuforia = false;
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
@@ -192,10 +192,10 @@ public class RobotParams
     public static final double CAMERA_LEFT_OFFSET               = 6.0;  //Camera offset from left of robot in inches
     public static final double CAMERA_HEIGHT_OFFSET             = 16.0; //Camera offset from floor in inches
     public static final double CAMERA_TILT_DOWN                 = 36.0; //Camera tilt down angle from horizontal in deg
+    public static final double CAMERA_TAGSIZE                   = 0.035;// in meters
     // Camera: Logitech C310
     public static final int CAMERA_IMAGE_WIDTH                  = 640;
     public static final int CAMERA_IMAGE_HEIGHT                 = 480;
-    public static final double CAMERA_TAGSIZE                   = 0.035;    // in meters
     public static final double CAMERA_FX                        = 821.993;  // in pixels
     public static final double CAMERA_FY                        = 821.993;  // in pixels
     public static final double CAMERA_CX                        = 330.489;  // in pixels
