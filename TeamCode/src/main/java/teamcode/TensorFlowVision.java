@@ -109,7 +109,6 @@ public class TensorFlowVision
      * @param label specifies the label of the targets to detect for, can be null for detecting any target.
      * @param filter specifies the filter to call to filter out false positive targets.
      * @param comparator specifies the comparator to sort the array if provided, can be null if not provided.
-     * @param traceTargets specifies true to display info for all detected targets.
      * @return array of detected target info.
      */
     public TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>[] getDetectedTargetsInfo(
