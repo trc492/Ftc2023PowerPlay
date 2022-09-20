@@ -210,6 +210,28 @@ public class Vision
         if (detectedSignal != 0)
         {
             lastSignal = detectedSignal;
+            if (robot.blinkin != null)
+            {
+                // Turn off previous detection indication.
+                robot.blinkin.setPatternState(Vision.LABEL_BOLT, false);
+                robot.blinkin.setPatternState(Vision.LABEL_BULB, false);
+                robot.blinkin.setPatternState(Vision.LABEL_PANEL, false);
+
+                switch (detectedSignal)
+                {
+                    case 1:
+                        robot.blinkin.setPatternState(Vision.LABEL_BOLT, true);
+                        break;
+
+                    case 2:
+                        robot.blinkin.setPatternState(Vision.LABEL_BULB, true);
+                        break;
+
+                    case 3:
+                        robot.blinkin.setPatternState(Vision.LABEL_PANEL, true);
+                        break;
+                }
+            }
         }
 
         return detectedSignal;
