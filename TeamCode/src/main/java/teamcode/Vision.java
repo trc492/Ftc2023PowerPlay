@@ -170,14 +170,13 @@ public class Vision
     }   //getLastSignal
 
     /**
-     * This method calls the appropriate vision detection to detect the signal position.
+     * This method determines the signal value from the detected object info.
      *
-     * @return detected signal position, 0 if none detected.
+     * @return signal value of the detected object, 0 if no detected object.
      */
-    public int getDetectedSignal()
+    public int determineDetectedSignal(TrcVisionTargetInfo<?> target)
     {
         int detectedSignal = 0;
-        TrcVisionTargetInfo<?> target = getBestDetectedTargetInfo(null);
 
         if (target != null)
         {
@@ -235,6 +234,16 @@ public class Vision
         }
 
         return detectedSignal;
+    }   //determineDetectedSignal
+
+    /**
+     * This method calls the appropriate vision detection to detect the signal position.
+     *
+     * @return detected signal position, 0 if none detected.
+     */
+    public int getDetectedSignal()
+    {
+        return determineDetectedSignal(getBestDetectedTargetInfo(null));
     }   //getDetectedSignal
 
     /**

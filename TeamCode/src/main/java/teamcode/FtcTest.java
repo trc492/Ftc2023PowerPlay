@@ -963,7 +963,9 @@ public class FtcTest extends FtcTeleOp
                     numTargets = Math.min(targetsInfo.length, maxNumLines);
                     for (int i = 0; i < numTargets; i++)
                     {
-                        robot.dashboard.displayPrintf(lineIndex, "[%d] %s", i, targetsInfo[i]);
+                        robot.dashboard.displayPrintf(
+                            lineIndex, "[%d] %s (signal=%d)",
+                            i, targetsInfo[i], robot.vision.determineDetectedSignal(targetsInfo[i]));
                         lineIndex++;
                     }
                 }
