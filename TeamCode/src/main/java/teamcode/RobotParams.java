@@ -40,6 +40,7 @@ public class RobotParams
      */
     public static class Preferences
     {
+        public static boolean testRobot = false;
         public static boolean noRobot = false;
         public static boolean initSubsystems = true;
         public static boolean useExternalOdometry = false;

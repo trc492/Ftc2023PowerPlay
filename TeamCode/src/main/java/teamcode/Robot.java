@@ -122,7 +122,7 @@ public class Robot
             //
             // Create and initialize RobotDrive.
             //
-            robotDrive = new SwerveDrive(this);
+            robotDrive = RobotParams.Preferences.testRobot? new MecanumDrive(this): new SwerveDrive(this);
             //
             // Create and initialize other subsystems.
             //
