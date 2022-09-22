@@ -258,15 +258,19 @@ public class Vision
 
         if (tensorFlowVision != null)
         {
-            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareConfidence);
+            targets = tensorFlowVision.getDetectedTargetsInfo(
+                label, null, this::compareConfidence,
+                RobotParams.SIGNAL_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
         else if (eocvVision != null)
         {
-            targets = eocvVision.getDetectedTargetsInfo(null, this::compareObjectSize);
+            targets = eocvVision.getDetectedTargetsInfo(
+                null, this::compareObjectSize, RobotParams.SIGNAL_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
         else if (aprilTagVision != null)
         {
-            targets = aprilTagVision.getDetectedTargetsInfo(null, null);
+            targets = aprilTagVision.getDetectedTargetsInfo(
+                null, null, RobotParams.SIGNAL_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
 
         return targets;
@@ -297,15 +301,21 @@ public class Vision
 
         if (tensorFlowVision != null)
         {
-            targets = tensorFlowVision.getDetectedTargetsInfo(label, null, this::compareDistanceFromCamera);
+            targets = tensorFlowVision.getDetectedTargetsInfo(
+                label, null, this::compareDistanceFromCamera,
+                RobotParams.SIGNAL_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
         else if (eocvVision != null)
         {
-            targets = eocvVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera);
+            targets = eocvVision.getDetectedTargetsInfo(
+                null, this::compareDistanceFromCamera,
+                RobotParams.SIGNAL_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
         else if (aprilTagVision != null)
         {
-            targets = aprilTagVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera);
+            targets = aprilTagVision.getDetectedTargetsInfo(
+                null, this::compareDistanceFromCamera,
+                RobotParams.SIGNAL_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
 
         return targets != null? targets[0]: null;

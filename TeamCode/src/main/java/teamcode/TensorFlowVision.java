@@ -109,15 +109,18 @@ public class TensorFlowVision
      * @param label specifies the label of the targets to detect for, can be null for detecting any target.
      * @param filter specifies the filter to call to filter out false positive targets.
      * @param comparator specifies the comparator to sort the array if provided, can be null if not provided.
+     * @param objHeightOffset specifies the object height offset above the floor.
+     * @param cameraHeight specifies the height of the camera above the floor.
      * @return array of detected target info.
      */
     public TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>[] getDetectedTargetsInfo(
         String label, FtcTensorFlow.FilterTarget filter,
-        Comparator<? super TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>> comparator)
+        Comparator<? super TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>> comparator,
+        double objHeightOffset, double cameraHeight)
     {
         final String funcName = "getDetectedTargetsInfo";
         TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>[] targets =
-            tensorFlow.getDetectedTargetsInfo(label, filter, comparator);
+            tensorFlow.getDetectedTargetsInfo(label, filter, comparator, objHeightOffset, cameraHeight);
 
         if (tracer != null && targets != null)
         {

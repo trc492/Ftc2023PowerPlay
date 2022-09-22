@@ -193,7 +193,7 @@ public class RobotParams
     public static final double CAMERA_LEFT_OFFSET               = 6.0;  //Camera offset from left of robot in inches
     public static final double CAMERA_HEIGHT_OFFSET             = 16.0; //Camera offset from floor in inches
     public static final double CAMERA_TILT_DOWN                 = 36.0; //Camera tilt down angle from horizontal in deg
-    public static final double CAMERA_TAGSIZE                   = 0.035;// in meters
+    public static final double CAMERA_TAGSIZE                   = 0.05; // in meters
     // Camera: Logitech C310
     public static final int CAMERA_IMAGE_WIDTH                  = 640;
     public static final int CAMERA_IMAGE_HEIGHT                 = 480;
@@ -202,6 +202,7 @@ public class RobotParams
     public static final double CAMERA_CX                        = 330.489;  // in pixels
     public static final double CAMERA_CY                        = 248.997;  // in pixels
     public static final int FRAME_QUEUE_CAPACITY                = 2;
+    public static final double SIGNAL_HEIGHT_OFFSET             = 1.5;      // in inches
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 0.0;
