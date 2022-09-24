@@ -17,13 +17,33 @@ import org.opencv.imgproc.*;
 */
 public class GripPipeline
 {
-
+	// TODO: Add HSV filter.
+	private double[] hsvThresholdHue;
+	private double[] hsvThresholdSaturation;
+	private double[] hsvThresholdValue;
 	//Outputs
 	private Mat cvCvtcolorOutput = new Mat();
 	private Mat hsvThresholdOutput = new Mat();
 	private Mat cvErodeOutput = new Mat();
 	private Mat maskOutput = new Mat();
 	private MatOfKeyPoint findBlobsOutput = new MatOfKeyPoint();
+
+	// TODO: Add a method to set Red Alliance
+	public void setRedAlliance(boolean redAlliance)
+	{
+		if (redAlliance)
+		{
+			hsvThresholdHue = new double[] {14.568345323741006, 78.63481228668942};
+			hsvThresholdSaturation = new double[] {128.41726618705036, 255.0};
+			hsvThresholdValue = new double[] {217.85071942446044, 255.0};
+		}
+		else
+		{
+			hsvThresholdHue = new double[] {14.568345323741006, 78.63481228668942};
+			hsvThresholdSaturation = new double[] {128.41726618705036, 255.0};
+			hsvThresholdValue = new double[] {217.85071942446044, 255.0};
+		}
+	}	//setRedAlliance
 
 //	static {
 //		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -40,9 +60,6 @@ public class GripPipeline
 
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = cvCvtcolorOutput;
-		double[] hsvThresholdHue = {14.568345323741006, 78.63481228668942};
-		double[] hsvThresholdSaturation = {128.41726618705036, 255.0};
-		double[] hsvThresholdValue = {217.85071942446044, 255.0};
 		hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
 		// Step CV_erode0:

@@ -74,6 +74,8 @@ public class EocvVision extends FtcEocvDetector
 
         this.tracer = tracer;
         gripPipeline = new GripPipeline();
+        // Initialize to red alliance by default.
+        gripPipeline.setRedAlliance(true);
     }   //EocvVision
 
     /**
@@ -110,6 +112,16 @@ public class EocvVision extends FtcEocvDetector
         detectedObjects = null;
         return targets;
     }   //getDetectedObjects
+
+    /**
+     * This method sets the alliance color so the pipeline can detect the correct color.
+     *
+     * @param redAlliance specifies true to select red, false to select blue.
+     */
+    public void setRedAlliance(boolean redAlliance)
+    {
+        gripPipeline.setRedAlliance(redAlliance);
+    }   //setRedAlliance
 
     //
     // Implements FtcEocvDetector abstract methods.

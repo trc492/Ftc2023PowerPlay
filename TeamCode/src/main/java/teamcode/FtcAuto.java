@@ -220,6 +220,11 @@ public class FtcAuto extends FtcOpMode
         //
         robot.startMode(nextMode);
 
+        if (robot.vision != null && robot.vision.eocvVision != null)
+        {
+            robot.vision.eocvVision.setRedAlliance(autoChoices.alliance == Alliance.RED_ALLIANCE);
+        }
+
         if (robot.battery != null)
         {
             robot.battery.setEnabled(true);
