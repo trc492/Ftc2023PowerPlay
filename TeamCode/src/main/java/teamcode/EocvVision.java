@@ -24,11 +24,14 @@ package teamcode;
 
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import java.util.ArrayList;
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcHomographyMapper;
@@ -148,7 +151,7 @@ public class EocvVision extends FtcEocvDetector
 
         double startTime = TrcUtil.getCurrentTime();
         gripPipeline.process(input);
-        MatOfKeyPoint detectedTargets = gripPipeline.findBlobsOutput();
+        ArrayList<MatOfPoint> detectedTargets = gripPipeline.filterContoursOutput();
         double elapsedTime = TrcUtil.getCurrentTime() - startTime;
 
         totalTime += elapsedTime;
@@ -162,17 +165,13 @@ public class EocvVision extends FtcEocvDetector
 
         if (detectedTargets != null)
         {
-            KeyPoint[] targetPoints = detectedTargets.toArray();
-            targets = new TrcOpenCVDetector.DetectedObject[targetPoints.length];
+            MatOfPoint[] contours = (MatOfPoint[]) detectedTargets.toArray();
+            targets = new TrcOpenCVDetector.DetectedObject[contours.length];
             for (int i = 0; i < targets.length; i++)
             {
-                double radius = targetPoints[i].size/2;
                 targets[i] = new TrcOpenCVDetector.DetectedObject(
-                    new Rect((int)(targetPoints[i].pt.x - radius), (int)(targetPoints[i].pt.y - radius),
-                             (int)targetPoints[i].size, (int)targetPoints[i].size),
-                    targetPoints[i].angle, targetPoints[i].response, targetPoints[i].octave, targetPoints[i].class_id);
+                    Imgproc.boundingRect(contours[i]), Imgproc.contourArea(contours[i]));
             }
-            detectedTargets.release();
             TrcOpenCVDetector.drawRectangles(input, targets, ANNOTATE_RECT_COLOR, 0);
             synchronized (this)
             {
