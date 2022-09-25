@@ -587,6 +587,28 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_B:
+                    if (testChoices.test == Test.SENSORS_TEST || testChoices.test == Test.SUBSYSTEMS_TEST)
+                    {
+                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
+                        {
+                            robot.vision.eocvVision.setRedAlliance(true);
+                        }
+                        processed = true;
+                    }
+                    break;
+
+                case FtcGamepad.GAMEPAD_X:
+                    if (testChoices.test == Test.SENSORS_TEST || testChoices.test == Test.SUBSYSTEMS_TEST)
+                    {
+                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
+                        {
+                            robot.vision.eocvVision.setRedAlliance(false);
+                        }
+                        processed = true;
+                    }
+                    break;
+
+                case FtcGamepad.GAMEPAD_Y:
                     if (testChoices.test == Test.CALIBRATE_SWERVE_STEERING)
                     {
                         if (pressed)
@@ -595,12 +617,6 @@ public class FtcTest extends FtcTeleOp
                         }
                         processed = true;
                     }
-                    break;
-
-                case FtcGamepad.GAMEPAD_X:
-                    break;
-
-                case FtcGamepad.GAMEPAD_Y:
                     break;
 
                 case FtcGamepad.GAMEPAD_DPAD_UP:
