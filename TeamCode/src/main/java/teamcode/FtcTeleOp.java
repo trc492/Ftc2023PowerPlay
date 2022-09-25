@@ -153,6 +153,10 @@ public class FtcTeleOp extends FtcOpMode
         //
         // Other subsystems.
         //
+        if (RobotParams.Preferences.useTurret)
+        {
+            robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees()-90.0);
+        }
     }   //slowPeriodic
 
     /**

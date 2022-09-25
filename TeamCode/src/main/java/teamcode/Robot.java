@@ -27,10 +27,13 @@ import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
 import TrcCommonLib.trclib.TrcMotor;
+import TrcCommonLib.trclib.TrcPidActuator;
+import TrcCommonLib.trclib.TrcPidActuator.Parameters;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
 import TrcFtcLib.ftclib.FtcAndroidTone;
 import TrcFtcLib.ftclib.FtcDashboard;
+import TrcFtcLib.ftclib.FtcDcMotor;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcRevBlinkin;
 import TrcFtcLib.ftclib.FtcRobotBattery;
@@ -60,6 +63,9 @@ public class Robot
     // Subsystems.
     //
     public RobotDrive robotDrive;
+    public TrcPidActuator turret;
+    public FtcDcMotor turretMotor;
+    public Parameters turretParams;
 
     /**
      * Constructor: Create an instance of the object.
@@ -128,6 +134,11 @@ public class Robot
             //
             if (RobotParams.Preferences.initSubsystems)
             {
+                turretMotor = new FtcDcMotor("turretMotor");
+                turretParams = new Parameters();
+                turretParams.setPidParams(0.0, 0.0, 0.0, 0.0);
+                turret = new TrcPidActuator("turret", turretMotor, null, null, turretParams);
+                turret.setPositionScale(1.0); //TODO: Find turret scale
             }
         }
 
