@@ -26,14 +26,17 @@ import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
+import TrcCommonLib.trclib.TrcIntake;
 import TrcCommonLib.trclib.TrcMotor;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidActuator.Parameters;
+import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
 import TrcFtcLib.ftclib.FtcAndroidTone;
 import TrcFtcLib.ftclib.FtcDashboard;
 import TrcFtcLib.ftclib.FtcDcMotor;
+import TrcFtcLib.ftclib.FtcMotorActuator;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcRevBlinkin;
 import TrcFtcLib.ftclib.FtcRobotBattery;
@@ -66,6 +69,11 @@ public class Robot
     public TrcPidActuator turret;
     public FtcDcMotor turretMotor;
     public Parameters turretParams;
+
+    public TrcPidActuator elevator = null;
+    public TrcPidActuator arm = null;
+    public TrcIntake intake = null;
+
 
     /**
      * Constructor: Create an instance of the object.
@@ -134,11 +142,63 @@ public class Robot
             //
             if (RobotParams.Preferences.initSubsystems)
             {
-                turretMotor = new FtcDcMotor("turretMotor");
-                turretParams = new Parameters();
-                turretParams.setPidParams(0.0, 0.0, 0.0, 0.0);
-                turret = new TrcPidActuator("turret", turretMotor, null, null, turretParams);
-                turret.setPositionScale(1.0); //TODO: Find turret scale
+                if(RobotParams.Preferences.useTurret){
+                    turretMotor = new FtcDcMotor("turretMotor");
+                    turretParams = new Parameters();
+                    turretParams.setPidParams(0.0, 0.0, 0.0, 0.0);
+                    turret = new TrcPidActuator("turret", turretMotor, null, null, turretParams);
+                    turret.setPositionScale(1.0); //TODO: Find turret scale
+                }
+                if (RobotParams.Preferences.useElevator)
+                {
+                    final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
+                            RobotParams.ELEVATOR_MOTOR_INVERTED,
+                            RobotParams.ELEVATOR_HAS_LOWER_LIMIT_SWITCH, RobotParams.ELEVATOR_LOWER_LIMIT_INVERTED,
+                            RobotParams.ELEVATOR_HAS_UPPER_LIMIT_SWITCH, RobotParams.ELEVATOR_UPPER_LIMIT_INVERTED);
+                    final TrcPidActuator.Parameters elevatorParams = new TrcPidActuator.Parameters()
+                            .setPosRange(RobotParams.ELEVATOR_MIN_POS, RobotParams.ELEVATOR_MAX_POS)
+                            .setPidParams(new TrcPidController.PidParameters(
+                                    RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD, RobotParams.ELEVATOR_TOLERANCE))
+                            .setStallProtectionParams(
+                                    RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
+                                    RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
+                            .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
+                            .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
+                    elevator = new FtcMotorActuator(RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
+                    elevator.setMsgTracer(globalTracer);
+                    elevator.setBeep(androidTone);
+                    elevator.zeroCalibrate();
+                }
+                if (RobotParams.Preferences.useArm)
+                {
+                    final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
+                            RobotParams.ARM_MOTOR_INVERTED,
+                            RobotParams.ARM_HAS_LOWER_LIMIT_SWITCH, RobotParams.ARM_LOWER_LIMIT_INVERTED,
+                            RobotParams.ARM_HAS_UPPER_LIMIT_SWITCH, RobotParams.ARM_UPPER_LIMIT_INVERTED);
+                    final TrcPidActuator.Parameters armParams = new TrcPidActuator.Parameters()
+                            .setPosRange(RobotParams.ARM_MIN_POS, RobotParams.ARM_MAX_POS)
+                            .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
+                            .setPidParams(new TrcPidController.PidParameters(
+                                    RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
+                            .setStallProtectionParams(
+                                    RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
+                                    RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
+                            .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
+                            .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
+                    arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
+                    arm.setMsgTracer(globalTracer);
+                    arm.setBeep(androidTone);
+                    arm.zeroCalibrate();
+                }
+                if (RobotParams.Preferences.useIntake)
+                {
+                    TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
+                            .setMotorInverted(true)
+                            .setTriggerInverted(true)
+                            .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
+                            .setMsgTracer(globalTracer);
+                    intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
+                }
             }
         }
 

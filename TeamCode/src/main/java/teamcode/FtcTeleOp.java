@@ -319,15 +319,28 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
+                if (robot.intake != null)
+                {
+                    robot.intake.cancelAutoAssist();    //cancel auto-assist if it is active.
+                    robot.intake.setPower(pressed? RobotParams.INTAKE_POWER_DUMP: 0.0);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_B:
+                //extends the arm to the same preset level as the elevator level
+                robot.arm.setPresetPosition(robot.elevator.getPresetPosition());
                 break;
 
             case FtcGamepad.GAMEPAD_X:
+                robot.arm.setPresetPosition(0);
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
+                if (robot.intake != null)
+                {
+                    robot.intake.cancelAutoAssist();    //cancel auto-assist if it is active.
+                    robot.intake.setPower(pressed? RobotParams.INTAKE_POWER_PICKUP: 0.0);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
@@ -337,9 +350,12 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
+                robot.elevator.presetPositionUp();
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
+                robot.elevator.presetPositionDown();
+
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:

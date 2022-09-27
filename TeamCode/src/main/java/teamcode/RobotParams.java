@@ -44,7 +44,6 @@ public class RobotParams
         public static boolean noRobot = false;
         public static boolean initSubsystems = true;
         public static boolean useExternalOdometry = false;
-        public static boolean useTurret = false;
         public static boolean useBlinkin = false;
         public static boolean useVuforia = false;
         public static boolean showVuforiaView = false;
@@ -58,6 +57,14 @@ public class RobotParams
         public static boolean useBatteryMonitor = false;
         public static boolean useLoopPerformanceMonitor = true;
         public static boolean useVelocityControl = false;
+        //subsystems
+        public static boolean useTurret = false;
+        public static boolean useArm = false;
+        public static boolean useElevator = false;
+        public static boolean useIntake = false;
+        public static boolean hasIntakeSensor = false;
+
+
     }   //class Preferences
 
     public static final String ROBOT_NAME                       = "Robot3543";
@@ -82,6 +89,11 @@ public class RobotParams
     public static final String HWNAME_LBSTEER_SERVO2            = "lbSteerServo2";
     public static final String HWNAME_RBSTEER_SERVO1            = "rbSteerServo1";
     public static final String HWNAME_RBSTEER_SERVO2            = "rbSteerServo2";
+    public static final String HWNAME_ELEVATOR                  = "elevator";
+    public static final String HWNAME_ARM                       = "arm";
+    public static final String HWNAME_INTAKE                    = "intake";
+
+
     //
     // Field dimensions.
     //
@@ -235,5 +247,63 @@ public class RobotParams
         RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_X, RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_Y,
         RobotParams.HOMOGRAPHY_WORLD_BOTTOMLEFT_X, RobotParams.HOMOGRAPHY_WORLD_BOTTOMLEFT_Y,
         RobotParams.HOMOGRAPHY_WORLD_BOTTOMRIGHT_X, RobotParams.HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y);
-
+    //
+    // Arm subsystem.
+    //
+    static final double ARM_KP                                  = 0.2;
+    static final double ARM_KI                                  = 0.0;
+    static final double ARM_KD                                  = 0.0;
+    static final double ARM_TOLERANCE                           = 0.5;
+    static final double ARM_ENCODER_PPR                         = GOBILDA_5203_312_ENCODER_PPR;
+    // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
+    static final double ARM_GEAR_RATIO                          = 28.0;
+    static final double ARM_DEG_PER_COUNT                       = 360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO);
+    static final double ARM_OFFSET                              = 34.0;
+    static final double ARM_MIN_POS                             = 33.0;
+    static final double ARM_MAX_POS                             = 140.0;
+    static final double ARM_TRAVEL_POS                          = ARM_MIN_POS+2.0;
+    static final boolean ARM_MOTOR_INVERTED                     = true;
+    static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
+    static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
+    static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = true;
+    static final boolean ARM_UPPER_LIMIT_INVERTED               = false;
+    static final double ARM_CAL_POWER                           = 0.5;
+    static final double ARM_STALL_MIN_POWER                     = 0.3;
+    static final double ARM_STALL_TOLERANCE                     = 0.0;
+    static final double ARM_STALL_TIMEOUT                       = 1.0;
+    static final double ARM_RESET_TIMEOUT                       = 0.5;
+    static final double[] ARM_PRESET_LEVELS                     = new double[] {ARM_MIN_POS, 51.6, 78, 107};
+    static final double ARM_SLOW_POWER_SCALE                    = 0.5;
+    //
+    // Elevator Subsystem
+    //
+    static final double ELEVATOR_KP                                  = 0.2;
+    static final double ELEVATOR_KI                                  = 0.0;
+    static final double ELEVATOR_KD                                  = 0.0;
+    static final double ELEVATOR_TOLERANCE                           = 0.5;
+    static final double ELEVATOR_ENCODER_PPR                         = GOBILDA_5203_312_ENCODER_PPR;
+    // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
+    static final double ELEVATOR_GEAR_RATIO                          = 28.0;
+    static final double ELEVATOR_MIN_POS                             = 33.0;
+    static final double ELEVATOR_MAX_POS                             = 140.0;
+    static final boolean ELEVATOR_MOTOR_INVERTED                     = true;
+    static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH             = true;
+    static final boolean ELEVATOR_LOWER_LIMIT_INVERTED               = false;
+    static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH             = true;
+    static final boolean ELEVATOR_UPPER_LIMIT_INVERTED               = false;
+    static final double ELEVATOR_CAL_POWER                           = 0.5;
+    static final double ELEVATOR_STALL_MIN_POWER                     = 0.3;
+    static final double ELEVATOR_STALL_TOLERANCE                     = 0.0;
+    static final double ELEVATOR_STALL_TIMEOUT                       = 1.0;
+    static final double ELEVATOR_RESET_TIMEOUT                       = 0.5;
+    static final double[] ELEVATOR_PRESET_LEVELS                     = new double[] {ARM_MIN_POS, 51.6, 78, 107};
+    static final double ELEVATOR_SLOW_POWER_SCALE                    = 0.5;
+    //
+    // Intake subsystem.
+    //
+    static final double INTAKE_POWER_PICKUP                     = 1.0;;
+    static final double INTAKE_POWER_DUMP                       = -0.4;
+    static final double INTAKE_DUMP_TIME                        = 1.2;
+    static final double INTAKE_SENSOR_THRESHOLD                 = 4.6;    //in cm
+    //
 }   //class RobotParams
