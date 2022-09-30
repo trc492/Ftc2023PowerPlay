@@ -143,11 +143,23 @@ public class Robot
             if (RobotParams.Preferences.initSubsystems)
             {
                 if(RobotParams.Preferences.useTurret){
-                    turretMotor = new FtcDcMotor("turretMotor");
-                    turretParams = new Parameters();
-                    turretParams.setPidParams(0.0, 0.0, 0.0, 0.0);
-                    turret = new TrcPidActuator("turret", turretMotor, null, null, turretParams);
-                    turret.setPositionScale(1.0); //TODO: Find turret scale
+                    final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
+                            RobotParams.TURRET_MOTOR_INVERTED,
+                            RobotParams.TURRET_HAS_LOWER_LIMIT_SWITCH, RobotParams.TURRET_LOWER_LIMIT_INVERTED,
+                            RobotParams.TURRET_HAS_UPPER_LIMIT_SWITCH, RobotParams.TURRET_UPPER_LIMIT_INVERTED);
+                    final TrcPidActuator.Parameters turretParams = new TrcPidActuator.Parameters()
+                            .setPosRange(RobotParams.TURRET_MIN_POS, RobotParams.TURRET_MAX_POS)
+                            .setScaleOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
+                            .setPidParams(new TrcPidController.PidParameters(
+                                    RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD, RobotParams.TURRET_TOLERANCE))
+                            .setStallProtectionParams(RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
+                                    RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
+                            .setZeroCalibratePower(RobotParams.TURRET_CAL_POWER)
+                            .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
+                    turret = new FtcMotorActuator(RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
+                    turret.setMsgTracer(globalTracer);
+                    turret.setBeep(androidTone);
+                    turret.zeroCalibrate();
                 }
                 if (RobotParams.Preferences.useElevator)
                 {
