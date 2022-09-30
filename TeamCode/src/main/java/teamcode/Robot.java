@@ -29,13 +29,11 @@ import TrcCommonLib.trclib.TrcDigitalInput;
 import TrcCommonLib.trclib.TrcIntake;
 import TrcCommonLib.trclib.TrcMotor;
 import TrcCommonLib.trclib.TrcPidActuator;
-import TrcCommonLib.trclib.TrcPidActuator.Parameters;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
 import TrcFtcLib.ftclib.FtcAndroidTone;
 import TrcFtcLib.ftclib.FtcDashboard;
-import TrcFtcLib.ftclib.FtcDcMotor;
 import TrcFtcLib.ftclib.FtcMotorActuator;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcRevBlinkin;
@@ -67,9 +65,6 @@ public class Robot
     //
     public RobotDrive robotDrive;
     public TrcPidActuator turret;
-    public FtcDcMotor turretMotor;
-    public Parameters turretParams;
-
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
     public TrcIntake intake = null;
@@ -142,7 +137,8 @@ public class Robot
             //
             if (RobotParams.Preferences.initSubsystems)
             {
-                if(RobotParams.Preferences.useTurret){
+                if (RobotParams.Preferences.useTurret)
+                {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
                             RobotParams.TURRET_MOTOR_INVERTED,
                             RobotParams.TURRET_HAS_LOWER_LIMIT_SWITCH, RobotParams.TURRET_LOWER_LIMIT_INVERTED,
@@ -151,16 +147,20 @@ public class Robot
                             .setPosRange(RobotParams.TURRET_MIN_POS, RobotParams.TURRET_MAX_POS)
                             .setScaleOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
                             .setPidParams(new TrcPidController.PidParameters(
-                                    RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD, RobotParams.TURRET_TOLERANCE))
-                            .setStallProtectionParams(RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
-                                    RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
+                                RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
+                                RobotParams.TURRET_TOLERANCE))
+                            .setStallProtectionParams(
+                                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
+                                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
                             .setZeroCalibratePower(RobotParams.TURRET_CAL_POWER)
                             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
-                    turret = new FtcMotorActuator(RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
+                    turret = new FtcMotorActuator(
+                        RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
                     turret.setMsgTracer(globalTracer);
                     turret.setBeep(androidTone);
                     turret.zeroCalibrate();
                 }
+
                 if (RobotParams.Preferences.useElevator)
                 {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
@@ -170,17 +170,20 @@ public class Robot
                     final TrcPidActuator.Parameters elevatorParams = new TrcPidActuator.Parameters()
                             .setPosRange(RobotParams.ELEVATOR_MIN_POS, RobotParams.ELEVATOR_MAX_POS)
                             .setPidParams(new TrcPidController.PidParameters(
-                                    RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD, RobotParams.ELEVATOR_TOLERANCE))
+                                RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
+                                RobotParams.ELEVATOR_TOLERANCE))
                             .setStallProtectionParams(
-                                    RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
-                                    RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
+                                RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
+                                RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
                             .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
                             .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
-                    elevator = new FtcMotorActuator(RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
+                    elevator = new FtcMotorActuator(
+                        RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     elevator.setMsgTracer(globalTracer);
                     elevator.setBeep(androidTone);
                     elevator.zeroCalibrate();
                 }
+
                 if (RobotParams.Preferences.useArm)
                 {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
@@ -191,10 +194,10 @@ public class Robot
                             .setPosRange(RobotParams.ARM_MIN_POS, RobotParams.ARM_MAX_POS)
                             .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
                             .setPidParams(new TrcPidController.PidParameters(
-                                    RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
+                                RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
                             .setStallProtectionParams(
-                                    RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
-                                    RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
+                                RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
+                                RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
                             .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
                             .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
@@ -202,6 +205,7 @@ public class Robot
                     arm.setBeep(androidTone);
                     arm.zeroCalibrate();
                 }
+
                 if (RobotParams.Preferences.useIntake)
                 {
                     TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()

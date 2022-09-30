@@ -153,9 +153,9 @@ public class FtcTeleOp extends FtcOpMode
         //
         // Other subsystems.
         //
-        if (RobotParams.Preferences.useTurret)
+        if (robot.turret != null)
         {
-            robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees()-90.0, false);
+            robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees() - 90.0, false);
         }
     }   //slowPeriodic
 
@@ -258,8 +258,7 @@ public class FtcTeleOp extends FtcOpMode
      */
     public void driverButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
-        robot.dashboard.displayPrintf(
-            7, "%s: %04x->%s", gamepad, button, pressed? "Pressed": "Released");
+        robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed? "Pressed": "Released");
 
         switch (button)
         {
@@ -313,8 +312,7 @@ public class FtcTeleOp extends FtcOpMode
      */
     public void operatorButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
-        robot.dashboard.displayPrintf(
-            7, "%s: %04x->%s", gamepad, button, pressed? "Pressed": "Released");
+        robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed? "Pressed": "Released");
 
         switch (button)
         {
