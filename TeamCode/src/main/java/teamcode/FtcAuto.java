@@ -47,13 +47,24 @@ public class FtcAuto extends FtcOpMode
         RED_ALLIANCE,
         BLUE_ALLIANCE
     }   //enum Alliance
-
+    public enum StartPos{
+        LEFT,
+        RIGHT
+    }
     public enum AutoStrategy
     {
+        CYCLE_HIGH,
+        CYCLE_MID,
+        PARKING,
         PID_DRIVE,
         TIMED_DRIVE,
-        DO_NOTHING
+        DO_NOTHING,
+
     }   //enum AutoStrategy
+    public enum Parking{
+        NEAR_TILE,
+        FAR_TILE
+    }
 
     /**
      * This class stores the autonomous menu choices.
@@ -62,7 +73,11 @@ public class FtcAuto extends FtcOpMode
     {
         public double startDelay = 0.0;
         public Alliance alliance = Alliance.RED_ALLIANCE;
+        //create StartPos obj, assign it to value POS_1(default)
+        public StartPos startPos = StartPos.LEFT;
         public AutoStrategy strategy = AutoStrategy.DO_NOTHING;
+        public Parking parking = Parking.NEAR_TILE;
+
         public double xTarget = 0.0;
         public double yTarget = 0.0;
         public double turnTarget = 0.0;
@@ -74,15 +89,18 @@ public class FtcAuto extends FtcOpMode
         {
             return String.format(
                 Locale.US,
-                "startDelay=%.0f " +
+          "startDelay=%.0f " +
                 "alliance=\"%s\" " +
+                "startPos=\"%s\" " +
                 "strategy=\"%s\" " +
+                "parking=\"%s\" " +
                 "xTarget=%.1f " +
                 "yTarget=%.1f " +
                 "turnTarget=%.0f " +
                 "driveTime=%.0f " +
                 "drivePower=%.1f",
-                startDelay, alliance, strategy, xTarget, yTarget, turnTarget, driveTime, drivePower);
+                //TODO: add string for parking, after srategy
+                startDelay, alliance, startPos, strategy, parking, xTarget, yTarget, turnTarget, driveTime, drivePower);
         }   //toString
 
     }   //class AutoChoices
@@ -317,7 +335,10 @@ public class FtcAuto extends FtcOpMode
         FtcValueMenu startDelayMenu = new FtcValueMenu(
             "Start delay time:", null, 0.0, 30.0, 1.0, 0.0, " %.0f sec");
         FtcChoiceMenu<Alliance> allianceMenu = new FtcChoiceMenu<>("Alliance:", startDelayMenu);
+        // create a start position menu
+        FtcChoiceMenu<StartPos> startPosMenu = new FtcChoiceMenu<>("Start Position:", allianceMenu);
         FtcChoiceMenu<AutoStrategy> strategyMenu = new FtcChoiceMenu<>("Auto Strategies:", allianceMenu);
+        FtcChoiceMenu<Parking> parkingMenu = new FtcChoiceMenu<>("Parking:", strategyMenu);
 
         FtcValueMenu xTargetMenu = new FtcValueMenu(
             "xTarget:", strategyMenu, -12.0, 12.0, 0.5, 4.0, " %.1f ft");
@@ -340,10 +361,19 @@ public class FtcAuto extends FtcOpMode
         //
         allianceMenu.addChoice("Red", Alliance.RED_ALLIANCE, true, strategyMenu);
         allianceMenu.addChoice("Blue", Alliance.BLUE_ALLIANCE, false, strategyMenu);
+        startPosMenu.addChoice("Start Position Left", StartPos.LEFT, true, strategyMenu);
+        startPosMenu.addChoice("Start Position Right", StartPos.RIGHT, false, strategyMenu);
 
+        //HW: add 2 choices to strategy menu(high goal, medium goal)
+        strategyMenu.addChoice("Cycle High", AutoStrategy.CYCLE_HIGH, false, parkingMenu);
+        strategyMenu.addChoice("Cycle Mid", AutoStrategy.CYCLE_MID, false, parkingMenu);
         strategyMenu.addChoice("PID Drive", AutoStrategy.PID_DRIVE, false, xTargetMenu);
         strategyMenu.addChoice("Timed Drive", AutoStrategy.TIMED_DRIVE, false, driveTimeMenu);
         strategyMenu.addChoice("Do nothing", AutoStrategy.DO_NOTHING, true);
+
+        parkingMenu.addChoice("Parking Near Tile", Parking.NEAR_TILE, true, null);
+        parkingMenu.addChoice("Parking Far Tile", Parking.FAR_TILE, false, null);
+
         //
         // Traverse menus.
         //
@@ -353,7 +383,9 @@ public class FtcAuto extends FtcOpMode
         //
         autoChoices.startDelay = startDelayMenu.getCurrentValue();
         autoChoices.alliance = allianceMenu.getCurrentChoiceObject();
+        autoChoices.startPos = startPosMenu.getCurrentChoiceObject();
         autoChoices.strategy = strategyMenu.getCurrentChoiceObject();
+        autoChoices.parking = parkingMenu.getCurrentChoiceObject();
         autoChoices.xTarget = xTargetMenu.getCurrentValue();
         autoChoices.yTarget = yTargetMenu.getCurrentValue();
         autoChoices.turnTarget = turnTargetMenu.getCurrentValue();
