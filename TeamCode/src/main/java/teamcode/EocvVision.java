@@ -165,7 +165,7 @@ public class EocvVision extends FtcEocvDetector
 
         if (detectedTargets != null)
         {
-            MatOfPoint[] contours = (MatOfPoint[]) detectedTargets.toArray();
+            MatOfPoint[] contours = (MatOfPoint[]) detectedTargets.toArray(new MatOfPoint[0]);
             targets = new TrcOpenCVDetector.DetectedObject[contours.length];
             for (int i = 0; i < targets.length; i++)
             {
