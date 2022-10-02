@@ -111,16 +111,33 @@ public class RobotParams
     //
     // Game positions.
     //
-    public static final double STARTPOS_FROM_FIELDCENTER_X      = 1.5 * FULL_TILE_INCHES;
-    public static final double STARTPOS_FROM_FIELDCENTER_Y      = HALF_FIELD_INCHES - ROBOT_LENGTH/2.0;
-    public static TrcPose2D STARTPOS_RED_LEFT = new TrcPose2D(
-        -STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D STARTPOS_RED_RIGHT = new TrcPose2D(
-        STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D STARTPOS_BLUE_LEFT = new TrcPose2D(
-        STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
-    public static TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
-        -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
+    public static TrcPose2D RED_LEFT_P1_FAR = new TrcPose2D(-2.5, -0.5, 0.0);
+    public static TrcPose2D RED_LEFT_P1_NEAR = new TrcPose2D(-2.5, -1.5, 0.0);
+    public static TrcPose2D RED_LEFT_P2_FAR = new TrcPose2D(-1.5, -0.5, 0.0);
+    public static TrcPose2D RED_LEFT_P2_NEAR = new TrcPose2D(-1.5, -1.5, 0.0);
+    public static TrcPose2D RED_LEFT_P3_FAR = new TrcPose2D(-0.5, -0.5, 0.0);
+    public static TrcPose2D RED_LEFT_P3_NEAR = new TrcPose2D(-0.5, -1.5, 0.0);
+
+    public static TrcPose2D RED_RIGHT_P1_FAR = new TrcPose2D(0.5, -0.5, 0.0);
+    public static TrcPose2D RED_RIGHT_P1_NEAR = new TrcPose2D(0.5, -1.5, 0.0);
+    public static TrcPose2D RED_RIGHT_P2_FAR = new TrcPose2D(1.5, -0.5, 0.0);
+    public static TrcPose2D RED_RIGHT_P2_NEAR = new TrcPose2D(1.5, -1.5, 0.0);
+    public static TrcPose2D RED_RIGHT_P3_FAR = new TrcPose2D(2.5, -0.5, 0.0);
+    public static TrcPose2D RED_RIGHT_P3_NEAR = new TrcPose2D(2.5, -1.5, 0.0);
+
+    public static TrcPose2D BLUE_LEFT_P1_FAR = new TrcPose2D(2.5, 0.5, 0.0);
+    public static TrcPose2D BLUE_LEFT_P1_NEAR = new TrcPose2D(2.5, 1.5, 0.0);
+    public static TrcPose2D BLUE_LEFT_P2_FAR = new TrcPose2D(1.5, 0.5, 0.0);
+    public static TrcPose2D BLUE_LEFT_P2_NEAR = new TrcPose2D(1.5, 1.5, 0.0);
+    public static TrcPose2D BLUE_LEFT_P3_FAR = new TrcPose2D(0.5, 0.5, 0.0);
+    public static TrcPose2D BLUE_LEFT_P3_NEAR = new TrcPose2D(0.5, 1.5, 0.0);
+
+    public static TrcPose2D BLUE_RIGHT_P1_FAR = new TrcPose2D(-0.5, 0.5, 0.0);
+    public static TrcPose2D BLUE_RIGHT_P1_NEAR = new TrcPose2D(-0.5, 1.5, 0.0);
+    public static TrcPose2D BLUE_RIGHT_P2_FAR = new TrcPose2D(-1.5, 0.5, 0.0);
+    public static TrcPose2D BLUE_RIGHT_P2_NEAR = new TrcPose2D(-1.5, 1.5, 0.0);
+    public static TrcPose2D BLUE_RIGHT_P3_FAR = new TrcPose2D(-2.5, 0.5, 0.0);
+    public static TrcPose2D BLUE_RIGHT_P3_NEAR = new TrcPose2D(-2.5, 1.5, 0.0);
     //
     // Vision subsystem.
     //
