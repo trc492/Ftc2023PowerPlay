@@ -159,8 +159,9 @@ public class EocvVision extends FtcEocvDetector
         if (tracer != null)
         {
             tracer.traceInfo(
-                funcName, "AvgProcessTime=%.3f sec, FrameRate=%.1f",
-                totalTime/totalFrames, totalFrames/(TrcUtil.getCurrentTime() - taskStartTime));
+                funcName, "AvgProcessTime=%.3f sec, FrameRate=%.1f (Targets %sfound: %d)",
+                totalTime/totalFrames, totalFrames/(TrcUtil.getCurrentTime() - taskStartTime),
+                detectedTargets == null? "not ": "", detectedTargets != null? detectedTargets.size(): 0);
         }
 
         if (detectedTargets != null)
