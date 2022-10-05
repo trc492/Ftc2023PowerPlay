@@ -38,26 +38,38 @@ public class FtcTeleOp extends FtcOpMode
 {
     public enum DriveOrientation
     {
-        ROBOT(0), FIELD(1), INVERTED(2);
+        ROBOT, FIELD, INVERTED;
 
-        int value;
-
-        DriveOrientation(int val)
+        static DriveOrientation nextDriveOrientation(DriveOrientation driveOrientation)
         {
-            this.value = val;
-        }
+            DriveOrientation nextDriveOrientation;
 
-        void increment()
-        {
-            value = (value + 1) % 3;
-        }
+            switch (driveOrientation)
+            {
+                case ROBOT:
+                    nextDriveOrientation = FIELD;
+                    break;
+
+                case FIELD:
+                    nextDriveOrientation = INVERTED;
+                    break;
+
+                default:
+                case INVERTED:
+                    nextDriveOrientation = ROBOT;
+                    break;
+            }
+
+            return nextDriveOrientation;
+        }   //nextDriveOrientation
+
     }   //enum DriveOrientation
 
     protected Robot robot;
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
     private double drivePowerScale = 1.0;
-    private final DriveOrientation driveOrientation = DriveOrientation.FIELD;
+    private DriveOrientation driveOrientation = DriveOrientation.FIELD;
 
     //
     // Implements FtcOpMode abstract method.
@@ -277,7 +289,7 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_LBUMPER:
                 if (pressed)
                 {
-                    driveOrientation.increment();
+                    driveOrientation = DriveOrientation.nextDriveOrientation(driveOrientation);
                 }
                 break;
 

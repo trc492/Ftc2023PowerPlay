@@ -22,10 +22,8 @@
 
 package teamcode;
 
-import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -45,10 +43,52 @@ import TrcFtcLib.ftclib.FtcEocvDetector;
  */
 public class EocvVision extends FtcEocvDetector
 {
+    private static final double[] redThresholdRedCone = {128.0, 255.0};
+    private static final double[] greenThresholdRedCone = {0.0, 100.0};
+    private static final double[] blueThresholdRedCone = {0.0, 60.0};
+
+    private static final double[] redThresholdBlueCone = {0.0, 100.0};
+    private static final double[] greenThresholdBlueCone = {0.0, 100.0};
+    private static final double[] blueThresholdBlueCone = {100.0, 255.0};
+
+    private static final double[] redThresholdYellowPole = {128.0, 255.0};
+    private static final double[] greenThresholdYellowPole = {128.0, 255.0};
+    private static final double[] blueThresholdYellowPole = {0.0, 60.0};
+
+    public enum ObjectType
+    {
+        RED_CONE, BLUE_CONE, YELLOW_POLE;
+
+        static ObjectType nextObjectType(ObjectType objType)
+        {
+            ObjectType nextObjType;
+
+            switch (objType)
+            {
+                case RED_CONE:
+                    nextObjType = BLUE_CONE;
+                    break;
+
+                case BLUE_CONE:
+                    nextObjType = YELLOW_POLE;
+                    break;
+
+                default:
+                case YELLOW_POLE:
+                    nextObjType = RED_CONE;
+                    break;
+            }
+
+            return nextObjType;
+        }   //nextObjectType
+
+    }   //enum ObjectType
+
     private static final Scalar ANNOTATE_RECT_COLOR = new Scalar(0, 255, 0);
     private final TrcDbgTrace tracer;
     private final GripPipeline gripPipeline;
     private TrcOpenCVDetector.DetectedObject[] detectedObjects = null;
+    private ObjectType objectType = ObjectType.RED_CONE;
 
     private double totalTime = 0.0;
     private long totalFrames = 0;
@@ -77,9 +117,51 @@ public class EocvVision extends FtcEocvDetector
 
         this.tracer = tracer;
         gripPipeline = new GripPipeline();
-        // Initialize to red alliance by default.
-        gripPipeline.setRedAlliance(true);
+        updatePipelineColorThreshold();
     }   //EocvVision
+
+    /**
+     * This method updates the Grip pipeline with color thresholds of the the selected object type to detect.
+     */
+    private void updatePipelineColorThreshold()
+    {
+        TrcDbgTrace.getGlobalTracer().traceInfo("updatePipelineThresholds", "objType=%s", objectType);
+        switch (objectType)
+        {
+            case RED_CONE:
+                gripPipeline.setColorThresholds(redThresholdRedCone, greenThresholdRedCone, blueThresholdRedCone);
+                break;
+
+            case BLUE_CONE:
+                gripPipeline.setColorThresholds(redThresholdBlueCone, greenThresholdBlueCone, blueThresholdBlueCone);
+                break;
+
+            case YELLOW_POLE:
+                gripPipeline.setColorThresholds(
+                    redThresholdYellowPole, greenThresholdYellowPole, blueThresholdYellowPole);
+                break;
+        }
+    }   //updatePipelineColorThreshold
+
+    /**
+     * This method sets the object type to detect.
+     *
+     * @param objType specifies the object type to detect.
+     */
+    public void setDetectObjectType(ObjectType objType)
+    {
+        objectType = objType;
+        updatePipelineColorThreshold();
+    }   //setDetectObjectType
+
+    /**
+     * This method sets the detect object type to the next type.
+     */
+    public void setNextObjectType()
+    {
+        objectType = ObjectType.nextObjectType(objectType);
+        updatePipelineColorThreshold();
+    }   //setNextObjectType
 
     /**
      * This method pauses/resumes pipeline processing.
@@ -115,16 +197,6 @@ public class EocvVision extends FtcEocvDetector
         detectedObjects = null;
         return targets;
     }   //getDetectedObjects
-
-    /**
-     * This method sets the alliance color so the pipeline can detect the correct color.
-     *
-     * @param redAlliance specifies true to select red, false to select blue.
-     */
-    public void setRedAlliance(boolean redAlliance)
-    {
-        gripPipeline.setRedAlliance(redAlliance);
-    }   //setRedAlliance
 
     //
     // Implements FtcEocvDetector abstract methods.
@@ -166,7 +238,7 @@ public class EocvVision extends FtcEocvDetector
 
         if (detectedTargets != null)
         {
-            MatOfPoint[] contours = (MatOfPoint[]) detectedTargets.toArray(new MatOfPoint[0]);
+            MatOfPoint[] contours = detectedTargets.toArray(new MatOfPoint[0]);
             targets = new TrcOpenCVDetector.DetectedObject[contours.length];
             for (int i = 0; i < targets.length; i++)
             {

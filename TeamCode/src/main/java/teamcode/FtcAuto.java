@@ -257,7 +257,9 @@ public class FtcAuto extends FtcOpMode
 
         if (robot.vision != null && robot.vision.eocvVision != null)
         {
-            robot.vision.eocvVision.setRedAlliance(autoChoices.alliance == Alliance.RED_ALLIANCE);
+            robot.vision.eocvVision.setDetectObjectType(
+                autoChoices.alliance == Alliance.RED_ALLIANCE?
+                    EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
         }
 
         if (robot.battery != null)

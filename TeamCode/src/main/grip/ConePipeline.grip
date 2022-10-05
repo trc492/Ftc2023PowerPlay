@@ -1,88 +1,78 @@
 <grip:Pipeline>
   <sources>
     <grip:ImageFile>
-      <property name="path" value="C:\Grip\RedCone.jpg"/>
-    </grip:ImageFile>
-    <grip:ImageFile>
-      <property name="path" value="C:\Grip\BlueCone.jpg"/>
+      <property name="path" value="C:\Users\Michael\Documents\GitHub\Trc492\Ftc2023PowerPlay\TeamCode\src\main\grip\Cones.jpg"/>
     </grip:ImageFile>
   </sources>
   <steps>
-    <grip:Step name="CV cvtColor">
+    <grip:Step name="RGB Threshold">
       <grip:Input step="0" socket="0"/>
       <grip:Input step="0" socket="1">
-        <value>COLOR_RGB2HSV</value>
+        <value>
+          <double>126.12410071942446</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="2">
+        <value>
+          <double>0.0</double>
+          <double>100.52047781569964</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="3">
+        <value>
+          <double>0.0</double>
+          <double>61.356655290102395</double>
+        </value>
       </grip:Input>
       <grip:Output step="0" socket="0" previewed="true"/>
     </grip:Step>
-    <grip:Step name="HSV Threshold">
+    <grip:Step name="Find Contours">
       <grip:Input step="1" socket="0"/>
       <grip:Input step="1" socket="1">
-        <value>
-          <double>0.0</double>
-          <double>74.02730375426621</double>
-        </value>
-      </grip:Input>
-      <grip:Input step="1" socket="2">
-        <value>
-          <double>199.5053956834533</double>
-          <double>255.0</double>
-        </value>
-      </grip:Input>
-      <grip:Input step="1" socket="3">
-        <value>
-          <double>100.89928057553956</double>
-          <double>255.0</double>
-        </value>
+        <value>false</value>
       </grip:Input>
       <grip:Output step="1" socket="0" previewed="true"/>
     </grip:Step>
-    <grip:Step name="Find Contours">
+    <grip:Step name="Filter Contours">
       <grip:Input step="2" socket="0"/>
       <grip:Input step="2" socket="1">
-        <value>false</value>
-      </grip:Input>
-      <grip:Output step="2" socket="0" previewed="true"/>
-    </grip:Step>
-    <grip:Step name="Filter Contours">
-      <grip:Input step="3" socket="0"/>
-      <grip:Input step="3" socket="1">
-        <value>10.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="2">
-        <value>0.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="3">
-        <value>10.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="4">
-        <value>1000.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="5">
         <value>100.0</value>
       </grip:Input>
-      <grip:Input step="3" socket="6">
+      <grip:Input step="2" socket="2">
+        <value>100.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="3">
+        <value>10.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="4">
         <value>1000.0</value>
       </grip:Input>
-      <grip:Input step="3" socket="7">
+      <grip:Input step="2" socket="5">
+        <value>100.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="6">
+        <value>1000.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="7">
         <value>
           <double>0.0</double>
-          <int>100</int>
+          <double>100.0</double>
         </value>
       </grip:Input>
-      <grip:Input step="3" socket="8">
-        <value>1000000.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="9">
-        <value>0.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="10">
-        <value>0.0</value>
-      </grip:Input>
-      <grip:Input step="3" socket="11">
+      <grip:Input step="2" socket="8">
         <value>1000.0</value>
       </grip:Input>
-      <grip:Output step="3" socket="0" previewed="true"/>
+      <grip:Input step="2" socket="9">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="10">
+        <value>0.0</value>
+      </grip:Input>
+      <grip:Input step="2" socket="11">
+        <value>1000.0</value>
+      </grip:Input>
+      <grip:Output step="2" socket="0" previewed="true"/>
     </grip:Step>
   </steps>
   <connections>
@@ -91,12 +81,8 @@
       <grip:Input step="1" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output source="1" socket="0" previewed="true"/>
+      <grip:Output source="0" socket="0" previewed="true"/>
       <grip:Input step="0" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
-      <grip:Output step="2" socket="0" previewed="true"/>
-      <grip:Input step="3" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output step="1" socket="0" previewed="true"/>

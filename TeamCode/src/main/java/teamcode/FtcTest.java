@@ -31,6 +31,7 @@ import TrcCommonLib.command.CmdPidDrive;
 import TrcCommonLib.command.CmdPurePursuitDrive;
 import TrcCommonLib.command.CmdTimedDrive;
 
+import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcElapsedTimer;
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPidController;
@@ -587,25 +588,17 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_B:
-                    if (testChoices.test == Test.SENSORS_TEST || testChoices.test == Test.SUBSYSTEMS_TEST)
+                    if (testChoices.test == Test.SUBSYSTEMS_TEST)
                     {
                         if (pressed && robot.vision != null && robot.vision.eocvVision != null)
                         {
-                            robot.vision.eocvVision.setRedAlliance(true);
+                            robot.vision.eocvVision.setNextObjectType();
                         }
                         processed = true;
                     }
                     break;
 
                 case FtcGamepad.GAMEPAD_X:
-                    if (testChoices.test == Test.SENSORS_TEST || testChoices.test == Test.SUBSYSTEMS_TEST)
-                    {
-                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
-                        {
-                            robot.vision.eocvVision.setRedAlliance(false);
-                        }
-                        processed = true;
-                    }
                     break;
 
                 case FtcGamepad.GAMEPAD_Y:

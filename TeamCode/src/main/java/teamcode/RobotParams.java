@@ -55,8 +55,8 @@ public class RobotParams
         public static boolean useAprilTag = true;
         public static boolean showAprilTagView = true;
         // Robot
-        public static boolean testRobot = false;
         public static boolean noRobot = false;
+        public static boolean swerveRobot = false;
         // Drive Base
         public static boolean useExternalOdometry = false;
         public static boolean useVelocityControl = false;
@@ -113,6 +113,7 @@ public class RobotParams
     //
     public static final double STARTPOS_FROM_FIELDCENTER_X      = 1.5 * FULL_TILE_INCHES;
     public static final double STARTPOS_FROM_FIELDCENTER_Y      = HALF_FIELD_INCHES - ROBOT_LENGTH/2.0;
+
     public static TrcPose2D STARTPOS_RED_LEFT = new TrcPose2D(
             -STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
     public static TrcPose2D STARTPOS_RED_RIGHT = new TrcPose2D(
@@ -121,34 +122,67 @@ public class RobotParams
             STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
     public static TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
             -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
-    
-    public static TrcPose2D RED_LEFT_P1_FAR = new TrcPose2D(-2.5, -0.5, 0.0);
-    public static TrcPose2D RED_LEFT_P1_NEAR = new TrcPose2D(-2.5, -1.5, 0.0);
-    public static TrcPose2D RED_LEFT_P2_FAR = new TrcPose2D(-1.5, -0.5, 0.0);
-    public static TrcPose2D RED_LEFT_P2_NEAR = new TrcPose2D(-1.5, -1.5, 0.0);
-    public static TrcPose2D RED_LEFT_P3_FAR = new TrcPose2D(-0.5, -0.5, 0.0);
-    public static TrcPose2D RED_LEFT_P3_NEAR = new TrcPose2D(-0.5, -1.5, 0.0);
 
-    public static TrcPose2D RED_RIGHT_P1_FAR = new TrcPose2D(0.5, -0.5, 0.0);
-    public static TrcPose2D RED_RIGHT_P1_NEAR = new TrcPose2D(0.5, -1.5, 0.0);
-    public static TrcPose2D RED_RIGHT_P2_FAR = new TrcPose2D(1.5, -0.5, 0.0);
-    public static TrcPose2D RED_RIGHT_P2_NEAR = new TrcPose2D(1.5, -1.5, 0.0);
-    public static TrcPose2D RED_RIGHT_P3_FAR = new TrcPose2D(2.5, -0.5, 0.0);
-    public static TrcPose2D RED_RIGHT_P3_NEAR = new TrcPose2D(2.5, -1.5, 0.0);
+    public static final double PARKPOS_LEFTP1_FROM_FIELDCENTER_X    = 2.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_LEFTP2_FROM_FIELDCENTER_X    = 1.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_LEFTP3_FROM_FIELDCENTER_X    = 0.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_RIGHTP1_FROM_FIELDCENTER_X   = 0.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_RIGHTP2_FROM_FIELDCENTER_X   = 1.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_RIGHTP3_FROM_FIELDCENTER_X   = 2.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_FAR_FROM_FIELDCENTER_Y       = 0.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_NEAR_FROM_FIELDCENTER_Y      = 1.5 * FULL_TILE_INCHES;
 
-    public static TrcPose2D BLUE_LEFT_P1_FAR = new TrcPose2D(2.5, 0.5, 0.0);
-    public static TrcPose2D BLUE_LEFT_P1_NEAR = new TrcPose2D(2.5, 1.5, 0.0);
-    public static TrcPose2D BLUE_LEFT_P2_FAR = new TrcPose2D(1.5, 0.5, 0.0);
-    public static TrcPose2D BLUE_LEFT_P2_NEAR = new TrcPose2D(1.5, 1.5, 0.0);
-    public static TrcPose2D BLUE_LEFT_P3_FAR = new TrcPose2D(0.5, 0.5, 0.0);
-    public static TrcPose2D BLUE_LEFT_P3_NEAR = new TrcPose2D(0.5, 1.5, 0.0);
+    public static TrcPose2D PARKPOS_RED_LEFTP1_FAR = new TrcPose2D(
+        -PARKPOS_LEFTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_LEFTP1_NEAR = new TrcPose2D(
+        -PARKPOS_LEFTP1_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_LEFTP2_FAR = new TrcPose2D(
+        -PARKPOS_LEFTP2_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_LEFTP2_NEAR = new TrcPose2D(
+        -PARKPOS_LEFTP2_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_LEFTP3_FAR = new TrcPose2D(
+        -PARKPOS_LEFTP3_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_LEFTP3_NEAR = new TrcPose2D(
+        -PARKPOS_LEFTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
 
-    public static TrcPose2D BLUE_RIGHT_P1_FAR = new TrcPose2D(-0.5, 0.5, 0.0);
-    public static TrcPose2D BLUE_RIGHT_P1_NEAR = new TrcPose2D(-0.5, 1.5, 0.0);
-    public static TrcPose2D BLUE_RIGHT_P2_FAR = new TrcPose2D(-1.5, 0.5, 0.0);
-    public static TrcPose2D BLUE_RIGHT_P2_NEAR = new TrcPose2D(-1.5, 1.5, 0.0);
-    public static TrcPose2D BLUE_RIGHT_P3_FAR = new TrcPose2D(-2.5, 0.5, 0.0);
-    public static TrcPose2D BLUE_RIGHT_P3_NEAR = new TrcPose2D(-2.5, 1.5, 0.0);
+    public static TrcPose2D PARKPOS_RED_RIGHTP1_FAR = new TrcPose2D(
+        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_RIGHTP1_NEAR = new TrcPose2D(
+        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_RIGHTP2_FAR = new TrcPose2D(
+        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_RIGHTP2_NEAR = new TrcPose2D(
+        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_RIGHTP3_FAR = new TrcPose2D(
+        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_RED_RIGHTP3_NEAR = new TrcPose2D(
+        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+
+    public static TrcPose2D PARKPOS_BLUE_LEFTP1_FAR = new TrcPose2D(
+        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_LEFTP1_NEAR = new TrcPose2D(
+        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_LEFTP2_FAR = new TrcPose2D(
+        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_LEFTP2_NEAR = new TrcPose2D(
+        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_LEFTP3_FAR = new TrcPose2D(
+        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_LEFTP3_NEAR = new TrcPose2D(
+        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+
+    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_FAR = new TrcPose2D(
+        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_NEAR = new TrcPose2D(
+        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_FAR = new TrcPose2D(
+        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_NEAR = new TrcPose2D(
+        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_FAR = new TrcPose2D(
+        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_NEAR = new TrcPose2D(
+        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
     //
     // Vision subsystem.
     //
