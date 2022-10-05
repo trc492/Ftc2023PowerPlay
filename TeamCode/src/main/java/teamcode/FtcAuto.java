@@ -189,22 +189,16 @@ public class FtcAuto extends FtcOpMode
 
         if (robot.vision != null)
         {
-            // Enabling vision early so we can detect objects before match starts.
-            if (robot.vision.vuforiaVision != null)
+            // Enabling vision early so we can detect signal position before match starts.
+            if (robot.vision.aprilTagVision != null)
             {
-                robot.globalTracer.traceInfo(funcName, "Enabling Vuforia.");
-                robot.vision.vuforiaVision.setEnabled(true);
+                robot.globalTracer.traceInfo(funcName, "Enabling AprilTagVision.");
+                robot.vision.aprilTagVision.setEnabled(true);
             }
-
-            if (robot.vision.tensorFlowVision != null)
+            else if (robot.vision.tensorFlowVision != null)
             {
-                robot.globalTracer.traceInfo(funcName, "Enabling TensorFlow.");
+                robot.globalTracer.traceInfo(funcName, "Enabling TensorFlowVision.");
                 robot.vision.tensorFlowVision.setEnabled(true);
-            }
-            else if (robot.vision.eocvVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
-                robot.vision.eocvVision.setEnabled(true);
             }
         }
     }   //initRobot
@@ -238,8 +232,9 @@ public class FtcAuto extends FtcOpMode
     @Override
     public void startMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
-        robot.dashboard.clearDisplay();
+        final String funcName = "startMode";
 
+        robot.dashboard.clearDisplay();
         if (RobotParams.Preferences.useTraceLog)
         {
             robot.globalTracer.setTraceLogEnabled(true);
@@ -255,11 +250,27 @@ public class FtcAuto extends FtcOpMode
         //
         robot.startMode(nextMode);
 
-        if (robot.vision != null && robot.vision.eocvVision != null)
+        if (robot.vision != null)
         {
-            robot.vision.eocvVision.setDetectObjectType(
-                autoChoices.alliance == Alliance.RED_ALLIANCE?
-                    EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
+            // We are done with detecting signal, disable signal detectors.
+            if (robot.vision.tensorFlowVision != null)
+            {
+                robot.globalTracer.traceInfo(funcName, "Shutting down TensorFlow.");
+                robot.vision.tensorFlowShutdown();
+            }
+            else if (robot.vision.aprilTagVision != null)
+            {
+                robot.globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
+                robot.vision.aprilTagVision.setEnabled(false);
+            }
+
+            // Enabling EOCV vision to detect cones and junction poles.
+            if (robot.vision.eocvVision != null)
+            {
+                robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
+                robot.vision.eocvVision.setEnabled(true);
+                robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.YELLOW_POLE);
+            }
         }
 
         if (robot.battery != null)
@@ -285,26 +296,6 @@ public class FtcAuto extends FtcOpMode
         if (autoCommand != null)
         {
             autoCommand.cancel();
-        }
-
-        if (robot.vision != null)
-        {
-            if (robot.vision.vuforiaVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling Vuforia.");
-                robot.vision.vuforiaVision.setEnabled(false);
-            }
-
-            if (robot.vision.tensorFlowVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling TensorFlow.");
-                robot.vision.tensorFlowVision.setEnabled(false);
-            }
-            else if (robot.vision.eocvVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling EocvVision.");
-                robot.vision.eocvVision.setEnabled(false);
-            }
         }
         //
         // Tell robot object opmode is about to stop so it can do the necessary cleanup for the mode.

@@ -31,7 +31,6 @@ import TrcCommonLib.command.CmdPidDrive;
 import TrcCommonLib.command.CmdPurePursuitDrive;
 import TrcCommonLib.command.CmdTimedDrive;
 
-import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcElapsedTimer;
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPidController;
@@ -59,6 +58,7 @@ public class FtcTest extends FtcTeleOp
     {
         SENSORS_TEST,
         SUBSYSTEMS_TEST,
+        VISION_TEST,
         DRIVE_SPEED_TEST,
         DRIVE_MOTORS_TEST,
         X_TIMED_DRIVE,
@@ -71,12 +71,20 @@ public class FtcTest extends FtcTeleOp
         CALIBRATE_SWERVE_STEERING
     }   //enum Test
 
+    private enum VisionType
+    {
+        APRILTAG,
+        EOCV,
+        TENSOR_FLOW
+    }   //enum VisionType
+
     /**
      * This class stores the test menu choices.
      */
     private static class TestChoices
     {
         Test test = Test.SENSORS_TEST;
+        VisionType visionType = VisionType.APRILTAG;
         double xTarget = 0.0;
         double yTarget = 0.0;
         double turnTarget = 0.0;
@@ -93,6 +101,7 @@ public class FtcTest extends FtcTeleOp
             return String.format(
                 Locale.US,
                 "test=\"%s\" " +
+                "visionType=\"%s\" " +
                 "xTarget=%.1f " +
                 "yTarget=%.1f " +
                 "turnTarget=%1f " +
@@ -102,8 +111,8 @@ public class FtcTest extends FtcTeleOp
                 "tuneDistance=%.1f " +
                 "tuneHeading=%.1f " +
                 "tuneDrivePower=%.1f",
-                test, xTarget, yTarget, turnTarget, driveTime, drivePower, tunePidCoeff, tuneDistance, tuneHeading,
-                tuneDrivePower);
+                test, visionType,  xTarget, yTarget, turnTarget, driveTime, drivePower, tunePidCoeff, tuneDistance,
+                tuneHeading, tuneDrivePower);
         }   //toString
 
     }   //class TestChoices
@@ -228,10 +237,9 @@ public class FtcTest extends FtcTeleOp
                 break;
         }
         //
-        // Only SENSORS_TEST and SUBSYSTEMS_TEST need TensorFlow, shut it down for all other tests.
+        // Only VISION_TEST needs TensorFlow, shut it down for all other tests.
         //
-        if (robot.vision != null && robot.vision.tensorFlowVision != null &&
-            testChoices.test != Test.SENSORS_TEST && testChoices.test != Test.SUBSYSTEMS_TEST)
+        if (robot.vision != null && robot.vision.tensorFlowVision != null && testChoices.test != Test.VISION_TEST)
         {
             robot.globalTracer.traceInfo("TestInit", "Shutting down TensorFlow.");
             robot.vision.tensorFlowShutdown();
@@ -257,8 +265,7 @@ public class FtcTest extends FtcTeleOp
         super.startMode(prevMode, nextMode);
         switch (testChoices.test)
         {
-            case SENSORS_TEST:
-            case SUBSYSTEMS_TEST:
+            case VISION_TEST:
                 if (robot.vision != null)
                 {
                     //
@@ -270,20 +277,20 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.vuforiaVision.setEnabled(true);
                     }
 
-                    if (robot.vision.tensorFlowVision != null)
+                    if (robot.vision.aprilTagVision != null && testChoices.visionType == VisionType.APRILTAG)
+                    {
+                        robot.globalTracer.traceInfo(funcName, "Enabling AprilTagVision.");
+                        robot.vision.aprilTagVision.setEnabled(true);
+                    }
+                    else if (robot.vision.tensorFlowVision != null && testChoices.visionType == VisionType.TENSOR_FLOW)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling TensorFlow.");
                         robot.vision.tensorFlowVision.setEnabled(true);
                     }
-                    else if (robot.vision.eocvVision != null)
+                    else if (robot.vision.eocvVision != null && testChoices.visionType == VisionType.EOCV)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
                         robot.vision.eocvVision.setEnabled(true);
-                    }
-                    else if (robot.vision.aprilTagVision != null)
-                    {
-                        robot.globalTracer.traceInfo(funcName, "Enabling AprilTagVision.");
-                        robot.vision.aprilTagVision.setEnabled(true);
                     }
                 }
                 break;
@@ -346,34 +353,6 @@ public class FtcTest extends FtcTeleOp
         if (testCommand != null)
         {
             testCommand.cancel();
-        }
-
-        if (robot.vision != null)
-        {
-            //
-            // Vision generally will impact performance, so we only enable it if it's needed.
-            //
-            if (robot.vision.vuforiaVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling Vuforia.");
-                robot.vision.vuforiaVision.setEnabled(false);
-            }
-
-            if (robot.vision.tensorFlowVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling TensorFlow.");
-                robot.vision.tensorFlowVision.setEnabled(false);
-            }
-            else if (robot.vision.eocvVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling EocvVision.");
-                robot.vision.eocvVision.setEnabled(false);
-            }
-            else if (robot.vision.aprilTagVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
-                robot.vision.aprilTagVision.setEnabled(false);
-            }
         }
 
         super.stopMode(prevMode, nextMode);
@@ -528,6 +507,9 @@ public class FtcTest extends FtcTeleOp
             case SENSORS_TEST:
             case SUBSYSTEMS_TEST:
                 doSensorsTest();
+                break;
+
+            case VISION_TEST:
                 doVisionTest();
                 break;
 
@@ -566,7 +548,7 @@ public class FtcTest extends FtcTeleOp
     @Override
     public void driverButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
-        if (allowButtonControl())
+        if (allowButtonControl() || testChoices.test == Test.VISION_TEST)
         {
             boolean processed = false;
             //
@@ -588,7 +570,7 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_B:
-                    if (testChoices.test == Test.SUBSYSTEMS_TEST)
+                    if (testChoices.test == Test.VISION_TEST)
                     {
                         if (pressed && robot.vision != null && robot.vision.eocvVision != null)
                         {
@@ -729,6 +711,7 @@ public class FtcTest extends FtcTeleOp
         // Create menus.
         //
         testMenu = new FtcChoiceMenu<>("Tests:", null);
+        FtcChoiceMenu<VisionType> visionTypeMenu = new FtcChoiceMenu<>("Vision Type:", testMenu);
         FtcValueMenu xTargetMenu = new FtcValueMenu(
             "xTarget:", testMenu, -10.0, 10.0, 0.5, 0.0, " %.1f ft");
         FtcValueMenu yTargetMenu = new FtcValueMenu(
@@ -764,6 +747,7 @@ public class FtcTest extends FtcTeleOp
         //
         testMenu.addChoice("Sensors test", Test.SENSORS_TEST, true);
         testMenu.addChoice("Subsystems test", Test.SUBSYSTEMS_TEST, false);
+        testMenu.addChoice("Vision test", Test.VISION_TEST, false, visionTypeMenu);
         testMenu.addChoice("Drive speed test", Test.DRIVE_SPEED_TEST, false);
         testMenu.addChoice("Drive motors test", Test.DRIVE_MOTORS_TEST, false);
         testMenu.addChoice("X Timed drive", Test.X_TIMED_DRIVE, false, driveTimeMenu);
@@ -774,6 +758,10 @@ public class FtcTest extends FtcTeleOp
         testMenu.addChoice("Tune Turn PID", Test.TUNE_TURN_PID, false, tuneKpMenu);
         testMenu.addChoice("Pure Pursuit Drive", Test.PURE_PURSUIT_DRIVE, false);
         testMenu.addChoice("Calibrate Swerve Steering", Test.CALIBRATE_SWERVE_STEERING, false);
+
+        visionTypeMenu.addChoice("AprilTag vision", VisionType.APRILTAG, true);
+        visionTypeMenu.addChoice("EOCV vision", VisionType.EOCV, false);
+        visionTypeMenu.addChoice("TensorFlow vision", VisionType.TENSOR_FLOW, false);
 
         xTargetMenu.setChildMenu(yTargetMenu);
         yTargetMenu.setChildMenu(turnTargetMenu);
@@ -793,6 +781,7 @@ public class FtcTest extends FtcTeleOp
         // Fetch choices.
         //
         testChoices.test = testMenu.getCurrentChoiceObject();
+        testChoices.visionType = visionTypeMenu.getCurrentChoiceObject();
         testChoices.xTarget = xTargetMenu.getCurrentValue();
         testChoices.yTarget = yTargetMenu.getCurrentValue();
         testChoices.turnTarget = turnTargetMenu.getCurrentValue();

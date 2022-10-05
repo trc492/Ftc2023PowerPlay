@@ -56,17 +56,18 @@ public class Vision
     public static final String GOT_TARGET = "GotTarget";
     public static final String SAW_TARGET = "SawTarget";
 
-    private final TrcRevBlinkin.Pattern[] ledPatternPriorities = {
-        new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
-        new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
-        new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
-        new TrcRevBlinkin.Pattern(SAW_TARGET, TrcRevBlinkin.RevLedPattern.SolidViolet),
-        new TrcRevBlinkin.Pattern(GOT_TARGET, TrcRevBlinkin.RevLedPattern.SolidAqua),
-        new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
-        new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
-        new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
-        new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue)
-    };
+    private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
+        {
+            new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
+            new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
+            new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
+            new TrcRevBlinkin.Pattern(SAW_TARGET, TrcRevBlinkin.RevLedPattern.SolidViolet),
+            new TrcRevBlinkin.Pattern(GOT_TARGET, TrcRevBlinkin.RevLedPattern.SolidAqua),
+            new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
+            new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
+            new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
+            new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue)
+        };
 
     private final Robot robot;
     public VuforiaVision vuforiaVision;
@@ -95,6 +96,7 @@ public class Vision
             OpenCvCamera webcam =
                 OpenCvCameraFactory.getInstance().createWebcam(
                     opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM), cameraViewId);
+
             if (RobotParams.Preferences.useEasyOpenCV)
             {
                 eocvVision = new EocvVision(
@@ -102,7 +104,8 @@ public class Vision
                     RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
                     RobotParams.Preferences.showEasyOpenCvView, null);
             }
-            else
+
+            if (RobotParams.Preferences.useAprilTag)
             {
                 aprilTagVision = new FtcAprilTagDetector(
                     "AprilTagVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
@@ -184,17 +187,19 @@ public class Vision
             {
                 FtcTensorFlow.DetectedObject detectedObj = (FtcTensorFlow.DetectedObject) target.detectedObj;
 
-                if (detectedObj.label.equals(LABEL_BOLT))
+                switch (detectedObj.label)
                 {
-                    detectedSignal = 1;
-                }
-                else if (detectedObj.label.equals(LABEL_BULB))
-                {
-                    detectedSignal = 2;
-                }
-                else if (detectedObj.label.equals(LABEL_PANEL))
-                {
-                    detectedSignal = 3;
+                    case LABEL_BOLT:
+                        detectedSignal = 1;
+                        break;
+
+                    case LABEL_BULB:
+                        detectedSignal = 2;
+                        break;
+
+                    case LABEL_PANEL:
+                        detectedSignal = 3;
+                        break;
                 }
             }
             else if (aprilTagVision != null)
@@ -256,17 +261,17 @@ public class Vision
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
-        if (tensorFlowVision != null)
+        if (tensorFlowVision != null && tensorFlowVision.isEnabled())
         {
             targets = tensorFlowVision.getDetectedTargetsInfo(
                 label, null, this::compareConfidence, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
-        else if (eocvVision != null)
+        else if (eocvVision != null && eocvVision.isEnabled())
         {
             targets = eocvVision.getDetectedTargetsInfo(
                 null, this::compareObjectSize, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
-        else if (aprilTagVision != null)
+        else if (aprilTagVision != null && aprilTagVision.isEnabled())
         {
             targets = aprilTagVision.getDetectedTargetsInfo(
                 null, null, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
@@ -298,18 +303,18 @@ public class Vision
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
-        if (tensorFlowVision != null)
+        if (tensorFlowVision != null && tensorFlowVision.isEnabled())
         {
             targets = tensorFlowVision.getDetectedTargetsInfo(
                 label, null, this::compareDistanceFromCamera,
                 RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
-        else if (eocvVision != null)
+        else if (eocvVision != null && eocvVision.isEnabled())
         {
             targets = eocvVision.getDetectedTargetsInfo(
                 null, this::compareDistanceFromCamera, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
-        else if (aprilTagVision != null)
+        else if (aprilTagVision != null && aprilTagVision.isEnabled())
         {
             targets = aprilTagVision.getDetectedTargetsInfo(
                 null, this::compareDistanceFromCamera, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);

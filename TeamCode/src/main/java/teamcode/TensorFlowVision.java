@@ -86,6 +86,16 @@ public class TensorFlowVision
     }   //setEnabled
 
     /**
+     * This method checks if TensorFlow is enabled.
+     *
+     * @return true if TensorFlow is enabled, false otherwise.
+     */
+    public boolean isEnabled()
+    {
+        return tensorFlow.isEnabled();
+    }   //isEnabled
+
+    /**
      * This method shuts down TensorFlow.
      */
     public void shutdown()

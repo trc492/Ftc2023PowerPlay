@@ -309,12 +309,14 @@ public class Robot
                 globalTracer.traceInfo(funcName, "Shutting down TensorFlow.");
                 vision.tensorFlowShutdown();
             }
-            else if (vision.eocvVision != null)
+
+            if (vision.eocvVision != null)
             {
                 globalTracer.traceInfo(funcName, "Disabling EocvVision.");
                 vision.eocvVision.setEnabled(false);
             }
-            else if (vision.aprilTagVision != null)
+
+            if (vision.aprilTagVision != null)
             {
                 globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
                 vision.aprilTagVision.setEnabled(false);

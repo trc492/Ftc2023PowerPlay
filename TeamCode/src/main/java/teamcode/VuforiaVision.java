@@ -153,6 +153,16 @@ public class VuforiaVision
     }   //setEnabled
 
     /**
+     * This method checks if Vuforia is enabled.
+     *
+     * @return true if Vuforia is enabled, false otherwise.
+     */
+    public boolean isEnabled()
+    {
+        return vuforia.isTrackingEnabled();
+    }   //isEnabled
+
+    /**
      * This method creates an OpenGLMatrix as the image location.
      *
      * @param dx specifies translation coordinate in X.
