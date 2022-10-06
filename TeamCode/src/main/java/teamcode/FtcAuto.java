@@ -67,7 +67,8 @@ public class FtcAuto extends FtcOpMode
     public enum Parking
     {
         NEAR_TILE,
-        FAR_TILE
+        FAR_TILE,
+        NO_PARKING
     }   //enum Parking
 
     /**
@@ -151,7 +152,7 @@ public class FtcAuto extends FtcOpMode
             case CYCLE_HIGH:
                 if (!RobotParams.Preferences.noRobot)
                 {
-
+                    autoCommand = new CmdAutoHigh(robot, autoChoices);
                 }
                 break;
 
@@ -383,6 +384,7 @@ public class FtcAuto extends FtcOpMode
 
         parkingMenu.addChoice("Parking Near Tile", Parking.NEAR_TILE, false);
         parkingMenu.addChoice("Parking Far Tile", Parking.FAR_TILE, true);
+        parkingMenu.addChoice("No Parking", Parking.NO_PARKING, true);
         //
         // Traverse menus.
         //
