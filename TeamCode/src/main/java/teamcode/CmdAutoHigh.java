@@ -169,22 +169,37 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //raise elevator to scoring height
                     //turn turret to score position
                     //wait for pure pursuit to finish
-                    // Todo: find the points
+                    // Todo: add option to do center high poles
+                    //Todo: fix points bc arm is too short
                     if (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE) {
-                        robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.pathPoint(-2.5, -1.0, 0.0),
-                                robot.robotDrive.pathPoint(-2.5, -2.2, 0.0));
-                    } else {
-                        robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                // First two points same as red alliance. Last point, yTarget and heading is different.
-                                robot.robotDrive.pathPoint(-2.5, 1.0, 180.0),
-                                robot.robotDrive.pathPoint(-2.5, 2.2, 180.0));
+                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(-1.5, -0.5, 0));
+                            robot.turret.setTarget(45.0);
+                        }
+                        else {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(1.5, -0.5, 0));
+                            robot.turret.setTarget(-45.0);
+                        }
+                    }
+                    else {
+                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(1.5, 0.5, 180.0));
+                            robot.turret.setTarget(-135.0);
+                        }
+                        else {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(-1.5, 0.5, 180.0));
+                            robot.turret.setTarget(135.0);
+                        }
                     }
                     sm.waitForSingleEvent(event, State.RAISE_ARM);
-                    //todo: find out how to make turret turn to goal
-                    robot.turret.setPresetPosition(2);
                     robot.elevator.setPresetPosition(2);
                     break;
 
@@ -210,18 +225,41 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //move robot toward cone stack
                 //wait for pure pursuit
                 case PREPARE_PICKUP:
-                    //Todo: Change time
-                    if (TrcUtil.getCurrentTime() >= 25 || cycleCount == 5) {
+                    if (TrcUtil.getModeElapsedTime() >= 27 || cycleCount == 5) {
                         sm.setState(State.PARK);
                     } else {
                         robot.turret.setPresetPosition(0);
                         robot.elevator.setPresetPosition(2);
                         //todo: find arm pos
                         robot.arm.setPresetPosition(2);
-                        robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.pathPoint(-2.5, -1.0, 0.0),
-                                robot.robotDrive.pathPoint(-2.5, -2.2, 0.0));
+                        if (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE) {
+                            if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                                robot.robotDrive.purePursuitDrive.start(
+                                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                        robot.robotDrive.pathPoint(-2.9388, -0.4847, 0));
+                                robot.turret.setTarget(-104.0);
+                            }
+                            else {
+                                robot.robotDrive.purePursuitDrive.start(
+                                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                        robot.robotDrive.pathPoint(2.9388, -0.4847, 0));
+                                robot.turret.setTarget(104.0);
+                            }
+                        }
+                        else {
+                            if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                                robot.robotDrive.purePursuitDrive.start(
+                                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                        robot.robotDrive.pathPoint(2.9388, 0.4847, 180.0));
+                                robot.turret.setTarget(76.0);
+                            }
+                            else {
+                                robot.robotDrive.purePursuitDrive.start(
+                                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                        robot.robotDrive.pathPoint(-2.9388, 0.4847, 180.0));
+                                robot.turret.setTarget(-76.0);
+                            }
+                        }
                         sm.waitForSingleEvent(event, State.GRAB_CONE);
                     }
                     break;
@@ -243,12 +281,34 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.arm.setPresetPosition(2, event, null);
                     robot.turret.setPresetPosition(0);
                     robot.elevator.setPresetPosition(0);
-                    robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.pathPoint(-2.5, -1.0, 0.0),
-                            robot.robotDrive.pathPoint(-2.5, -2.2, 0.0));
-
-
+                    if (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE) {
+                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(-1.0612, -0.0153, 0));
+                            robot.turret.setTarget(76.0);
+                        }
+                        else {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(1.0612, -0.0153, 0));
+                            robot.turret.setTarget(-76.0);
+                        }
+                    }
+                    else {
+                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(1.0612, 0.0153, 180.0));
+                            robot.turret.setTarget(-104.0);
+                        }
+                        else {
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.pathPoint(-1.0612, 0.0153, 180.0));
+                            robot.turret.setTarget(104.0);
+                        }
+                    }
                     sm.waitForSingleEvent(event, State.SCORE_CONE);
                     break;
 
