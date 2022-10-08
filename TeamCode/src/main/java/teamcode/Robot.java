@@ -95,8 +95,7 @@ public class Robot
         //
         if ((RobotParams.Preferences.useVuforia ||
              RobotParams.Preferences.useTensorFlow ||
-             RobotParams.Preferences.useEasyOpenCV ||
-             RobotParams.Preferences.useAprilTag) &&
+             RobotParams.Preferences.useEasyOpenCV) &&
             (runMode == TrcRobot.RunMode.AUTO_MODE || runMode == TrcRobot.RunMode.TEST_MODE))
         {
             vision = new Vision(this);
@@ -314,12 +313,6 @@ public class Robot
             {
                 globalTracer.traceInfo(funcName, "Disabling EocvVision.");
                 vision.eocvVision.setEnabled(false);
-            }
-
-            if (vision.aprilTagVision != null)
-            {
-                globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
-                vision.aprilTagVision.setEnabled(false);
             }
         }
 

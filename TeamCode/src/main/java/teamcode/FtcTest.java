@@ -73,7 +73,6 @@ public class FtcTest extends FtcTeleOp
 
     private enum VisionType
     {
-        APRILTAG,
         EOCV,
         TENSOR_FLOW
     }   //enum VisionType
@@ -84,7 +83,7 @@ public class FtcTest extends FtcTeleOp
     private static class TestChoices
     {
         Test test = Test.SENSORS_TEST;
-        VisionType visionType = VisionType.APRILTAG;
+        VisionType visionType = VisionType.EOCV;
         double xTarget = 0.0;
         double yTarget = 0.0;
         double turnTarget = 0.0;
@@ -277,20 +276,15 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.vuforiaVision.setEnabled(true);
                     }
 
-                    if (robot.vision.aprilTagVision != null && testChoices.visionType == VisionType.APRILTAG)
+                    if (robot.vision.eocvVision != null && testChoices.visionType == VisionType.EOCV)
                     {
-                        robot.globalTracer.traceInfo(funcName, "Enabling AprilTagVision.");
-                        robot.vision.aprilTagVision.setEnabled(true);
+                        robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
+                        robot.vision.eocvVision.setEnabled(true);
                     }
                     else if (robot.vision.tensorFlowVision != null && testChoices.visionType == VisionType.TENSOR_FLOW)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling TensorFlow.");
                         robot.vision.tensorFlowVision.setEnabled(true);
-                    }
-                    else if (robot.vision.eocvVision != null && testChoices.visionType == VisionType.EOCV)
-                    {
-                        robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
-                        robot.vision.eocvVision.setEnabled(true);
                     }
                 }
                 break;
@@ -348,8 +342,6 @@ public class FtcTest extends FtcTeleOp
     @Override
     public void stopMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
-        final String funcName = "stopMode";
-
         if (testCommand != null)
         {
             testCommand.cancel();
@@ -759,8 +751,7 @@ public class FtcTest extends FtcTeleOp
         testMenu.addChoice("Pure Pursuit Drive", Test.PURE_PURSUIT_DRIVE, false);
         testMenu.addChoice("Calibrate Swerve Steering", Test.CALIBRATE_SWERVE_STEERING, false);
 
-        visionTypeMenu.addChoice("AprilTag vision", VisionType.APRILTAG, true);
-        visionTypeMenu.addChoice("EOCV vision", VisionType.EOCV, false);
+        visionTypeMenu.addChoice("EOCV vision", VisionType.EOCV, true);
         visionTypeMenu.addChoice("TensorFlow vision", VisionType.TENSOR_FLOW, false);
 
         xTargetMenu.setChildMenu(yTargetMenu);
@@ -946,9 +937,7 @@ public class FtcTest extends FtcTeleOp
     {
         if (robot.vision != null)
         {
-            if (robot.vision.tensorFlowVision != null ||
-                robot.vision.eocvVision != null ||
-                robot.vision.aprilTagVision != null)
+            if (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null)
             {
                 final int maxNumLines = 3;
                 int lineIndex = 10;

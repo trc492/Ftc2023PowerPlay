@@ -23,7 +23,6 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcEvent;
-import TrcCommonLib.trclib.TrcNotifier;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTimer;
@@ -117,16 +116,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
             robot.dashboard.displayPrintf(1, "State: %s", state);
             switch (state) {
                 case START_DELAY:
-                    //
-                    // Disable TensorFlow if we are not using it to improve PurePursuitDrive performance.
-                    //
-                    if (robot.vision != null) {
-                        if (robot.vision.aprilTagVision != null) {
-                            robot.globalTracer.traceInfo(moduleName + ".cmdPeriodic", "Disabling aprilTag.");
-                            robot.vision.aprilTagVision.setEnabled(false);
-                        }
-
-                    }
                     //
                     // Set robot starting position in the field.
                     //

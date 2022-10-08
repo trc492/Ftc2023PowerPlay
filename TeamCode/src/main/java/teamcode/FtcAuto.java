@@ -191,14 +191,15 @@ public class FtcAuto extends FtcOpMode
         if (robot.vision != null)
         {
             // Enabling vision early so we can detect signal position before match starts.
-            if (robot.vision.aprilTagVision != null)
+            if (robot.vision.eocvVision != null)
             {
-                robot.globalTracer.traceInfo(funcName, "Enabling AprilTagVision.");
-                robot.vision.aprilTagVision.setEnabled(true);
+                robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect AprilTag.");
+                robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
+                robot.vision.eocvVision.setEnabled(true);
             }
             else if (robot.vision.tensorFlowVision != null)
             {
-                robot.globalTracer.traceInfo(funcName, "Enabling TensorFlowVision.");
+                robot.globalTracer.traceInfo(funcName, "Enabling TensorFlowVision to detect Signal.");
                 robot.vision.tensorFlowVision.setEnabled(true);
             }
         }
@@ -216,7 +217,7 @@ public class FtcAuto extends FtcOpMode
     public void initPeriodic()
     {
         // Use vision to detect objects before the match starts.
-        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.aprilTagVision != null))
+        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null))
         {
             robot.vision.getDetectedSignal();
         }
@@ -259,18 +260,13 @@ public class FtcAuto extends FtcOpMode
                 robot.globalTracer.traceInfo(funcName, "Shutting down TensorFlow.");
                 robot.vision.tensorFlowShutdown();
             }
-            else if (robot.vision.aprilTagVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Disabling AprilTagVision.");
-                robot.vision.aprilTagVision.setEnabled(false);
-            }
 
             // Enabling EOCV vision to detect cones and junction poles.
             if (robot.vision.eocvVision != null)
             {
-                robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
-                robot.vision.eocvVision.setEnabled(true);
+                robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect yellow pole.");
                 robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.YELLOW_POLE);
+                robot.vision.eocvVision.setEnabled(true);
             }
         }
 

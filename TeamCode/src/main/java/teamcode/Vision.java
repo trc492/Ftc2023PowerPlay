@@ -24,15 +24,14 @@ package teamcode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import TrcCommonLib.trclib.TrcOpenCVDetector;
+import TrcCommonLib.trclib.TrcOpenCvDetector;
 import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
-import TrcFtcLib.ftclib.FtcAprilTagDetector;
+import TrcFtcLib.ftclib.FtcEocvAprilTagPipeline;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcTensorFlow;
 import TrcFtcLib.ftclib.FtcVuforia;
@@ -45,16 +44,19 @@ import TrcFtcLib.ftclib.FtcVuforia;
 public class Vision
 {
     public static final String OPENCV_NATIVE_LIBRARY_NAME = "EasyOpenCV";
+    public static final String LABEL_BOLT = "1 Bolt";
+    public static final String LABEL_BULB = "2 Bulb";
+    public static final String LABEL_PANEL = "3 Panel";
+    public static final String SAW_TARGET = "SawTarget";
+    public static final String GOT_TARGET = "GotTarget";
     public static final String IMAGE1_NAME = "Red Audience Wall";
     public static final String IMAGE2_NAME = "Red Rear Wall";
     public static final String IMAGE3_NAME = "Blue Audience Wall";
     public static final String IMAGE4_NAME = "Blue Rear Wall";
-    public static final String LABEL_BOLT = "1 Bolt";
-    public static final String LABEL_BULB = "2 Bulb";
-    public static final String LABEL_PANEL = "3 Panel";
     public static final String[] TARGET_LABELS = {LABEL_BOLT, LABEL_BULB, LABEL_PANEL};
-    public static final String GOT_TARGET = "GotTarget";
-    public static final String SAW_TARGET = "SawTarget";
+    public static final String DRIVE_ORIENTATION_FIELD = "FieldMode";
+    public static final String DRIVE_ORIENTATION_ROBOT = "RobotMode";
+    public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
 
     private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
         {
@@ -66,14 +68,16 @@ public class Vision
             new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
             new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
             new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
-            new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue)
+            new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidYellow),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray)
         };
 
     private final Robot robot;
     public VuforiaVision vuforiaVision;
     public TensorFlowVision tensorFlowVision;
     public EocvVision eocvVision;
-    public FtcAprilTagDetector aprilTagVision;
 
     private int lastSignal = 0;
 
@@ -91,32 +95,18 @@ public class Vision
                 "cameraMonitorViewId", "id", opMode.hardwareMap.appContext.getPackageName());
 
         this.robot = robot;
-        if (RobotParams.Preferences.useEasyOpenCV || RobotParams.Preferences.useAprilTag)
+        if (RobotParams.Preferences.useEasyOpenCV)
         {
             OpenCvCamera webcam =
                 OpenCvCameraFactory.getInstance().createWebcam(
                     opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM), cameraViewId);
 
-            if (RobotParams.Preferences.useEasyOpenCV)
-            {
-                eocvVision = new EocvVision(
-                    "EocvVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
-                    RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
-                    RobotParams.Preferences.showEasyOpenCvView, null);
-            }
-
-            if (RobotParams.Preferences.useAprilTag)
-            {
-                aprilTagVision = new FtcAprilTagDetector(
-                    "AprilTagVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
-                    RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
-                    RobotParams.Preferences.showAprilTagView, null,
-                    AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.CAMERA_TAGSIZE,
-                    RobotParams.CAMERA_FX, RobotParams.CAMERA_FY,
-                    RobotParams.CAMERA_CX, RobotParams.CAMERA_CY);
-            }
+            eocvVision = new EocvVision(
+                "EocvVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
+                RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
+                RobotParams.Preferences.showEasyOpenCvView, null);
         }
-        else
+        else if (RobotParams.Preferences.useVuforia || RobotParams.Preferences.useTensorFlow)
         {
             final String VUFORIA_LICENSE_KEY =
                 "ARbBwjf/////AAABmZijKPKUWEY+uNSzCuTOUFgm7Gr5irDO55gtIOjsOXmhLzLEILJp45qdPrwMfoBV2Yh7F+Wh8iEjnSA" +
@@ -202,12 +192,12 @@ public class Vision
                         break;
                 }
             }
-            else if (aprilTagVision != null)
+            else if (eocvVision != null && eocvVision.getPipeline() instanceof FtcEocvAprilTagPipeline)
             {
-                FtcAprilTagDetector.DetectedObject detectedObj =
-                    (FtcAprilTagDetector.DetectedObject) target.detectedObj;
+                FtcEocvAprilTagPipeline.DetectedObject detectedObj =
+                    (FtcEocvAprilTagPipeline.DetectedObject) target.detectedObj;
 
-                detectedSignal = detectedObj.aprilTagInfo.id;
+                detectedSignal = detectedObj.object.id;
             }
         }
 
@@ -269,11 +259,6 @@ public class Vision
         else if (eocvVision != null && eocvVision.isEnabled())
         {
             targets = eocvVision.getDetectedTargetsInfo(
-                null, this::compareObjectSize, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
-        }
-        else if (aprilTagVision != null && aprilTagVision.isEnabled())
-        {
-            targets = aprilTagVision.getDetectedTargetsInfo(
                 null, null, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
 
@@ -312,11 +297,6 @@ public class Vision
         else if (eocvVision != null && eocvVision.isEnabled())
         {
             targets = eocvVision.getDetectedTargetsInfo(
-                null, this::compareDistanceFromCamera, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
-        }
-        else if (aprilTagVision != null && aprilTagVision.isEnabled())
-        {
-            targets = aprilTagVision.getDetectedTargetsInfo(
                 null, this::compareDistanceFromCamera, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
         }
 
@@ -372,11 +352,10 @@ public class Vision
      *         larger area than b.
      */
     private int compareObjectSize(
-        TrcVisionTargetInfo<TrcOpenCVDetector.DetectedObject> a,
-        TrcVisionTargetInfo<TrcOpenCVDetector.DetectedObject> b)
+        TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> a,
+        TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> b)
     {
-        return a.detectedObj.rect.width * a.detectedObj.rect.height -
-               b.detectedObj.rect.width * b.detectedObj.rect.height;
+        return (int)(a.detectedObj.getArea() - b.detectedObj.getArea());
     }   //compareObjectSize
 
 }   //class Vision

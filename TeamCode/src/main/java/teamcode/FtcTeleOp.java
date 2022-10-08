@@ -257,6 +257,33 @@ public class FtcTeleOp extends FtcOpMode
         return angle;
     }   //getDriveGyroAngle
 
+    /**
+     * This method updates the blinkin LEDs to show the drive orientation mode.
+     */
+    private void updateDriveModeLeds()
+    {
+        if (robot.blinkin != null)
+        {
+            robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_FIELD, false);
+            robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_ROBOT, false);
+            robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_INVERTED, false);
+            switch (driveOrientation)
+            {
+                case FIELD:
+                    robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_FIELD, true);
+                    break;
+
+                case ROBOT:
+                    robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_ROBOT, true);
+                    break;
+
+                case INVERTED:
+                    robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_INVERTED, true);
+                    break;
+            }
+        }
+    }   //updateDriveModeLeds
+
     //
     // Implements TrcGameController.ButtonHandler interface.
     //
@@ -290,6 +317,7 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed)
                 {
                     driveOrientation = DriveOrientation.nextDriveOrientation(driveOrientation);
+                    updateDriveModeLeds();
                 }
                 break;
 
