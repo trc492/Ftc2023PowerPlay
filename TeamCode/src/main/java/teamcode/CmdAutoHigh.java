@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
+* Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private final TrcEvent event;
     private final TrcStateMachine<State> sm;
     private int signalPos = 0;
+    // Todo: CodeReview: why public? Nobody outside of this class will access it.
     public int cycleCount = 0;
 
     /**
@@ -104,39 +105,40 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
      * @return true if the command sequence is completed, false otherwise.
      */
     @Override
-    public boolean cmdPeriodic(double elapsedTime) {
+    public boolean cmdPeriodic(double elapsedTime)
+    {
         State state = sm.checkReadyAndGetState();
 
-        if (state == null) {
+        if (state == null)
+        {
             robot.dashboard.displayPrintf(1, "State: disabled or waiting...");
-        } else {
+        }
+        else
+        {
             boolean traceState = true;
             String msg;
 
             robot.dashboard.displayPrintf(1, "State: %s", state);
-            switch (state) {
+            switch (state)
+            {
                 case START_DELAY:
                     //
                     // Set robot starting position in the field.
                     //
-
-                    robot.robotDrive.driveBase.setFieldPosition(
-                            (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE ?
-                                    ( autoChoices.startPos == FtcAuto.StartPos.LEFT ?
-                                            RobotParams.STARTPOS_RED_LEFT : RobotParams.STARTPOS_RED_RIGHT) :
-                                    (autoChoices.startPos == FtcAuto.StartPos.LEFT ?
-                                            RobotParams.STARTPOS_BLUE_LEFT : RobotParams.STARTPOS_BLUE_RIGHT)));
+                    robot.setAutoStartPosition(autoChoices);
                     // Call vision at the beginning to figure out the position of the duck.
-                    if (robot.vision != null) {
+                    if (robot.vision != null)
+                    {
                         signalPos = robot.vision.getLastSignal();
                         msg = "Signal found at position " + signalPos;
                         robot.globalTracer.traceInfo(moduleName, msg);
                         robot.speak(msg);
                     }
 
-                    if (signalPos == 0) {
+                    if (signalPos == 0)
+                    {
                         //
-                        // We still can't see the duck, default to level 3.
+                        // We still can't see the signal, set to default position.
                         //
                         signalPos = 2;
                         msg = "No signal found, default to position " + signalPos;
@@ -146,12 +148,15 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //
                     // Do start delay if any.
                     //
-                    if (autoChoices.startDelay == 0.0) {
+                    if (autoChoices.startDelay == 0.0)
+                    {
                         //
                         // Intentionally falling through to the next state.
                         //
                         sm.setState(State.DRIVE_TO_HIGH);
-                    } else {
+                    }
+                    else
+                    {
                         timer.set(autoChoices.startDelay, event);
                         sm.waitForSingleEvent(event, State.DRIVE_TO_HIGH);
                         break;
@@ -163,29 +168,37 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //turn turret to score position
                     //wait for pure pursuit to finish
                     // Todo: add option to do center high poles
-                    //Points are 6 inches from the high junction, on the line drawn from the the high junction to the corresponding cone stack, facing the cone stack
-                    if (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE) {
-                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                    //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
+                    //corresponding cone stack, facing the cone stack
+                    // Todo: CodeReview: please change all purePursuit points to use robot.getAutoTargetPoint.
+                    if (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE)
+                    {
+                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT)
+                        {
                             robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.pathPoint(-1.243, -0.061, -104.0));
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.pathPoint(-1.243, -0.061, -104.0));
                         }
-                        else {
+                        else
+                        {
                             robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.pathPoint(1.243, -0.061, 104.0));
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.pathPoint(1.243, -0.061, 104.0));
                         }
                     }
-                    else {
-                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT) {
+                    else
+                    {
+                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT)
+                        {
                             robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.pathPoint(1.243, 0.061, 76.0));
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.pathPoint(1.243, 0.061, 76.0));
                         }
-                        else {
+                        else
+                        {
                             robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.pathPoint(-1.243, 0.061, -76.0));
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.pathPoint(-1.243, 0.061, -76.0));
                         }
                     }
                     robot.turret.setTarget(180.0);
@@ -204,7 +217,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //todo: write code for alignment to pole with vision
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
                     sm.waitForSingleEvent(event, State.PREPARE_PICKUP);
-
                     break;
 
                 //this is the first step in the cycle sequence(picking up the cone from the stack)
@@ -215,9 +227,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //move robot toward cone stack
                 //wait for pure pursuit
                 case PREPARE_PICKUP:
-                    if (TrcUtil.getModeElapsedTime() >= 27 || cycleCount == 5) {
+                    if (TrcUtil.getModeElapsedTime() >= 27 || cycleCount == 5)
+                    {
                         sm.setState(State.PARK);
-                    } else {
+                    }
+                    else
+                    {
                         robot.turret.setPresetPosition(0);
                         robot.elevator.setPresetPosition(2);
                         //todo: find arm pos
@@ -232,9 +247,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP, event, null, 0.0);
                     //lower elevator until pickup signal
                     robot.elevator.setPresetPosition(0);
-
                     sm.waitForSingleEvent(event, State.PREPARE_SCORE);
-
                     break;
                 //prepare for scoring
                 case PREPARE_SCORE:
@@ -249,14 +262,20 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case PARK:
-                    if (autoChoices.parking == FtcAuto.Parking.NO_PARKING) {
+                    if (autoChoices.parking == FtcAuto.Parking.NO_PARKING)
+                    {
                         // We are not parking anywhere, just stop and be done.
                         sm.setState(State.DONE);
-                    } else {
-                        if (autoChoices.parking == FtcAuto.Parking.FAR_TILE) {
+                    }
+                    else
+                    {
+                        if (autoChoices.parking == FtcAuto.Parking.FAR_TILE)
+                        {
                             //Todo: not sure how to use the constants in RobotParams
 
-                        } else {
+                        }
+                        else
+                        {
 
                         }
                     }
@@ -273,15 +292,15 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
             }
 
-            if (traceState) {
+            if (traceState)
+            {
                 robot.globalTracer.traceStateInfo(
                         sm.toString(), state, robot.robotDrive.driveBase, robot.robotDrive.pidDrive,
-                        robot.robotDrive.purePursuitDrive,
-                        null);
+                        robot.robotDrive.purePursuitDrive, null);
             }
         }
 
         return !sm.isEnabled();
-        }
     }   //cmdPeriodic
 
+}   //class CmdAutoHigh

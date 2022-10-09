@@ -355,7 +355,7 @@ public class Vision
         TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> a,
         TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> b)
     {
-        return (int)(a.detectedObj.getArea() - b.detectedObj.getArea());
+        return (int)((a.detectedObj.getArea() - b.detectedObj.getArea())*1000);
     }   //compareObjectSize
 
 }   //class Vision
