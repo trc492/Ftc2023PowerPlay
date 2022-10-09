@@ -125,7 +125,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //
                     // Set robot starting position in the field.
                     //
-                    robot.setAutoStartPosition(autoChoices);
+                    robot.robotDrive.setAutoStartPosition(autoChoices);
                     // Call vision at the beginning to figure out the position of the duck.
                     if (robot.vision != null)
                     {

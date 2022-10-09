@@ -69,7 +69,6 @@ public class Robot
     public TrcPidActuator arm = null;
     public TrcIntake intake = null;
 
-
     /**
      * Constructor: Create an instance of the object.
      *

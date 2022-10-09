@@ -172,4 +172,49 @@ public class RobotDrive
         return pathPoint(targetLocation.x, targetLocation.y, heading, true);
     }   //pathPoint
 
+    /**
+     * This method sets the robot's autonomous starting position according to the autonomous choices.
+     *
+     * @param autoChoices specifies all the auto choices.
+     */
+    public void setAutoStartPosition(FtcAuto.AutoChoices autoChoices)
+    {
+        TrcPose2D pos =
+            autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE ?
+                (autoChoices.startPos == FtcAuto.StartPos.LEFT ?
+                    RobotParams.STARTPOS_RED_LEFT : RobotParams.STARTPOS_RED_RIGHT) :
+                (autoChoices.startPos == FtcAuto.StartPos.LEFT ?
+                    RobotParams.STARTPOS_BLUE_LEFT : RobotParams.STARTPOS_BLUE_RIGHT);
+
+        driveBase.setFieldPosition(pos);
+    }   //setAutoStartPosition
+
+    /**
+     * This method adjusts the target point according to the alliance and startPos in autoChoices.
+     *
+     * @param tileX specifies X tile coordinate for RED LEFT.
+     * @param tileY specifies Y tile coordinate for RED LEFT.
+     * @param heading specifies heading for RED LEFT.
+     * @param autoChoices specifies auto choices.
+     * @return adjusted target point as TrcPose2D.
+     */
+    public TrcPose2D getAutoTargetPoint(double tileX, double tileY, double heading, FtcAuto.AutoChoices autoChoices)
+    {
+        if (autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE)
+        {
+            tileY = -tileY;
+            heading = (heading + 180.0) % 360.0;
+            if (autoChoices.startPos == FtcAuto.StartPos.LEFT)
+            {
+                tileX = -tileX;
+            }
+        }
+        else if (autoChoices.startPos == FtcAuto.StartPos.RIGHT)
+        {
+            tileX = -tileX;
+        }
+
+        return new TrcPose2D(tileX * RobotParams.FULL_TILE_INCHES, tileY * RobotParams.FULL_TILE_INCHES, heading);
+    }   //getAutoTargetPoint
+
 }   //class RobotDrive
