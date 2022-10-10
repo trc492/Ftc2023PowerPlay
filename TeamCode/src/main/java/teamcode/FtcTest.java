@@ -71,19 +71,12 @@ public class FtcTest extends FtcTeleOp
         CALIBRATE_SWERVE_STEERING
     }   //enum Test
 
-    private enum VisionType
-    {
-        EOCV,
-        TENSOR_FLOW
-    }   //enum VisionType
-
     /**
      * This class stores the test menu choices.
      */
     private static class TestChoices
     {
         Test test = Test.SENSORS_TEST;
-        VisionType visionType = VisionType.EOCV;
         double xTarget = 0.0;
         double yTarget = 0.0;
         double turnTarget = 0.0;
@@ -100,7 +93,6 @@ public class FtcTest extends FtcTeleOp
             return String.format(
                 Locale.US,
                 "test=\"%s\" " +
-                "visionType=\"%s\" " +
                 "xTarget=%.1f " +
                 "yTarget=%.1f " +
                 "turnTarget=%1f " +
@@ -110,7 +102,7 @@ public class FtcTest extends FtcTeleOp
                 "tuneDistance=%.1f " +
                 "tuneHeading=%.1f " +
                 "tuneDrivePower=%.1f",
-                test, visionType,  xTarget, yTarget, turnTarget, driveTime, drivePower, tunePidCoeff, tuneDistance,
+                test, xTarget, yTarget, turnTarget, driveTime, drivePower, tunePidCoeff, tuneDistance,
                 tuneHeading, tuneDrivePower);
         }   //toString
 
@@ -276,12 +268,12 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.vuforiaVision.setEnabled(true);
                     }
 
-                    if (robot.vision.eocvVision != null && testChoices.visionType == VisionType.EOCV)
+                    if (robot.vision.eocvVision != null)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
                         robot.vision.eocvVision.setEnabled(true);
                     }
-                    else if (robot.vision.tensorFlowVision != null && testChoices.visionType == VisionType.TENSOR_FLOW)
+                    else if (robot.vision.tensorFlowVision != null)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling TensorFlow.");
                         robot.vision.tensorFlowVision.setEnabled(true);
@@ -703,7 +695,6 @@ public class FtcTest extends FtcTeleOp
         // Create menus.
         //
         testMenu = new FtcChoiceMenu<>("Tests:", null);
-        FtcChoiceMenu<VisionType> visionTypeMenu = new FtcChoiceMenu<>("Vision Type:", testMenu);
         FtcValueMenu xTargetMenu = new FtcValueMenu(
             "xTarget:", testMenu, -10.0, 10.0, 0.5, 0.0, " %.1f ft");
         FtcValueMenu yTargetMenu = new FtcValueMenu(
@@ -739,7 +730,7 @@ public class FtcTest extends FtcTeleOp
         //
         testMenu.addChoice("Sensors test", Test.SENSORS_TEST, true);
         testMenu.addChoice("Subsystems test", Test.SUBSYSTEMS_TEST, false);
-        testMenu.addChoice("Vision test", Test.VISION_TEST, false, visionTypeMenu);
+        testMenu.addChoice("Vision test", Test.VISION_TEST, false);
         testMenu.addChoice("Drive speed test", Test.DRIVE_SPEED_TEST, false);
         testMenu.addChoice("Drive motors test", Test.DRIVE_MOTORS_TEST, false);
         testMenu.addChoice("X Timed drive", Test.X_TIMED_DRIVE, false, driveTimeMenu);
@@ -750,9 +741,6 @@ public class FtcTest extends FtcTeleOp
         testMenu.addChoice("Tune Turn PID", Test.TUNE_TURN_PID, false, tuneKpMenu);
         testMenu.addChoice("Pure Pursuit Drive", Test.PURE_PURSUIT_DRIVE, false);
         testMenu.addChoice("Calibrate Swerve Steering", Test.CALIBRATE_SWERVE_STEERING, false);
-
-        visionTypeMenu.addChoice("EOCV vision", VisionType.EOCV, true);
-        visionTypeMenu.addChoice("TensorFlow vision", VisionType.TENSOR_FLOW, false);
 
         xTargetMenu.setChildMenu(yTargetMenu);
         yTargetMenu.setChildMenu(turnTargetMenu);
@@ -772,7 +760,6 @@ public class FtcTest extends FtcTeleOp
         // Fetch choices.
         //
         testChoices.test = testMenu.getCurrentChoiceObject();
-        testChoices.visionType = visionTypeMenu.getCurrentChoiceObject();
         testChoices.xTarget = xTargetMenu.getCurrentValue();
         testChoices.yTarget = yTargetMenu.getCurrentValue();
         testChoices.turnTarget = turnTargetMenu.getCurrentValue();

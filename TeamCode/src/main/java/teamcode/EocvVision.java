@@ -121,6 +121,7 @@ public class EocvVision extends FtcEocvDetector
         aprilTagPipeline = new FtcEocvAprilTagPipeline(
             AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.CAMERA_TAGSIZE,
             RobotParams.CAMERA_FX, RobotParams.CAMERA_FY, RobotParams.CAMERA_CX, RobotParams.CAMERA_CY, tracer);
+        updatePipeline();
     }   //EocvVision
 
     /**
