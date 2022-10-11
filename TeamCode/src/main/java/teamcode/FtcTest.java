@@ -565,6 +565,14 @@ public class FtcTest extends FtcTeleOp
                     break;
 
                 case FtcGamepad.GAMEPAD_X:
+                    if (testChoices.test == Test.VISION_TEST)
+                    {
+                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
+                        {
+                            robot.vision.eocvVision.toggleColorFilterOutput();
+                        }
+                        processed = true;
+                    }
                     break;
 
                 case FtcGamepad.GAMEPAD_Y:

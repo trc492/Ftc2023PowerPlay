@@ -29,6 +29,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcHomographyMapper;
 import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
+import TrcCommonLib.trclib.TrcOpenCvPipeline;
 import TrcFtcLib.ftclib.FtcEocvAprilTagPipeline;
 import TrcFtcLib.ftclib.FtcEocvColorBlobPipeline;
 import TrcFtcLib.ftclib.FtcEocvDetector;
@@ -169,5 +170,20 @@ public class EocvVision extends FtcEocvDetector
         objectType = ObjectType.nextObjectType(objectType);
         updatePipeline();
     }   //setNextObjectType
+
+    /**
+     * This method toggles the colorblob pipeline to display either the annotated input or the color filter output.
+     * This is mainly for debugging the color filtering of the pipeline so one can see what the color filtering output
+     * looks like.
+     */
+    public void toggleColorFilterOutput()
+    {
+        TrcOpenCvPipeline pipeline = getPipeline();
+
+        if (pipeline == redConePipeline || pipeline == blueConePipeline || pipeline == yellowPolePipeline)
+        {
+            ((FtcEocvColorBlobPipeline) pipeline).toggleColorFilterOutput();
+        }
+    }   //toggleColorFilterOutput
 
 }   //class EocvVision
