@@ -43,7 +43,7 @@ public class RobotParams
         // Miscellaneous
         public static boolean useTraceLog = true;
         public static boolean useLoopPerformanceMonitor = true;
-        public static boolean useBlinkin = false;
+        public static boolean useBlinkin = true;
         public static boolean useBatteryMonitor = false;
         // Vision
         public static boolean useVuforia = false;

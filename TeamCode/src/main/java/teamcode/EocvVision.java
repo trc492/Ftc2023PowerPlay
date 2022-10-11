@@ -77,6 +77,7 @@ public class EocvVision extends FtcEocvDetector
 
     }   //enum ObjectType
 
+    private final TrcDbgTrace tracer;
     private final FtcEocvColorBlobPipeline redConePipeline;
     private final FtcEocvColorBlobPipeline blueConePipeline;
     private final FtcEocvColorBlobPipeline yellowPolePipeline;
@@ -104,6 +105,7 @@ public class EocvVision extends FtcEocvDetector
         super(instanceName, openCvCam, imageWidth, imageHeight, cameraRotation, showEocvView, cameraRect, worldRect,
               tracer);
 
+        this.tracer = tracer;
         TrcOpenCvColorBlobPipeline.FilterContourParams filterContourParams =
             new TrcOpenCvColorBlobPipeline.FilterContourParams()
                 .setMinArea(100.0)
@@ -130,7 +132,11 @@ public class EocvVision extends FtcEocvDetector
      */
     private void updatePipeline()
     {
-        TrcDbgTrace.getGlobalTracer().traceInfo("updatePipeline", "objType=%s", objectType);
+        if (tracer != null)
+        {
+            tracer.traceInfo("updatePipeline", "objType=%s", objectType);
+        }
+
         switch (objectType)
         {
             case APRIL_TAG:
@@ -167,8 +173,7 @@ public class EocvVision extends FtcEocvDetector
      */
     public void setNextObjectType()
     {
-        objectType = ObjectType.nextObjectType(objectType);
-        updatePipeline();
+        setDetectObjectType(ObjectType.nextObjectType(objectType));
     }   //setNextObjectType
 
     /**
