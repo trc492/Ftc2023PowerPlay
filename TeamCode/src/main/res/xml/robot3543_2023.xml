@@ -24,20 +24,12 @@ SOFTWARE.
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Control Hub" port="173">
             <goBILDA5202SeriesMotor name="lfDriveMotor" port="0" />
-            <goBILDA5202SeriesMotor name="lbDriveMotor" port="1" />
-            <Servo name="lfSteerServo1" port="0" />
-            <Servo name="lfSteerServo2" port="1" />
-            <Servo name="lbSteerServo1" port="2" />
-            <Servo name="lbSteerServo2" port="3" />
+            <goBILDA5202SeriesMotor name="rfDriveMotor" port="1" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
-        <LynxModule name="Expansion Hub 3" port="3">
-            <goBILDA5202SeriesMotor name="rfDriveMotor" port="0" />
+        <LynxModule name="Expansion Hub 2" port="2">
+            <goBILDA5202SeriesMotor name="lbDriveMotor" port="0" />
             <goBILDA5202SeriesMotor name="rbDriveMotor" port="1" />
-            <Servo name="rfSteerServo1" port="0" />
-            <Servo name="rfSteerServo2" port="1" />
-            <Servo name="rbSteerServo1" port="2" />
-            <Servo name="rbSteerServo2" port="3" />
         </LynxModule>
     </LynxUsbDevice>
     <Webcam name="Webcam 1" serialNumber="816BAF60" />
