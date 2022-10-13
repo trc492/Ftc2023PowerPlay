@@ -102,10 +102,10 @@ public class RobotParams
     //
     // Robot dimensions.
     //
-    public static final double ROBOT_LENGTH                     = 17.0;
-    public static final double ROBOT_WIDTH                      = 13.0;
+    public static final double ROBOT_LENGTH                     = 17.00;
+    public static final double ROBOT_WIDTH                      = 14.50;
     public static final double DRIVE_BASE_LENGTH                = 13.25;
-    public static final double DRIVE_BASE_WIDTH                 = 11.25;
+    public static final double DRIVE_BASE_WIDTH                 = 12.50;
     //
     // Game positions.
     //
