@@ -19,18 +19,27 @@ public class Turret{
 
     }
 
+    public enum SetPositionStates{
+        WAIT_FOR_ARM_RAISE,
+        SET_TURRET_POSITION,
+        DONE
+    }
+
     TrcPidActuator pidTurret;
     public TrcDbgTrace globalTracer;
     Robot robot;
     boolean armCalibrationDone = false;
     boolean elevatorCalibrationDone = false;
     final TrcTaskMgr.TaskObject zeroCalTaskObj;
+    final TrcTaskMgr.TaskObject setPosTaskObj;
     private final TrcStateMachine<ZeroCalStates> sm;
+    private final TrcStateMachine<SetPositionStates> sm2;
     //state machine where both setPosition and setPower use it. check if elevator and arm below level, otherwise move it up above safe level
     //once you are above elevator and arm, then get out of the safemachine
     private final TrcEvent armEvent;
     private final TrcEvent elevatorEvent;
     private final TrcEvent turretEvent;
+    private double turretPositionAmount = 0;
 
 
     public Turret(Robot robot){
@@ -40,7 +49,9 @@ public class Turret{
             turretEvent = new TrcEvent("turret event");
 
         sm = new TrcStateMachine<>("zeroCalStateMachine");
+        sm2 = new TrcStateMachine<>("setPositionStateMachine");
             zeroCalTaskObj = TrcTaskMgr.createTask("turret zeroCal task", this::zeroCalTask);
+            setPosTaskObj = TrcTaskMgr.createTask("turret setPos task", this::setPosTask);
 //            globalTracer = new TrcDbgTrace().getGlobalTracer();
             final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
                     RobotParams.TURRET_MOTOR_INVERTED,
@@ -76,8 +87,23 @@ public class Turret{
     //if they are below threshold, raise them before turning
     public void setTarget(double position){
 //        if(elevator.getPosition() < Robotparams.)
+        if (robot.arm.getPosition() < RobotParams.ARM_MIN_POS_FOR_TURRET){
+            sm2.start(SetPositionStates.WAIT_FOR_ARM_RAISE);
+            setPosTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+            turretPositionAmount = position;
+        }
+        else{
+            pidTurret.setTarget(position);
+        }
     }
     public void setPower(double power){
+        if (robot.arm.getPosition() < RobotParams.ARM_MIN_POS_FOR_TURRET){
+            sm2.start(SetPositionStates.WAIT_FOR_ARM_RAISE);
+            setPosTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+        }
+        else{
+            pidTurret.setPower(power);
+        }
 
     }
 
@@ -118,9 +144,50 @@ public class Turret{
         }
 
     }
+
+    public void setPosTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode) {
+        SetPositionStates state = sm2.checkReadyAndGetState();
+
+        if (state == null) {
+            robot.dashboard.displayPrintf(1, "State: disabled or waiting...");
+        } else {
+            boolean traceState = true;
+            String msg;
+
+            robot.dashboard.displayPrintf(1, "State: %s", state);
+            switch (state) {
+                case WAIT_FOR_ARM_RAISE:
+                    robot.arm.setPresetPosition(2, armEvent, null);
+                    if (turretPositionAmount != 0) {
+                        sm2.waitForSingleEvent(armEvent, SetPositionStates.DONE);
+                    }
+                    else {
+                        sm2.setState(SetPositionStates.DONE);
+                    }
+                    break;
+                case SET_TURRET_POSITION:
+                    pidTurret.setTarget(turretPositionAmount, false, turretEvent);
+                    turretPositionAmount = 0;
+                    sm2.waitForSingleEvent(turretEvent, SetPositionStates.DONE);
+                    break;
+                default:
+                case DONE:
+                    cancelSetPosition();
+                    break;
+            }
+        }
+    }
     public void cancel () {
         sm.stop();
         zeroCalTaskObj.unregisterTask();
+        robot.arm.cancel();
+        robot.elevator.cancel();
+        pidTurret.cancel();
+    }
+
+    public void cancelSetPosition () {
+        sm2.stop();
+        setPosTaskObj.unregisterTask();
         robot.arm.cancel();
         robot.elevator.cancel();
         pidTurret.cancel();

@@ -370,6 +370,7 @@ public class RobotParams
     static final double ARM_OFFSET                              = 34.0;
     static final double ARM_MIN_POS                             = 33.0;
     static final double ARM_MAX_POS                             = 140.0;
+    static final double ARM_MIN_POS_FOR_TURRET                  = 42.0;
     static final double ARM_TRAVEL_POS                          = ARM_MIN_POS+2.0;
     static final boolean ARM_MOTOR_INVERTED                     = true;
     static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
