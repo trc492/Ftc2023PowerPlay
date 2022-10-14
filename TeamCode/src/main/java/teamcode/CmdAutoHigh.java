@@ -233,7 +233,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        robot.turret.setPresetPosition(0);
+                        //robot.turret.setPresetPosition(0);
                         robot.elevator.setPresetPosition(2);
                         //todo: find arm pos
                         robot.arm.setPresetPosition(2);
@@ -255,7 +255,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.elevator.cancel();
                     cycleCount++;
                     robot.arm.setPresetPosition(2, event, null);
-                    robot.turret.setPresetPosition(180);
+                    //robot.turret.setPresetPosition(180);
                     robot.elevator.setPresetPosition(2);
                     //Todo: add code that moves robot BACKWARDS x inches (but still in abs coordinates) to the high junction
                     sm.waitForSingleEvent(event, State.SCORE_CONE);
@@ -287,7 +287,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //
                     // We are done, zero calibrate the arm will lower it.
                     //
-                    robot.arm.zeroCalibrate();
+                    //robot.turret.zeroCalibrate();
                     cancel();
                     break;
             }

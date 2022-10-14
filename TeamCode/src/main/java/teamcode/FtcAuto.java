@@ -59,6 +59,7 @@ public class FtcAuto extends FtcOpMode
         CYCLE_HIGH,
         CYCLE_MID,
         PARKING,
+        VISION_TEST,
         PID_DRIVE,
         TIMED_DRIVE,
         DO_NOTHING
@@ -160,6 +161,11 @@ public class FtcAuto extends FtcOpMode
                 if (!RobotParams.Preferences.noRobot)
                 {
 
+                }
+                break;
+            case VISION_TEST:
+                if(!RobotParams.Preferences.noRobot){
+                    autoCommand = new CmdVisionTest(robot, autoChoices);
                 }
                 break;
 
@@ -373,7 +379,7 @@ public class FtcAuto extends FtcOpMode
 
         strategyMenu.addChoice("Cycle High", AutoStrategy.CYCLE_HIGH, true, parkingMenu);
         strategyMenu.addChoice("Cycle Mid", AutoStrategy.CYCLE_MID, false, parkingMenu);
-
+        strategyMenu.addChoice("Vision Test", AutoStrategy.VISION_TEST, false);
         strategyMenu.addChoice("PID Drive", AutoStrategy.PID_DRIVE, false, xTargetMenu);
         strategyMenu.addChoice("Timed Drive", AutoStrategy.TIMED_DRIVE, false, driveTimeMenu);
         strategyMenu.addChoice("Do nothing", AutoStrategy.DO_NOTHING, false);

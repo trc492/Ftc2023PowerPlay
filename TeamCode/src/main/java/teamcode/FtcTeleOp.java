@@ -167,7 +167,8 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (robot.turret != null)
         {
-            robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees() - 90.0, false);
+            //robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees() - 90.0, false);
+
         }
     }   //slowPeriodic
 
@@ -298,6 +299,7 @@ public class FtcTeleOp extends FtcOpMode
     public void driverButtonEvent(TrcGameController gamepad, int button, boolean pressed)
     {
         robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed? "Pressed": "Released");
+        robot.dashboard.displayPrintf(8, "Drive Mode:%s", driveOrientation.toString());
 
         switch (button)
         {

@@ -28,6 +28,7 @@ import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
 import TrcCommonLib.trclib.TrcIntake;
 import TrcCommonLib.trclib.TrcMotor;
+import TrcCommonLib.trclib.TrcNotifier;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcRobot;
@@ -64,10 +65,12 @@ public class Robot
     // Subsystems.
     //
     public RobotDrive robotDrive;
-    public TrcPidActuator turret;
+    public Turret turret;
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
     public TrcIntake intake = null;
+
+    //zero intake
 
     /**
      * Constructor: Create an instance of the object.
@@ -135,30 +138,6 @@ public class Robot
             //
             if (RobotParams.Preferences.initSubsystems)
             {
-                if (RobotParams.Preferences.useTurret)
-                {
-                    final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
-                            RobotParams.TURRET_MOTOR_INVERTED,
-                            RobotParams.TURRET_HAS_LOWER_LIMIT_SWITCH, RobotParams.TURRET_LOWER_LIMIT_INVERTED,
-                            RobotParams.TURRET_HAS_UPPER_LIMIT_SWITCH, RobotParams.TURRET_UPPER_LIMIT_INVERTED);
-                    final TrcPidActuator.Parameters turretParams = new TrcPidActuator.Parameters()
-                            .setPosRange(RobotParams.TURRET_MIN_POS, RobotParams.TURRET_MAX_POS)
-                            .setScaleOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
-                            .setPidParams(new TrcPidController.PidParameters(
-                                RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
-                                RobotParams.TURRET_TOLERANCE))
-                            .setStallProtectionParams(
-                                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
-                                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
-                            .setZeroCalibratePower(RobotParams.TURRET_CAL_POWER)
-                            .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
-                    turret = new FtcMotorActuator(
-                        RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
-                    turret.setMsgTracer(globalTracer);
-                    turret.setBeep(androidTone);
-                    turret.zeroCalibrate();
-                }
-
                 if (RobotParams.Preferences.useElevator)
                 {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
@@ -179,7 +158,6 @@ public class Robot
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     elevator.setMsgTracer(globalTracer);
                     elevator.setBeep(androidTone);
-                    elevator.zeroCalibrate();
                 }
 
                 if (RobotParams.Preferences.useArm)
@@ -201,18 +179,22 @@ public class Robot
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);
                     arm.setBeep(androidTone);
-                    arm.zeroCalibrate();
                 }
+            if(RobotParams.Preferences.useTurret){
+                turret = new Turret(this);
+                turret.zeroCalibrate();
+            }
 
-                if (RobotParams.Preferences.useIntake)
-                {
-                    TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
-                            .setMotorInverted(true)
-                            .setTriggerInverted(true)
-                            .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
-                            .setMsgTracer(globalTracer);
-                    intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
-                }
+            if (RobotParams.Preferences.useIntake)
+            {
+                TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
+                        .setMotorInverted(true)
+                        .setTriggerInverted(true)
+                        .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
+                        .setMsgTracer(globalTracer);
+                intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
+            }
+
             }
         }
 
