@@ -102,8 +102,8 @@ public class FtcTest extends FtcTeleOp
                 "tuneDistance=%.1f " +
                 "tuneHeading=%.1f " +
                 "tuneDrivePower=%.1f",
-                test, xTarget, yTarget, turnTarget, driveTime, drivePower, tunePidCoeff, tuneDistance,
-                tuneHeading, tuneDrivePower);
+                test, xTarget, yTarget, turnTarget, driveTime, drivePower, tunePidCoeff, tuneDistance, tuneHeading,
+                tuneDrivePower);
         }   //toString
 
     }   //class TestChoices
