@@ -183,7 +183,7 @@ public class EocvVision extends FtcEocvDetector
      */
     public void toggleColorFilterOutput()
     {
-        TrcOpenCvPipeline pipeline = getPipeline();
+        TrcOpenCvPipeline<?> pipeline = getPipeline();
 
         if (pipeline == redConePipeline || pipeline == blueConePipeline || pipeline == yellowPolePipeline)
         {

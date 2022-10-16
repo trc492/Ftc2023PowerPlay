@@ -260,7 +260,7 @@ public class FtcAuto extends FtcOpMode
 
         if (robot.vision != null)
         {
-            // We are done with detecting signal, disable signal detectors.
+            // We are done with detecting signal with TensorFlow, shut it down.
             if (robot.vision.tensorFlowVision != null)
             {
                 robot.globalTracer.traceInfo(funcName, "Shutting down TensorFlow.");
@@ -292,7 +292,6 @@ public class FtcAuto extends FtcOpMode
     @Override
     public void stopMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
-        final String funcName = "stopMode";
         //
         // Opmode is about to stop, cancel autonomous command in progress if any.
         //
