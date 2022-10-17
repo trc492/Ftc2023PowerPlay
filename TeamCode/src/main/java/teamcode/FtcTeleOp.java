@@ -69,7 +69,8 @@ public class FtcTeleOp extends FtcOpMode
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
     private double drivePowerScale = 1.0;
-    private DriveOrientation driveOrientation = DriveOrientation.FIELD;
+    private DriveOrientation driveOrientation = DriveOrientation.ROBOT;
+    private boolean pivotTurnMode = false;
 
     //
     // Implements FtcOpMode abstract method.
@@ -150,8 +151,24 @@ public class FtcTeleOp extends FtcOpMode
         if (robot.robotDrive != null)
         {
             double[] inputs = getDriveInputs();
+            boolean turnOnly = inputs[0] == 0.0 && inputs[1] == 0.0;
 
-            if (robot.robotDrive.driveBase.supportsHolonomicDrive())
+            if (pivotTurnMode && turnOnly)
+            {
+                double leftPower, rightPower;
+                if (inputs[2] >= 0.0)
+                {
+                    leftPower = inputs[2];
+                    rightPower = 0.0;
+                }
+                else
+                {
+                    leftPower = 0.0;
+                    rightPower = -inputs[2];
+                }
+                robot.robotDrive.driveBase.tankDrive(leftPower, rightPower);
+            }
+            else if (robot.robotDrive.driveBase.supportsHolonomicDrive())
             {
                 robot.robotDrive.driveBase.holonomicDrive(null, inputs[0], inputs[1], inputs[2], getDriveGyroAngle());
             }
@@ -168,7 +185,6 @@ public class FtcTeleOp extends FtcOpMode
         if (robot.turret != null)
         {
             //robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees() - 90.0, false);
-
         }
     }   //slowPeriodic
 
@@ -313,6 +329,10 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
+                if (pressed)
+                {
+                    pivotTurnMode = !pivotTurnMode;
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
