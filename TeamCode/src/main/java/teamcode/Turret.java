@@ -33,20 +33,13 @@ import TrcFtcLib.ftclib.FtcMotorActuator;
 
 public class Turret
 {
-    private enum ZeroCalStates
+    //state machine if we need it in the future
+    private enum State
     {
-        ZERO_ARM_AND_ELEVATOR,
-        RAISE_ARM,
-        ZERO_TURRET,
+
         DONE
     }   //enum ZeroCalStates
 
-    private enum SetPositionStates
-    {
-        WAIT_FOR_ARM_RAISE,
-        SET_TURRET_POSITION,
-        DONE
-    }   //enum SetPositionStates
 
     private final Robot robot;
     private final TrcPidActuator pidTurret;
@@ -54,10 +47,7 @@ public class Turret
     private final TrcEvent armEvent;
     private final TrcEvent elevatorEvent;
     private final TrcEvent turretEvent;
-    private final TrcStateMachine<ZeroCalStates> zeroCalSm;
-    private final TrcStateMachine<SetPositionStates> setPosSm;
-    private final TrcTaskMgr.TaskObject zeroCalTaskObj;
-    private final TrcTaskMgr.TaskObject setPosTaskObj;
+    private final TrcStateMachine<State> sm;
     private double turretTargetPosition;
 
     //state machine where both setPosition and setPower use it. check if elevator and arm below level, otherwise move it up above safe level
@@ -88,37 +78,25 @@ public class Turret
         armEvent = new TrcEvent("armEvent");
         elevatorEvent = new TrcEvent("elevatorEvent");
         turretEvent = new TrcEvent("turretEvent");
-        zeroCalSm = new TrcStateMachine<>("zeroCalStateMachine");
-        setPosSm = new TrcStateMachine<>("setPositionStateMachine");
+        sm = new TrcStateMachine<>("turret state machine");
 
-        zeroCalTaskObj = TrcTaskMgr.createTask("turret zeroCal task", this::zeroCalTask);
-        setPosTaskObj = TrcTaskMgr.createTask("turret setPos task", this::setPosTask);
-//            globalTracer = new TrcDbgTrace().getGlobalTracer();
-//            pidTurret.setMsgTracer(globalTracer);
-//            pidTurret.setBeep(androidTone);
+
     }   //Turret
 
-    //assumption - when arm, elevator come down won't hit anything
+    // Since there are only 3 steps, we should use notifier callback instead. In this method, we should:
+    // 1. zero calibrate the elevator.
+    // 2. zero calibrate the arm and chain to a armZeroCalDone callback.
+    // 3. In the armZeroCalDone callback, do a fire and forget zero calibrate on the turret.
     public void zeroCalibrate()
     {
-        // CodeReview: after thinking about the arm and turret configuration, zero calibration may be simpler than
-        // we thought. Since we just need to raise the arm out of the way before we turn the turret, here is what I
-        // think we should do:
-        // 1. zero calibrate the arm and the elevator simultaneously. Note: arm calibrates upward.
-        // 2. Wait for arm calibrate done (don't care about elevator calibration).
-        // 3. zero calibrate the turret.
-        //
-        // Since there are only 3 steps, we should use notifier callback instead. In this method, we should:
-        // 1. zero calibrate the elevator.
-        // 2. zero calibrate the arm and chain to a armZeroCalDone callback.
-        // 3. In the armZeroCalDone callback, do a fire and forget zero calibrate on the turret.
-        zeroCalSm.start(ZeroCalStates.ZERO_ARM_AND_ELEVATOR);
-        zeroCalTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
-    }   //zeroCalibrate
+        robot.elevator.zeroCalibrate();
+        robot.arm.zeroCalibrate(RobotParams.ARM_CAL_POWER, this::armZeroCalDoneCallback);
 
-    //TODO: setPosition() and setPower()
-
-    //before it calls, setPosition, check if arm above a certain threshold
+    }
+    public void armZeroCalDoneCallback(Object context){
+        robot.turret.zeroCalibrate();
+    }
+    //before it calls, setTarget, check if arm above a certain threshold
     //if they are below threshold, raise them before turning
     public void setTarget(double position)
     {
@@ -130,108 +108,22 @@ public class Turret
         }
         else
         {
-            setPosSm.start(SetPositionStates.WAIT_FOR_ARM_RAISE);
-            setPosTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
             turretTargetPosition = position;
+            robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null, this::armRaiseDoneCallback );
         }
     }
+    //if arm isn't high enough to set power to turret, just set the arm target, no callback for doing turret power
     public void setPower(double power){
         if (robot.arm.getPosition() < RobotParams.ARM_MIN_POS_FOR_TURRET){
-            setPosSm.start(SetPositionStates.WAIT_FOR_ARM_RAISE);
-            setPosTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+            robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET);
         }
         else{
             pidTurret.setPower(power);
         }
-
     }
-
-
-    public void zeroCalTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
-    {
-        ZeroCalStates state = zeroCalSm.checkReadyAndGetState();
-
-        if (state == null)
-        {
-            robot.dashboard.displayPrintf(1, "State: disabled or waiting...");
-        }
-        else
-        {
-            robot.dashboard.displayPrintf(1, "State: %s", state);
-            switch (state)
-            {
-                case ZERO_ARM_AND_ELEVATOR:
-                    zeroCalSm.addEvent(armEvent);
-                    zeroCalSm.addEvent(elevatorEvent);
-                    robot.arm.zeroCalibrate(RobotParams.ARM_CAL_POWER, armEvent);
-                    robot.elevator.zeroCalibrate(RobotParams.ELEVATOR_CAL_POWER, elevatorEvent);
-                    zeroCalSm.waitForEvents(ZeroCalStates.RAISE_ARM, 0, true);
-                    break;
-
-                case RAISE_ARM:
-                    robot.arm.setPresetPosition(2, armEvent, null);
-                    zeroCalSm.waitForSingleEvent(armEvent, ZeroCalStates.ZERO_TURRET);
-                    break;
-                case ZERO_TURRET:
-                    pidTurret.zeroCalibrate(RobotParams.TURRET_CAL_POWER, turretEvent);
-                    zeroCalSm.waitForSingleEvent(turretEvent, ZeroCalStates.DONE);
-                    break;
-                default:
-                case DONE:
-                    cancel();
-                    break;
-            }
-
-        }
-
-    }
-
-    public void setPosTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode) {
-        SetPositionStates state = setPosSm.checkReadyAndGetState();
-
-        if (state == null) {
-            robot.dashboard.displayPrintf(1, "State: disabled or waiting...");
-        } else {
-            boolean traceState = true;
-            String msg;
-
-            robot.dashboard.displayPrintf(1, "State: %s", state);
-            switch (state) {
-                case WAIT_FOR_ARM_RAISE:
-                    robot.arm.setPresetPosition(2, armEvent, null);
-                    if (turretTargetPosition != 0) {
-                        setPosSm.waitForSingleEvent(armEvent, SetPositionStates.DONE);
-                    }
-                    else {
-                        setPosSm.setState(SetPositionStates.DONE);
-                    }
-                    break;
-                case SET_TURRET_POSITION:
-                    pidTurret.setTarget(turretTargetPosition, false, 1.0, turretEvent);
-                    turretTargetPosition = 0;
-                    setPosSm.waitForSingleEvent(turretEvent, SetPositionStates.DONE);
-                    break;
-                default:
-                case DONE:
-                    cancelSetPosition();
-                    break;
-            }
-        }
-    }
-    public void cancel () {
-        zeroCalSm.stop();
-        zeroCalTaskObj.unregisterTask();
-        robot.arm.cancel();
-        robot.elevator.cancel();
-        pidTurret.cancel();
-    }
-
-    public void cancelSetPosition () {
-        setPosSm.stop();
-        setPosTaskObj.unregisterTask();
-        robot.arm.cancel();
-        robot.elevator.cancel();
-        pidTurret.cancel();
+    public void armRaiseDoneCallback(Object context){
+        pidTurret.setTarget(turretTargetPosition);
+        turretTargetPosition = 0.0;
     }
 
 }
