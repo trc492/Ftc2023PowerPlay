@@ -68,6 +68,7 @@ public class Robot
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
     public TrcIntake intake = null;
+    public CyclingTask cyclingTask;
 
     //zero intake
 
@@ -82,6 +83,7 @@ public class Robot
         //
         // Initialize global objects.
         //
+        cyclingTask = new CyclingTask(this);
         opMode = FtcOpMode.getInstance();
         opMode.hardwareMap.logDevices();
         dashboard = FtcDashboard.getInstance();
