@@ -184,7 +184,15 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (robot.turret != null)
         {
-            //robot.turret.setTarget(operatorGamepad.getLeftStickDirectionDegrees() - 90.0, false);
+            double turretX = operatorGamepad.getLeftStickX();
+            double turretY = operatorGamepad.getLeftStickY();
+            double turretPower = operatorGamepad.getMagnitude(turretX, turretY);
+            double turretDirDegrees = 90.0 - operatorGamepad.getDirectionDegrees(turretX, turretY);
+            if (turretDirDegrees < 0.0)
+            {
+                turretDirDegrees += 360.0;
+            }
+            robot.turret.setTarget(turretDirDegrees, turretPower);
         }
     }   //slowPeriodic
 
@@ -384,8 +392,6 @@ public class FtcTeleOp extends FtcOpMode
                     robot.intake.cancelAutoAssist();    //cancel auto-assist if it is active.
                     robot.intake.setPower(pressed? RobotParams.INTAKE_POWER_DUMP: 0.0);
                 }
-
-
                 break;
 
             case FtcGamepad.GAMEPAD_B:

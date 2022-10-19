@@ -64,11 +64,11 @@ public class Robot
     // Subsystems.
     //
     public RobotDrive robotDrive;
-    public Turret turret;
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
+    public Turret turret;
     public TrcIntake intake = null;
-    public CyclingTask cyclingTask;
+    public TaskCyclingCones cyclingTask;
 
     //zero intake
 
@@ -83,7 +83,6 @@ public class Robot
         //
         // Initialize global objects.
         //
-        cyclingTask = new CyclingTask(this);
         opMode = FtcOpMode.getInstance();
         opMode.hardwareMap.logDevices();
         dashboard = FtcDashboard.getInstance();
@@ -181,21 +180,26 @@ public class Robot
                     arm.setMsgTracer(globalTracer);
                     arm.setBeep(androidTone);
                 }
-            if(RobotParams.Preferences.useTurret){
-                turret = new Turret(this);
-                turret.zeroCalibrate();
-            }
 
-            if (RobotParams.Preferences.useIntake)
-            {
-                TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
-                        .setMotorInverted(true)
-                        .setTriggerInverted(true)
-                        .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
-                        .setMsgTracer(globalTracer);
-                intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
-            }
+                if(RobotParams.Preferences.useTurret)
+                {
+                    turret = new Turret(this);
+                    turret.zeroCalibrate();
+                }
 
+                if (RobotParams.Preferences.useIntake)
+                {
+                    TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
+                            .setMotorInverted(true)
+                            .setTriggerInverted(true)
+                            .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
+                            .setMsgTracer(globalTracer);
+                    intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
+                }
+                //
+                // Create and initialize auto-assist tasks.
+                //
+                cyclingTask = new TaskCyclingCones(this);
             }
         }
 
@@ -274,6 +278,10 @@ public class Robot
         TrcMotor.setElapsedTimerEnabled(false);
         TrcServo.printElapsedTime(globalTracer);
         TrcServo.setElapsedTimerEnabled(false);
+        //
+        // Stop all auto-assists tasks if any.
+        //
+        cyclingTask.cancel();
         //
         // Disable vision.
         //

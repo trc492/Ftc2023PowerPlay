@@ -90,6 +90,7 @@ public class RobotParams
     public static final String HWNAME_RBSTEER_SERVO1            = "rbSteerServo1";
     public static final String HWNAME_RBSTEER_SERVO2            = "rbSteerServo2";
     public static final String HWNAME_TURRET                    = "turret";
+    public static final String HWNAME_TURRET_DIR_SWITCH         = "turretDirSwitch";
     public static final String HWNAME_ELEVATOR                  = "elevator";
     public static final String HWNAME_ARM                       = "arm";
     public static final String HWNAME_INTAKE                    = "intake";
@@ -322,10 +323,11 @@ public class RobotParams
     static final double TURRET_MIN_POS                          = 0.0;
     static final double TURRET_MAX_POS                          = 360-1E-10; //TODO: Will turret be able to spin continuously?
     static final boolean TURRET_MOTOR_INVERTED                  = false;
-    static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = false;
+    static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
     static final boolean TURRET_LOWER_LIMIT_INVERTED            = false;
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
+    static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
     static final double TURRET_CAL_POWER                        = -0.5;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
