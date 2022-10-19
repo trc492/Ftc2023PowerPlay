@@ -83,7 +83,7 @@ public class TaskCyclingCones
     }   //TaskCyclingCones
 
     /**
-     * This method enables/disables tracing for the shooter subsystem.
+     * This method enables/disables tracing for the auto-assist task.
      *
      * @param tracer specifies the tracer to use for logging events.
      */
