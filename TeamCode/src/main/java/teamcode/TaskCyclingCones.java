@@ -32,6 +32,8 @@ import TrcCommonLib.trclib.TrcUtil;
 
 public class TaskCyclingCones
 {
+    private static final String moduleName = "TaskCyclingCones";
+
     public enum CycleType
     {
         FULL_CYCLE, //does a full cycle(pickup and scoring), used for auto and maybe teleop
@@ -64,7 +66,6 @@ public class TaskCyclingCones
         DONE
     }
 
-    private static final String moduleName = "TaskCyclingCones";
     private final Robot robot;
     private final TrcStateMachine<State> sm;
     private final TrcTaskMgr.TaskObject cycleTaskObj;
