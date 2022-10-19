@@ -162,7 +162,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         break;
                     }
 
+                // CodeReview: Please change the code to do the following instead of the current complicated code
+                // because TaskCycleCones encapsulates the complexity for you.
+                // 1. Call TaskCycleCones to score the preloaded cone and set cycle count to 5.
+                // 2. If cycle count > 0 and we still have time, call TaskCycleCones to full score a cone from the
+                //    the substation and decrement cycle count else we are done.
                 case DRIVE_TO_HIGH:
+                    // CodeReview: simplify this code by using robot.robotDrive.getAutoTargetPoint.
                     //drive to score position
                     //raise elevator to scoring height
                     //turn turret to score position
@@ -201,6 +207,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                                 robot.robotDrive.pathPoint(-1.243, 0.061, -76.0));
                         }
                     }
+                    // CodeReview: turret zero calibrated to back and we score the preloaded cone to the back.
+                    // Therefore, the target should be zero.
                     robot.turret.setTarget(180.0);
                     sm.waitForSingleEvent(event, State.RAISE_ARM);
                     robot.elevator.setPresetPosition(2);
@@ -211,7 +219,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.arm.setPresetPosition(2, event, null);
                     sm.waitForSingleEvent(event, State.SCORE_CONE);
                     break;
-
+                // CodeReview: add code to call TaskCyclingCones to vision align the junction pole.
                 //dump the cone with auto-assist
                 case SCORE_CONE:
                     //todo: write code for alignment to pole with vision
@@ -219,6 +227,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     sm.waitForSingleEvent(event, State.PREPARE_PICKUP);
                     break;
 
+                // Todo: CodeReview: call TaskCyclingCones to cycle one cone from the substation.
                 //this is the first step in the cycle sequence(picking up the cone from the stack)
                 //go park if we've already done 5 cycles or we have lest than 5 seconds left
                 //turn turret to pickup position
@@ -269,6 +278,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
+                        // Todo: determine parking position according to signalPos.
+                        // Call PurePursuit to go there.
                         if (autoChoices.parking == FtcAuto.Parking.FAR_TILE)
                         {
                             //Todo: not sure how to use the constants in RobotParams
@@ -287,7 +298,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //
                     // We are done, zero calibrate the arm will lower it.
                     //
-                    //robot.turret.zeroCalibrate();
                     cancel();
                     break;
             }

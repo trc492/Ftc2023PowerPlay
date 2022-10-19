@@ -179,14 +179,12 @@ public class RobotDrive
      */
     public void setAutoStartPosition(FtcAuto.AutoChoices autoChoices)
     {
-        TrcPose2D pos =
+        driveBase.setFieldPosition(
             autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE ?
                 (autoChoices.startPos == FtcAuto.StartPos.LEFT ?
                     RobotParams.STARTPOS_RED_LEFT : RobotParams.STARTPOS_RED_RIGHT) :
                 (autoChoices.startPos == FtcAuto.StartPos.LEFT ?
-                    RobotParams.STARTPOS_BLUE_LEFT : RobotParams.STARTPOS_BLUE_RIGHT);
-
-        driveBase.setFieldPosition(pos);
+                    RobotParams.STARTPOS_BLUE_LEFT : RobotParams.STARTPOS_BLUE_RIGHT));
     }   //setAutoStartPosition
 
     /**
