@@ -43,7 +43,6 @@ public class TaskTileGridDrive
     private enum State
     {
         START,
-        DRIVE_TO_TARGET,
         DONE
     }   //enum State
 
@@ -53,7 +52,6 @@ public class TaskTileGridDrive
     private final TrcTaskMgr.TaskObject tileGridDriveTaskObj;
     private final ArrayList<TrcPose2D> targetSegments = new ArrayList<>();
     private TrcDbgTrace msgTracer = null;
-    private TrcPose2D startTilePose = null;
 
     /**
      * Constructor: Creates an instance of the object.
@@ -179,21 +177,17 @@ public class TaskTileGridDrive
             switch (state)
             {
                 case START:
-                    startTilePose = getRobotTilePose();
-                    //
-                    // Intentionally falling through.
-                    //
-                case DRIVE_TO_TARGET:
                     TrcPose2D targetTilePose = !targetSegments.isEmpty()? targetSegments.remove(0): null;
                     if (targetTilePose != null)
                     {
+                        TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
                         robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            event, robotPose, false,
                             new TrcPose2D(
-                                (startTilePose.x + targetTilePose.x) * RobotParams.FULL_TILE_INCHES,
-                                (startTilePose.y + targetTilePose.y) * RobotParams.FULL_TILE_INCHES,
+                                (tileCenterPosition(robotPose.x) + targetTilePose.x) * RobotParams.FULL_TILE_INCHES,
+                                (tileCenterPosition(robotPose.y) + targetTilePose.y) * RobotParams.FULL_TILE_INCHES,
                                 targetTilePose.angle));
-                        sm.waitForSingleEvent(event, State.DRIVE_TO_TARGET);
+                        sm.waitForSingleEvent(event, State.START);
                     }
                     else
                     {
@@ -217,18 +211,15 @@ public class TaskTileGridDrive
     }   //tileGridDriveTask
 
     /**
-     * This method returns the robot's current field position in tile unit.
+     * This method rounds the given position value to the center of a full tile, meaning it will round the value so
+     * that the position will be at the center of the tile in tile unit.
      *
-     * @return robot's field position in tile unit.
+     * @param position specifies the field position in inches.
+     * @return field position at the center of the tile in tile unit.
      */
-    private TrcPose2D getRobotTilePose()
+    private double tileCenterPosition(double position)
     {
-        TrcPose2D tilePose = robot.robotDrive.driveBase.getFieldPosition();
-
-        tilePose.x /= RobotParams.FULL_TILE_INCHES;
-        tilePose.y /= RobotParams.FULL_TILE_INCHES;
-
-        return tilePose;
-    }   //getRobotTilePose
+        return ((int) (position/RobotParams.FULL_TILE_INCHES)) + 0.5;
+    }   //tileCenterPosition
 
 }   //class TaskTileGridDrive
