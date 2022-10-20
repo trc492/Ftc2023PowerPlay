@@ -129,10 +129,12 @@ public class TaskCyclingCones
     }   //cancel
 
     //prepare for cycling, start sm
-    public void startCycling(CycleType cycleType, VisionType visionType)
+    public void startCycling(CycleType cycleType, VisionType visionType, TrcEvent event, TrcNotifier.Receiver callback)
     {
         this.cycleType = cycleType;
         this.visionType = visionType;
+        this.onFinishEvent = event;
+        this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
         //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
     }   //startCycling
