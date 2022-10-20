@@ -164,8 +164,6 @@ public class Turret
         turretCallback = null;
     }   //armRaiseDoneCallback
 
-    //if arm isn't high enough to set power to turret, just set the arm target, no callback for doing turret power
-
     /**
      * This method sets the turret in motion with the given power but it will first check if it's safe to turn the
      * turret. If not, it will instead raise the arm to above the safe level. Since setPower is generally called by
@@ -177,13 +175,15 @@ public class Turret
      */
     public void setPower(double power)
     {
-        if (robot.arm.getPosition() < RobotParams.ARM_MIN_POS_FOR_TURRET)
+        if (robot.arm.getPosition() >= RobotParams.ARM_MIN_POS_FOR_TURRET)
         {
-            robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET);
-        }
-        else
-        {
+            // We are safe to turn the turret, do it.
             pidTurret.setPidPower(power);
+        }
+        else if (!robot.arm.isPidActive())
+        {
+            // Need to raise the arm to the safe position if not already.
+            robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET);
         }
     }   //setPower
 
