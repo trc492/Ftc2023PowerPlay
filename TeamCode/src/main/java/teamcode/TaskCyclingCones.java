@@ -62,25 +62,19 @@ public class TaskCyclingCones
      * 2. lower the elevator to the correct height
      * 3. raise the elevator up higher than the pole
      * 4. turn turret 180 degrees while driving backwards to the pole
-     * 5. set arm to 90
+     * 5. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
      * 6. spin intake backwards
      * 7. turn turret 180 degrees and lower elevator while driving back to start position
      */
     public enum State
     {
-        //Pickup states
-        ALIGN_TO_CONE,        //horizontally align to the cone
-        FIND_DIST_TO_CONE,    //Determine distance to cone(if doing FULL_VISION)
-        DRIVE_TO_CONE,        //Drive forward if we determined distance to cone
         PREPARE_PICKUP,
-        GRAB_CONE,
-        TURN_AROUND,//if doing FULL_CYCLE, may need to rotate turret to switch from picking up cones to scoring them
-        //Scoring states
-        ALIGN_TO_POLE,
-        FIND_DIST_TO_POLE,
-        DRIVE_TO_POLE,
+        PICKUP_CONE,
+        RAISE_ELEVATOR,
         PREPARE_SCORE,
-        SCORE_CONE,
+        ALIGN_ARM,
+        SCORE,
+        RESET,
         DONE
     }
 
@@ -92,10 +86,16 @@ public class TaskCyclingCones
     private VisionType visionType = VisionType.FULL_VISION;
     private TrcEvent onFinishEvent = null;
     private TrcNotifier.Receiver onFinishCallback = null;
+    private final TrcEvent driveEvent;
+    private final TrcEvent elevatorEvent;
+    private final TrcEvent armEvent;
 
     public TaskCyclingCones(Robot robot)
     {
         this.robot = robot;
+        driveEvent = new TrcEvent(moduleName + ".drive");
+        elevatorEvent = new TrcEvent(moduleName + ".elevator");
+        armEvent = new TrcEvent(moduleName + ".arm");
         sm = new TrcStateMachine<>(moduleName);
         cycleTaskObj = TrcTaskMgr.createTask(moduleName, this::cycleTask);
     }   //TaskCyclingCones
@@ -134,7 +134,7 @@ public class TaskCyclingCones
         this.cycleType = cycleType;
         this.visionType = visionType;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
-        sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
+        //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
     }   //startCycling
 
     private void cycleTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
@@ -152,41 +152,36 @@ public class TaskCyclingCones
                 //ignore vision steps(like aligning or determining distance for now
                 //Pickup states
                 //horizontally align to the cone
-                case ALIGN_TO_CONE:
+
+                case PREPARE_PICKUP: //1. drive to the cone stack and raise elevator and set arm to 90 and spin intake wheels
+                    robot.robotDrive.purePursuitDrive.start(
+                            driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.pathPoint(0, 0, 0)); //TODO: Find values
+                    robot.elevator.setTarget(12, true, 1.0, elevatorEvent);
+                    robot.arm.setTarget(90, false, 1.0, armEvent);
+                    robot.intake.autoAssist(1);
+                    sm.addEvent(driveEvent);
+                    sm.addEvent(armEvent);
+                    sm.addEvent(elevatorEvent);
+                    sm.waitForEvents(State.PICKUP_CONE);
                     break;
 
-                //Determine distance to cone(if doing FULL_VISION)
-                case FIND_DIST_TO_CONE:
+                case PICKUP_CONE: //2. lower the elevator to the correct height
                     break;
 
-                //Drive forward if we determined distance to cone
-                case DRIVE_TO_CONE:
+                case RAISE_ELEVATOR: //3. raise the elevator up higher than the pole
                     break;
 
-                case PREPARE_PICKUP:
+                case PREPARE_SCORE: //4. turn turret 180 degrees while driving backwards to the pole
                     break;
 
-                case GRAB_CONE:
+                case ALIGN_ARM: //5. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
                     break;
 
-                //if doing FULL_CYCLE, may need to rotate turret to switch from picking up cones to scoring them
-                case TURN_AROUND:
+                case SCORE: //6. spin intake backwards
                     break;
 
-                //Scoring states
-                case ALIGN_TO_POLE:
-                    break;
-
-                case FIND_DIST_TO_POLE:
-                    break;
-
-                case DRIVE_TO_POLE:
-                    break;
-
-                case PREPARE_SCORE:
-                    break;
-
-                case SCORE_CONE:
+                case RESET: //7. turn turret 180 degrees and lower elevator while driving back to start position
                     break;
 
                 default:
