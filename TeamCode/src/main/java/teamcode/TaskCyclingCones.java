@@ -30,6 +30,15 @@ import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcUtil;
 
+/**
+ * Robot starts in between cone stack and high goal
+ * starts on the middle of the line
+ * facing the cone stack
+ * score one cone and end where it started
+ * turret starts facing forward
+ * elevator down
+ * arm position doesn't matter
+ */
 public class TaskCyclingCones
 {
     private static final String moduleName = "TaskCyclingCones";
@@ -48,6 +57,15 @@ public class TaskCyclingCones
         ALIGN_VISION_ONLY//only uses vision to horizontally align to target
     }
 
+    /*
+     * 1. drive to the cone stack and raise elevator and set arm to 90 and spin intake wheels
+     * 2. lower the elevator to the correct height
+     * 3. raise the elevator up higher than the pole
+     * 4. turn turret 180 degrees while driving backwards to the pole
+     * 5. set arm to 90
+     * 6. spin intake backwards
+     * 7. turn turret 180 degrees and lower elevator while driving back to start position
+     */
     public enum State
     {
         //Pickup states
