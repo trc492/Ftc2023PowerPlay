@@ -165,7 +165,7 @@ public class TaskCyclingCones
                     sm.addEvent(driveEvent);
                     sm.addEvent(armEvent);
                     sm.addEvent(elevatorEvent);
-                    sm.waitForEvents(State.PICKUP_CONE);
+                    sm.waitForEvents(State.PICKUP_CONE, 0.0, true);
                     break;
 
                 case PICKUP_CONE: //2. lower the elevator to the correct height
