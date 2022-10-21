@@ -35,7 +35,7 @@ import TrcCommonLib.trclib.TrcUtil;
  * starts on the middle of the line
  * facing the cone stack
  * score one cone and end where it started
- * turret starts facing forward
+ * turret starts facing backwards (Zero Calibrate is in the back)
  * elevator down
  * arm position doesn't matter
  */
@@ -58,17 +58,19 @@ public class TaskCyclingCones
     }
 
     /*
-     * 1. drive to the cone stack and raise elevator and set arm to 90 and spin intake wheels
-     * 2. lower the elevator to the correct height
-     * 3. raise the elevator up higher than the pole
-     * 4. turn turret 180 degrees while driving backwards to the pole
-     * 5. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
-     * 6. spin intake backwards
-     * 7. turn turret 180 degrees and lower elevator while driving back to start position
+     * 1. drive to the cone stack and raise elevator and set arm to 90
+     * 2. spin turret to the front and spin intake wheels
+     * 3. lower the elevator to the correct height
+     * 4. raise the elevator up higher than the pole
+     * 5. turn turret 180 degrees while driving backwards to the pole
+     * 6. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
+     * 7. spin intake backwards
+     * 8. turn turret 180 degrees and lower elevator while driving back to start position
      */
     public enum State
     {
         PREPARE_PICKUP,
+        START_SPIN,
         PICKUP_CONE,
         RAISE_ELEVATOR,
         PREPARE_SCORE,
@@ -79,6 +81,7 @@ public class TaskCyclingCones
     }
 
     private final Robot robot;
+    private FtcAuto.AutoChoices autoChoices;
     private final TrcStateMachine<State> sm;
     private final TrcTaskMgr.TaskObject cycleTaskObj;
     private TrcDbgTrace msgTracer = null;
@@ -89,6 +92,9 @@ public class TaskCyclingCones
     private final TrcEvent driveEvent;
     private final TrcEvent elevatorEvent;
     private final TrcEvent armEvent;
+    private final TrcEvent turretEvent;
+    private final TrcEvent intakeEvent;
+    private int conesRemaining;
 
     public TaskCyclingCones(Robot robot)
     {
@@ -96,6 +102,8 @@ public class TaskCyclingCones
         driveEvent = new TrcEvent(moduleName + ".drive");
         elevatorEvent = new TrcEvent(moduleName + ".elevator");
         armEvent = new TrcEvent(moduleName + ".arm");
+        turretEvent = new TrcEvent(moduleName + ".turret");
+        intakeEvent = new TrcEvent(moduleName + ".intake");
         sm = new TrcStateMachine<>(moduleName);
         cycleTaskObj = TrcTaskMgr.createTask(moduleName, this::cycleTask);
     }   //TaskCyclingCones
@@ -129,15 +137,22 @@ public class TaskCyclingCones
     }   //cancel
 
     //prepare for cycling, start sm
-    public void startCycling(CycleType cycleType, VisionType visionType, TrcEvent event, TrcNotifier.Receiver callback)
+    public void startCycling(CycleType cycleType, VisionType visionType, int conesRemaining, TrcEvent event, TrcNotifier.Receiver callback)
     {
         this.cycleType = cycleType;
         this.visionType = visionType;
+        this.conesRemaining = conesRemaining;
         this.onFinishEvent = event;
         this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+        sm.start(State.PREPARE_PICKUP);
         //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
     }   //startCycling
+
+    public void setAutoChoices(FtcAuto.AutoChoices autoChoices)
+    {
+        this.autoChoices = autoChoices;
+    }
 
     private void cycleTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
     {
@@ -155,35 +170,62 @@ public class TaskCyclingCones
                 //Pickup states
                 //horizontally align to the cone
 
-                case PREPARE_PICKUP: //1. drive to the cone stack and raise elevator and set arm to 90 and spin intake wheels
+                case PREPARE_PICKUP: //1. drive to the cone stack and raise elevator and set arm to 90
                     robot.robotDrive.purePursuitDrive.start(
                             driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.pathPoint(0, 0, 0)); //TODO: Find values
-                    robot.elevator.setTarget(12, true, 1.0, elevatorEvent);
-                    robot.arm.setTarget(90, false, 1.0, armEvent);
-                    robot.intake.autoAssist(1);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_PRESET_LEVELS[5] + RobotParams.CONE_GRAB_HEIGHT, true, 1.0, elevatorEvent);
+                    robot.arm.setTarget(RobotParams.ARM_EXTENDED, false, 1.0, armEvent);
                     sm.addEvent(driveEvent);
                     sm.addEvent(armEvent);
                     sm.addEvent(elevatorEvent);
                     sm.waitForEvents(State.PICKUP_CONE, 0.0, true);
                     break;
 
-                case PICKUP_CONE: //2. lower the elevator to the correct height
+                case START_SPIN: //2. spin turret to the front and spin intake wheels
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);
+                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
+                    sm.waitForSingleEvent(turretEvent, State.PICKUP_CONE);
                     break;
 
-                case RAISE_ELEVATOR: //3. raise the elevator up higher than the pole
+                case PICKUP_CONE: //3. lower the elevator to the correct height
+                    robot.elevator.setPresetPosition(conesRemaining, elevatorEvent, null);
+                    sm.waitForSingleEvent(elevatorEvent, State.RAISE_ELEVATOR);
                     break;
 
-                case PREPARE_SCORE: //4. turn turret 180 degrees while driving backwards to the pole
+                case RAISE_ELEVATOR: //4. raise the elevator up higher than the pole
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, elevatorEvent);
+                    sm.waitForSingleEvent(elevatorEvent, State.PREPARE_SCORE);
                     break;
 
-                case ALIGN_ARM: //5. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
+                case PREPARE_SCORE: //5. turn turret to the back while driving backwards to the pole
+                    robot.robotDrive.purePursuitDrive.start(
+                            driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(-1.0, 0.0, -104.0, autoChoices));
+                    robot.turret.setTarget(RobotParams.TURRET_BACK);
+                    sm.waitForSingleEvent(driveEvent, State.ALIGN_ARM);
                     break;
 
-                case SCORE: //6. spin intake backwards
+                case ALIGN_ARM: //6. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
+                    robot.arm.setTarget(RobotParams.ARM_EXTENDED, false, 1.0, armEvent);
+                    sm.waitForSingleEvent(armEvent, State.SCORE);
                     break;
 
-                case RESET: //7. turn turret 180 degrees and lower elevator while driving back to start position
+                case SCORE: //7. spin intake backwards
+                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, intakeEvent, null, 1.0);
+                    sm.waitForSingleEvent(intakeEvent, State.RESET);
+                    break;
+
+                case RESET: //8. turn turret 180 degrees and lower elevator while driving back to start position
+                    robot.robotDrive.purePursuitDrive.start(
+                            driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(-1.243, -0.061, -104.0, autoChoices));
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS, true, 1.0, elevatorEvent);
+                    sm.addEvent(driveEvent);
+                    sm.addEvent(turretEvent);
+                    sm.addEvent(elevatorEvent);
+                    sm.waitForEvents(State.DONE, 0.0, true);
                     break;
 
                 default:

@@ -100,6 +100,11 @@ public class RobotParams
     public static final double FULL_FIELD_INCHES                = 141.0;
     public static final double HALF_FIELD_INCHES                = FULL_FIELD_INCHES/2.0;
     public static final double FULL_TILE_INCHES                 = 23.75;
+    public static final double CONE_HEIGHT                      = 5.0;
+    public static final double STACKED_CONE_ADDITION            = 1.5;
+    public static final double LOW_JUNCTION_HEIGHT              = 16.5;
+    public static final double MID_JUNCTION_HEIGHT              = 26.5;
+    public static final double HIGH_JUNCTION_HEIGHT             = 36.5;
     //
     // Robot dimensions.
     //
@@ -333,7 +338,12 @@ public class RobotParams
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
     static final double TURRET_RESET_TIMEOUT                    = 0.5;
-    static final double[] TURRET_PRESET_LEVELS                  = new double[] {};
+    static final double TURRET_FRONT                            = 180.0;
+    static final double TURRET_BACK                             = 0.0;
+    static final double[] TURRET_PRESET_LEVELS                  = new double[] {
+            TURRET_BACK,                                        // Slot 0
+            TURRET_FRONT                                        // Slot 1
+    };
     //
     // Elevator Subsystem
     //
@@ -344,7 +354,7 @@ public class RobotParams
     static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_312_ENCODER_PPR;
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
     static final double ELEVATOR_GEAR_RATIO                     = 28.0;
-    static final double ELEVATOR_MIN_POS                        = 33.0;
+    static final double ELEVATOR_MIN_POS                        = 0.0;
     static final double ELEVATOR_MAX_POS                        = 140.0;
     static final boolean ELEVATOR_MOTOR_INVERTED                = true;
     static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH        = true;
@@ -356,7 +366,19 @@ public class RobotParams
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {ELEVATOR_MIN_POS, 51.6, 78, 107};
+    static final double CONE_GRAB_HEIGHT                        = 4.0;
+    static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
+            ELEVATOR_MIN_POS,                                   // Slot 0
+            CONE_GRAB_HEIGHT,                                   // Slot 1
+            STACKED_CONE_ADDITION + CONE_GRAB_HEIGHT,           // Slot 2
+            STACKED_CONE_ADDITION * 2 + CONE_GRAB_HEIGHT,       // Slot 3
+            STACKED_CONE_ADDITION * 3 + CONE_GRAB_HEIGHT,       // Slot 4
+            STACKED_CONE_ADDITION * 4 + CONE_GRAB_HEIGHT,       // Slot 5
+            LOW_JUNCTION_HEIGHT,                                // Slot 6
+            MID_JUNCTION_HEIGHT,                                // Slot 7
+            HIGH_JUNCTION_HEIGHT,                               // Slot 8
+            ELEVATOR_MAX_POS                                    // Slot 9
+    };
     static final double ELEVATOR_SLOW_POWER_SCALE               = 0.5;
     //
     // Arm subsystem.
@@ -370,8 +392,14 @@ public class RobotParams
     static final double ARM_GEAR_RATIO                          = 28.0;
     static final double ARM_DEG_PER_COUNT                       = 360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO);
     static final double ARM_OFFSET                              = 34.0;
-    static final double ARM_MIN_POS                             = 33.0;
-    static final double ARM_MAX_POS                             = 140.0;
+    /**
+     * Arm Zero-Calibrated to Up Position
+     */
+    static final double ARM_MIN_POS                             = 0.0;
+    /**
+     * Arm Max Position is Down
+     */
+    static final double ARM_MAX_POS                             = 180.0;
     static final double ARM_MIN_POS_FOR_TURRET                  = 42.0;
     static final double ARM_TRAVEL_POS                          = ARM_MIN_POS+2.0;
     static final boolean ARM_MOTOR_INVERTED                     = true;
@@ -384,13 +412,18 @@ public class RobotParams
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
-    static final double[] ARM_PRESET_LEVELS                     = new double[] {ARM_MIN_POS, 51.6, 78, 107};
+    static final double ARM_EXTENDED                            = 90.0;
+    static final double[] ARM_PRESET_LEVELS                     = new double[] {
+            ARM_MIN_POS,                                        // Slot 0: Up position
+            ARM_EXTENDED,                                       // Slot 1: Horizontal position
+            ARM_MAX_POS                                         // Slot 2: Down position
+    };
     static final double ARM_SLOW_POWER_SCALE                    = 0.5;
     //
     // Intake subsystem.
     //
     static final double INTAKE_POWER_PICKUP                     = 1.0;;
-    static final double INTAKE_POWER_DUMP                       = -0.4;
+    static final double INTAKE_POWER_DUMP                       = -1.0;
     static final double INTAKE_DUMP_TIME                        = 1.2;
     static final double INTAKE_SENSOR_THRESHOLD                 = 4.6;    //in cm
 
