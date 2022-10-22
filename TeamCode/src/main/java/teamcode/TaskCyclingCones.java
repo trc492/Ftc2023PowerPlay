@@ -92,7 +92,7 @@ public class TaskCyclingCones
     private final TrcTaskMgr.TaskObject cycleTaskObj;
     private TrcDbgTrace msgTracer = null;
     private CycleType cycleType = CycleType.AUTO_FULL_CYCLE;
-    private VisionType visionType = VisionType.FULL_VISION;
+    private VisionType visionType = VisionType.ALIGN_VISION;
     private TrcEvent onFinishEvent = null;
     private TrcNotifier.Receiver onFinishCallback = null;
     private final TrcEvent driveEvent;
