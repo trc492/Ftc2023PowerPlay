@@ -108,7 +108,7 @@ public class RobotParams
     //
     // Robot dimensions.
     //
-    public static final double ROBOT_LENGTH                     = 17.00;
+    public static final double ROBOT_LENGTH                     = 17.50;
     public static final double ROBOT_WIDTH                      = 14.50;
     public static final double DRIVE_BASE_LENGTH                = 13.25;
     public static final double DRIVE_BASE_WIDTH                 = 12.50;
@@ -127,14 +127,14 @@ public class RobotParams
     public static TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
             -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
 
-    public static final double PARKPOS_LEFTP1_FROM_FIELDCENTER_X    = 2.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_LEFTP2_FROM_FIELDCENTER_X    = 1.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_LEFTP3_FROM_FIELDCENTER_X    = 0.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_RIGHTP1_FROM_FIELDCENTER_X   = 0.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_RIGHTP2_FROM_FIELDCENTER_X   = 1.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_RIGHTP3_FROM_FIELDCENTER_X   = 2.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_FAR_FROM_FIELDCENTER_Y       = 0.5 * FULL_TILE_INCHES;
-    public static final double PARKPOS_NEAR_FROM_FIELDCENTER_Y      = 1.5 * FULL_TILE_INCHES;
+    public static final double PARKPOS_LEFTP1_FROM_FIELDCENTER_X    = 2.5;
+    public static final double PARKPOS_LEFTP2_FROM_FIELDCENTER_X    = 1.5;
+    public static final double PARKPOS_LEFTP3_FROM_FIELDCENTER_X    = 0.5;
+    public static final double PARKPOS_RIGHTP1_FROM_FIELDCENTER_X   = 0.5;
+    public static final double PARKPOS_RIGHTP2_FROM_FIELDCENTER_X   = 1.5;
+    public static final double PARKPOS_RIGHTP3_FROM_FIELDCENTER_X   = 2.5;
+    public static final double PARKPOS_FAR_FROM_FIELDCENTER_Y       = 0.5;
+    public static final double PARKPOS_NEAR_FROM_FIELDCENTER_Y      = 1.5;
 
     public static TrcPose2D PARKPOS_RED_LEFTP1_FAR = new TrcPose2D(
         -PARKPOS_LEFTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
@@ -187,6 +187,20 @@ public class RobotParams
         -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
     public static TrcPose2D PARKPOS_BLUE_RIGHTP3_NEAR = new TrcPose2D(
         -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+
+    //both arays use TILE_COORDINATES
+    public static TrcPose2D[] PARKPOS_RED_LEFT_NEAR = {
+        PARKPOS_RED_LEFTP1_NEAR,
+        PARKPOS_RED_LEFTP2_NEAR,
+        PARKPOS_RED_LEFTP3_NEAR
+    };
+    public static TrcPose2D[] PARKPOS_RED_LEFT_FAR = {
+        PARKPOS_RED_LEFTP1_FAR,
+        PARKPOS_RED_LEFTP2_FAR,
+        PARKPOS_RED_LEFTP3_FAR
+    };
+    //In tile coordinates
+    public static TrcPose2D CONE_STACK_RED_LEFT = new TrcPose2D(-2.95, -0.5, 0.0);
     //
     // Vision subsystem.
     //
@@ -339,11 +353,16 @@ public class RobotParams
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
     static final double TURRET_RESET_TIMEOUT                    = 0.5;
     static final double TURRET_FRONT                            = 180.0;
+    static final double TURRET_RIGHT                            = -90.0;
+    static final double TURRET_LEFT                             = 90.0;
     static final double TURRET_BACK                             = 0.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
             TURRET_BACK,                                        // Slot 0
+            TURRET_RIGHT,
             TURRET_FRONT                                        // Slot 1
     };
+    //In tile coordinates---how far from the cone the robot should be before trying to pick it up
+    static final double TURRET_PICKUP_OFFSET                    = 0.3; //todo: tune this
     //
     // Elevator Subsystem
     //

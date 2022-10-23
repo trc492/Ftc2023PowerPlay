@@ -176,6 +176,10 @@ public class EocvVision extends FtcEocvDetector
         setDetectObjectType(ObjectType.nextObjectType(objectType));
     }   //setNextObjectType
 
+    public void setObjectType(ObjectType type){
+        objectType = type;
+    }
+
     /**
      * This method toggles the colorblob pipeline to display either the annotated input or the color filter output.
      * This is mainly for debugging the color filtering of the pipeline so one can see what the color filtering output

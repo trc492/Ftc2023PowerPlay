@@ -23,6 +23,7 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcEvent;
+import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTimer;
@@ -36,11 +37,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     {
         START_DELAY,
         DRIVE_TO_HIGH,
-        RAISE_ARM,
-        SCORE_CONE,
-        PREPARE_PICKUP,
-        GRAB_CONE,
-        PREPARE_SCORE,
+        SCORE_PRELOAD,
+        DO_CYCLE,
         PARK,
         DONE
     }   //enum State
@@ -52,7 +50,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private final TrcStateMachine<State> sm;
     private int signalPos = 0;
     // Todo: CodeReview: why public? Nobody outside of this class will access it.
-    public int cycleCount = 0;
+    //tells us number cones left on the conestack
+    public int conesRemaining = 5;
 
     /**
      * Constructor: Create an instance of the object.
@@ -177,97 +176,37 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
                     // Todo: CodeReview: please change all purePursuit points to use robot.getAutoTargetPoint.
-                    if (autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE)
-                    {
-                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT)
-                        {
-                            robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.pathPoint(-1.243, -0.061, -104.0));
-                        }
-                        else
-                        {
-                            robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.pathPoint(1.243, -0.061, 104.0));
-                        }
-                    }
-                    else
-                    {
-                        if (autoChoices.startPos == FtcAuto.StartPos.LEFT)
-                        {
-                            robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.pathPoint(1.243, 0.061, 76.0));
-                        }
-                        else
-                        {
-                            robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.pathPoint(-1.243, 0.061, -76.0));
-                        }
-                    }
-                    // CodeReview: turret zero calibrated to back and we score the preloaded cone to the back.
-                    // Therefore, the target should be zero.
-                    robot.turret.setTarget(180.0);
-                    sm.waitForSingleEvent(event, State.RAISE_ARM);
-                    robot.elevator.setPresetPosition(2);
-                    break;
 
-                //raise arm to scoring position, wait for arm to finish
-                case RAISE_ARM:
-                    robot.arm.setPresetPosition(2, event, null);
-                    sm.waitForSingleEvent(event, State.SCORE_CONE);
+                    robot.robotDrive.purePursuitDrive.start(
+                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.5,0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
+                    robot.arm.setTarget(RobotParams.ARM_EXTENDED);
+                    robot.turret.setTarget(RobotParams.TURRET_RIGHT);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, null);
+                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
                 // CodeReview: add code to call TaskCyclingCones to vision align the junction pole.
                 //dump the cone with auto-assist
-                case SCORE_CONE:
+                case SCORE_PRELOAD:
                     //todo: write code for alignment to pole with vision
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
-                    sm.waitForSingleEvent(event, State.PREPARE_PICKUP);
+                    robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP, 1.0, event);
+                    sm.waitForSingleEvent(event, State.DO_CYCLE);
                     break;
 
-                // Todo: CodeReview: call TaskCyclingCones to cycle one cone from the substation.
-                //this is the first step in the cycle sequence(picking up the cone from the stack)
-                //go park if we've already done 5 cycles or we have lest than 5 seconds left
-                //turn turret to pickup position
-                //set elevator to pickup height
-                //set arm to pick up position
-                //move robot toward cone stack
-                //wait for pure pursuit
-                case PREPARE_PICKUP:
-                    if (TrcUtil.getModeElapsedTime() >= 27 || cycleCount == 5)
+                //if time >= 26 or no more cones on the conestack, go to park
+                //otherwise call the doCycle method for each cone on the stack
+                case DO_CYCLE:
+                    if (TrcUtil.getModeElapsedTime() >= 27 || conesRemaining == 0)
                     {
                         sm.setState(State.PARK);
                     }
-                    else
-                    {
-                        //robot.turret.setPresetPosition(0);
-                        robot.elevator.setPresetPosition(2);
-                        //todo: find arm pos
-                        robot.arm.setPresetPosition(2);
-                        //Todo: add code that moves robot FORWARDS x inches (but still in abs coordinates) to the cone pile
-                        sm.waitForSingleEvent(event, State.GRAB_CONE);
+                    else{
+                        robot.cyclingTask.doFullAutoCycle(TaskCyclingCones.VisionType.NO_VISION, conesRemaining, event);
+                        conesRemaining--;
+                        sm.waitForSingleEvent(event, State.DO_CYCLE);
                     }
-                    break;
-
-                case GRAB_CONE:
-                    //todo: call auto assist pickup
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP, event, null, 0.0);
-                    //lower elevator until pickup signal
-                    robot.elevator.setPresetPosition(0);
-                    sm.waitForSingleEvent(event, State.PREPARE_SCORE);
-                    break;
-                //prepare for scoring
-                case PREPARE_SCORE:
-                    //increment cycles by 1(5 is when we finished the cone stack)
-                    robot.elevator.cancel();
-                    cycleCount++;
-                    robot.arm.setPresetPosition(2, event, null);
-                    //robot.turret.setPresetPosition(180);
-                    robot.elevator.setPresetPosition(2);
-                    //Todo: add code that moves robot BACKWARDS x inches (but still in abs coordinates) to the high junction
-                    sm.waitForSingleEvent(event, State.SCORE_CONE);
                     break;
 
                 case PARK:
@@ -276,21 +215,15 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         // We are not parking anywhere, just stop and be done.
                         sm.setState(State.DONE);
                     }
-                    else
-                    {
-                        // Todo: determine parking position according to signalPos.
-                        // Call PurePursuit to go there.
-                        if (autoChoices.parking == FtcAuto.Parking.FAR_TILE)
-                        {
-                            //Todo: not sure how to use the constants in RobotParams
-
-                        }
-                        else
-                        {
-
-                        }
+                    else{
+                        TrcPose2D parkPos;
+                        parkPos = (autoChoices.parking == FtcAuto.Parking.NEAR_TILE)?
+                            RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
+                        robot.robotDrive.purePursuitDrive.start(
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90, autoChoices));
+                        sm.waitForSingleEvent(event, State.DONE);
                     }
-
                     break;
 
                 case DONE:

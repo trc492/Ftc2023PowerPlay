@@ -22,6 +22,8 @@
 
 package teamcode;
 
+import org.checkerframework.checker.units.qual.C;
+
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcNotifier;
@@ -47,15 +49,15 @@ public class TaskCyclingCones
 
     public enum CycleType
     {
-        AUTO_FULL_CYCLE,    //does a full cycle(pickup and scoring), used for auto
-        SCORING_ONLY,       //assumes robot already has a cone, scores it onto the pole
-        PICKUP_ONLY         //picks up a cone from the stack
+        AUTO_FULL_CYCLE, //does a full cycle(pickup and scoring), used for auto
+        SCORING_ONLY,//assumes robot already has a cone, scores it onto the pole
+        PICKUP_ONLY//picks up a cone from the stack
     }
 
     public enum VisionType
     {
         NO_VISION,
-        ALIGN_VISION        //uses vision to horizontally align to target
+        ALIGN_VISION//uses vision to horizontally align to target
     }
 
     /*
@@ -85,20 +87,22 @@ public class TaskCyclingCones
     }
 
     private final Robot robot;
+    private FtcAuto.AutoChoices autoChoices;
     private final TrcStateMachine<State> sm;
+    private final TrcTaskMgr.TaskObject cycleTaskObj;
+    private TrcDbgTrace msgTracer = null;
+    private CycleType cycleType = CycleType.AUTO_FULL_CYCLE;
+    private VisionType visionType = VisionType.ALIGN_VISION;
+    private TrcEvent onFinishEvent = null;
+    private TrcNotifier.Receiver onFinishCallback = null;
     private final TrcEvent driveEvent;
     private final TrcEvent elevatorEvent;
     private final TrcEvent armEvent;
     private final TrcEvent turretEvent;
     private final TrcEvent intakeEvent;
-    private final TrcTaskMgr.TaskObject cycleTaskObj;
-    private TrcDbgTrace msgTracer = null;
-    private FtcAuto.AutoChoices autoChoices;
-    private CycleType cycleType = CycleType.AUTO_FULL_CYCLE;
-    private VisionType visionType = VisionType.ALIGN_VISION;
     private int conesRemaining;
-    private TrcEvent onFinishEvent = null;
-    private TrcNotifier.Receiver onFinishCallback = null;
+    private Double visionExpireTime = null;
+    boolean coneIsPreload = true;
 
     //location of the cone or pole relative to the robot
     private TrcPose2D targetLocation;
@@ -106,12 +110,12 @@ public class TaskCyclingCones
     public TaskCyclingCones(Robot robot)
     {
         this.robot = robot;
-        sm = new TrcStateMachine<>(moduleName);
         driveEvent = new TrcEvent(moduleName + ".drive");
         elevatorEvent = new TrcEvent(moduleName + ".elevator");
         armEvent = new TrcEvent(moduleName + ".arm");
         turretEvent = new TrcEvent(moduleName + ".turret");
         intakeEvent = new TrcEvent(moduleName + ".intake");
+        sm = new TrcStateMachine<>(moduleName);
         cycleTaskObj = TrcTaskMgr.createTask(moduleName, this::cycleTask);
     }   //TaskCyclingCones
 
@@ -124,11 +128,6 @@ public class TaskCyclingCones
     {
         msgTracer = tracer;
     }   //setMsgTracer
-
-    public void setAutoChoices(FtcAuto.AutoChoices autoChoices)
-    {
-        this.autoChoices = autoChoices;
-    }
 
     public void cancel()
     {
@@ -148,26 +147,26 @@ public class TaskCyclingCones
         }
     }   //cancel
 
-    public void doFullAutoCycle(VisionType visionType, int conesRemaining, TrcEvent event)
-    {
+    //doFullAutoCycle pickups and scores 1 cone
+    /*Preconditions(AUTO_FULL_CYCLE)
+         * robot facing the cone stack with high and mid junction on either side turret position 90 degrees
+         * turret position 90 degrees means intake is right on top of the high pole or mid pole (because we just scored a cone)
+         * elevator is height of the high pole
+         * arm position extended, intake stopped
+    */
+    public void doFullAutoCycle(VisionType visionType, int conesRemaining, TrcEvent event){
         startCycling(CycleType.AUTO_FULL_CYCLE, visionType, conesRemaining, event, null);
     }
-
     //teleop call to do pickupOnly
-    public void doPickup(VisionType visionType, int conesRemaining, TrcEvent event)
-    {
+    public void doPickup(VisionType visionType, int conesRemaining, TrcEvent event){
         startCycling(CycleType.PICKUP_ONLY, visionType, conesRemaining, event, null);
     }
-
     //teleop call to do scoring, only the cone it currently has
-    public void scoreCone(VisionType visionType, TrcEvent event)
-    {
+    public void scoreCone(VisionType visionType, TrcEvent event){
         startCycling(CycleType.SCORING_ONLY, visionType, 1, event, null);
     }
-
     //prepare for cycling, start sm
-    public void startCycling(
-        CycleType cycleType, VisionType visionType, int conesRemaining, TrcEvent event, TrcNotifier.Receiver callback)
+    public void startCycling(CycleType cycleType, VisionType visionType, int conesRemaining, TrcEvent event, TrcNotifier.Receiver callback)
     {
         this.cycleType = cycleType;
         this.visionType = visionType;
@@ -176,11 +175,15 @@ public class TaskCyclingCones
         this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
         sm.start(State.PREPARE_PICKUP);
-//        if (cycleType == CycleType.SCORING_ONLY)
-//        {
-//            //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
-//        }
+        if(cycleType == CycleType.SCORING_ONLY){
+            //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
+        }
     }   //startCycling
+
+    public void setAutoChoices(FtcAuto.AutoChoices autoChoices)
+    {
+        this.autoChoices = autoChoices;
+    }
 
     private void cycleTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
     {
@@ -189,105 +192,104 @@ public class TaskCyclingCones
         if (state != null)
         {
             boolean traceState = true;
-//            double matchTime = TrcUtil.getModeElapsedTime();
+            double matchTime = TrcUtil.getModeElapsedTime();
 
-            switch (state)
-            {
-                case ALIGN_TO_CONE:
-                    // CodeReview: is there an assumption that vision is enabled? If so, where does vision get enabled?
-                    // Also note that calling real time vision may not get immediate result. You may need to create a
-                    // state to wait for valid vision result. In addition, distanceFromCamera is only available if you
-                    // have valid Homography. Homography assumes the camera is mounted fixed but our camera is mounted
-                    // on the elevator. Therefore, the only thing you can count on is horizontalAngle, you won't have
-                    // valid X and Y.
-                    //
-                    //don't use vision for horizontally align if its AUTO_FULL_CYCLE
-                    //because location of cone stack is set
-                    if (cycleType != CycleType.AUTO_FULL_CYCLE && visionType != VisionType.NO_VISION)
-                    {
-                        //use vision to find x, y, location of cone relative to robot
-                        TrcVisionTargetInfo<?> targetInfo = robot.vision.getBestDetectedTargetInfo(null);
-                        //Todo: not sure if this is correct
-                        //relative location from camera to cone
-                        targetLocation = new TrcPose2D(
-                            targetInfo.distanceFromCamera.x, targetInfo.distanceFromCamera.y,
-                            targetInfo.horizontalAngle);
-                    }
-                    sm.setState(State.PREPARE_PICKUP);
-                    break;
-
-                case PREPARE_PICKUP: //1. drive to the cone(using targetLocation) or auto conestack(set location)
-                    if (targetLocation != null)
-                    {
+            switch (state) {
+                case PREPARE_PICKUP: //1. drive forward to the cone and prepare turret to pick it up
+                    if(targetLocation != null){
+                        //todo: check math, find offset
+                        //drive to the cone stack
                         robot.robotDrive.purePursuitDrive.start(
-                            driveEvent, robot.robotDrive.driveBase.getFieldPosition(), true, targetLocation);
-                    }
-                    else if(cycleType == CycleType.AUTO_FULL_CYCLE)
-                    {
-                        //drive to position where robot can pick up from the cone stack
-                        //Todo: find position
-                        robot.robotDrive.purePursuitDrive.start(
-                            driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(-2.5, -0.3, -104, autoChoices));
+                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT.x - RobotParams.TURRET_PICKUP_OFFSET,
+                                        RobotParams.CONE_STACK_RED_LEFT.y, -90.0, autoChoices));
                     }
                     //set elevator to height so that intake is several inches above the cone stack
                     //todo: tune elevator height
-                    double elevatorHeight = RobotParams.ELEVATOR_PRESET_LEVELS[conesRemaining] + RobotParams.CONE_GRAB_HEIGHT;
-                    robot.elevator.setTarget(elevatorHeight, true, 1.0, elevatorEvent);
-                    robot.arm.setTarget(RobotParams.ARM_EXTENDED, false, 1.0, armEvent);
-                    sm.addEvent(driveEvent);
-                    sm.addEvent(armEvent);
-                    sm.addEvent(elevatorEvent);
-                    sm.waitForEvents(State.START_SPIN, 0.0, true);
-                    break;
-
-                case START_SPIN: //2. spin turret to the front and spin intake wheels
                     robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);
-                    // CodeReview: why don't we do autoAssist pickup?
-                    robot.intake.setPower(RobotParams.INTAKE_POWER_PICKUP);
-                    sm.waitForSingleEvent(turretEvent, State.PICKUP_CONE);
+                    sm.waitForSingleEvent(driveEvent, State.PICKUP_CONE);
                     break;
+                //no vision for now
+//                case ALIGN_TO_CONE:
+//                    //if using vision turn the robot to face the cone
+//                    if (visionType != VisionType.NO_VISION) {
+//                        //use vision to find x, y, location of cone relative to robot
+//                        //set pipeline to look for red or blue cones
+//                        if(autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE){
+//                            robot.vision.eocvVision.setObjectType(EocvVision.ObjectType.RED_CONE);
+//                        }
+//                        else{
+//                            robot.vision.eocvVision.setObjectType(EocvVision.ObjectType.BLUE_CONE);
+//                        }
+//                        TrcVisionTargetInfo<?> targetInfo = robot.vision.getBestDetectedTargetInfo(null);
+//                        //Todo: not sure if this is correct
+//                        //relative location from camera to cone
+//                        targetLocation = new TrcPose2D(targetInfo.distanceFromCamera.x, targetInfo.distanceFromCamera.y, targetInfo.horizontalAngle);
+//                    }
+//                    //if we found the target, strafe so that the cone is centered with the robot(only for auto bc angle should be pretty accurate)
+//                    if (targetLocation != null && cycleType == CycleType.AUTO_FULL_CYCLE) {
+//                        robot.robotDrive.purePursuitDrive.start(
+//                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), true,
+//                                robot.robotDrive.getAutoTargetPoint(targetLocation.x, 0, 0, autoChoices));
+//
+//                        sm.waitForSingleEvent(driveEvent, State.PREPARE_PICKUP);
+//                    }
+//                    //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
+//                    else if(visionType == VisionType.ALIGN_VISION && visionExpireTime == null){
+//                        visionExpireTime = TrcUtil.getCurrentTime() + 1;
+//                    }
+//                    else if(visionType == VisionType.ALIGN_VISION && TrcUtil.getCurrentTime() == visionExpireTime){
+//                        //set vision expire time equal to null
+//                        visionExpireTime = null;
+//                        sm.setState(State.PREPARE_PICKUP);
+//                    }
+//                    break;
 
-                case PICKUP_CONE: //3. lower the elevator to the correct height
+                case PICKUP_CONE: //2. lower elevator to the cone, spin intake wheels
                     robot.elevator.setPresetPosition(conesRemaining, elevatorEvent, null);
+                    robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP);//autoAssist(RobotParams.INTAKE_POWER_PICKUP);
                     sm.waitForSingleEvent(elevatorEvent, State.RAISE_ELEVATOR);
                     break;
 
-                case RAISE_ELEVATOR: //4. raise the elevator up higher than the pole
+
+                case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
                     robot.intake.setPower(0);
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, elevatorEvent);
                     sm.waitForSingleEvent(elevatorEvent, State.PREPARE_SCORE);
                     break;
 
-                case PREPARE_SCORE: //5. turn turret to the back while driving backwards to the pole
-                    robot.robotDrive.purePursuitDrive.start(
-                        driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(-1.2, -0.2, -104.0, autoChoices));
-                    robot.turret.setTarget(RobotParams.TURRET_BACK);
-                    sm.waitForSingleEvent(driveEvent, State.ALIGN_ARM);
-                    break;
-
-                case ALIGN_ARM: //6. set arm to 90 (to reset arm pos after ensuring turret will not bonk, might not be needed)
-                    robot.arm.setTarget(RobotParams.ARM_EXTENDED, false, 1.0, armEvent);
-                    sm.waitForSingleEvent(armEvent, State.SCORE);
+                case PREPARE_SCORE: //5. turn turret to the right side while driving backwards until intake is right above the pole
+                    if(cycleType == CycleType.AUTO_FULL_CYCLE){
+                        robot.robotDrive.purePursuitDrive.start(
+                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
+                    }
+                    //alternatively, use vision to drive until the pole is centered with the camera
+                    //drive straight backwards until the middle of the robot is aligned with the pole
+                    robot.turret.setTarget(RobotParams.TURRET_RIGHT);
+                    sm.waitForSingleEvent(driveEvent, State.SCORE);
                     break;
 
                 case SCORE: //7. spin intake backwards
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, intakeEvent, null, 1.0);
-                    sm.waitForSingleEvent(intakeEvent, State.RESET);
+                    robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP, 1.0, intakeEvent);
+                    sm.waitForSingleEvent(intakeEvent, State.DONE);
                     break;
 
-                case RESET: //8. turn turret 180 degrees and lower elevator while driving back to start position
-                    robot.robotDrive.purePursuitDrive.start(
-                        driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(-1.243, -0.061, -104.0, autoChoices));
-                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS, true, 1.0, elevatorEvent);
-                    sm.addEvent(driveEvent);
-                    sm.addEvent(turretEvent);
-                    sm.addEvent(elevatorEvent);
-                    sm.waitForEvents(State.DONE, 0.0, true);
-                    break;
+                //don't need this for now
+//                case RESET: //8. turn turret to the front and lower elevator. may need to drive forward a bit for auto
+//                    if(cycleType == CycleType.AUTO_FULL_CYCLE){
+//                        robot.robotDrive.purePursuitDrive.start(
+//                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+//                                robot.robotDrive.getAutoTargetPoint(-1.5, -0.5, -90.0, autoChoices));
+//                    }
+//                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);
+//                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS, true, 1.0, elevatorEvent);
+//                    robot.arm.setTarget(RobotParams.ARM_EXTENDED);
+//                    sm.addEvent(driveEvent);
+//                    sm.addEvent(turretEvent);
+//                    sm.addEvent(elevatorEvent);
+//                    sm.waitForEvents(State.DONE, 0.0, true);
+//                    break;
 
                 default:
                 case DONE:
