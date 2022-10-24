@@ -30,7 +30,6 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTaskMgr;
-import TrcFtcLib.ftclib.FtcGamepad;
 
 /**
  * This class implements the auto-assist tile grid drive. It allows the driver to use the DPad to quickly navigate
@@ -41,7 +40,7 @@ public class TaskTileGridDrive
 {
     private static final String moduleName = "TaskTileGridDrive";
 
-    public enum State
+    private enum State
     {
         START,
         DONE
@@ -51,7 +50,7 @@ public class TaskTileGridDrive
     private final TrcEvent event;
     private final TrcStateMachine<State> sm;
     private final TrcTaskMgr.TaskObject tileGridDriveTaskObj;
-    private final ArrayList<TrcPose2D> targetSegments = new ArrayList<>();
+    private final ArrayList<TrcPose2D> gridDriveQueue = new ArrayList<>();
     private TrcDbgTrace msgTracer = null;
 
     /**
@@ -83,7 +82,7 @@ public class TaskTileGridDrive
     public void cancel()
     {
         setTaskEnabled(false);
-        targetSegments.clear();
+        gridDriveQueue.clear();
     }   //cancel
 
     /**
@@ -122,19 +121,19 @@ public class TaskTileGridDrive
      */
     public void setRelativeXTileTarget(int tiles)
     {
-        TrcPose2D lastNode = !targetSegments.isEmpty()? targetSegments.get(targetSegments.size()-1): null;
-        if (lastNode != null) {
+        TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
+
+        if (lastNode != null)
+        {
             lastNode.x += tiles;
+            // CodeReview: need to check if lastNode became zero, if so remove the node.
         }
-        else{
-            lastNode = new TrcPose2D(tiles, 0, Math.signum(tiles) * 90);
-            targetSegments.add(lastNode);
+        else
+        {
+            lastNode = new TrcPose2D(tiles, 0.0, Math.signum(tiles) * 90.0);
+            gridDriveQueue.add(lastNode);
         }
 
-        // - Check if the movement is the same direction as the last segment movement and has the same orientation as
-        //   the direction of movement.
-        // - If so, coalesce the movement into the last segment.
-        // - Otherwise, add a new segment.
         setTaskEnabled(true);
     }   //setRelativeXTileTarget
 
@@ -145,38 +144,24 @@ public class TaskTileGridDrive
      */
     public void setRelativeYTileTarget(int tiles)
     {
-        TrcPose2D lastNode = !targetSegments.isEmpty()? targetSegments.get(targetSegments.size()-1): null;
-        if (lastNode != null) {
-            lastNode.y += tiles;
-        }
-        else{
-            lastNode = (Math.signum(tiles) == 1)? new TrcPose2D(0, tiles, 0): new TrcPose2D(0, tiles, 180);
-            targetSegments.add(lastNode);
-        }//If the robot is moving in the positive y direction, heading should be north (0)--otherwise, heading
-        // should be south (180)
+        TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
 
-        // - Check if the movement is the same direction as the last segment movement and has the same orientation as
-        //   the direction of movement.
-        // - If so, coalesce the movement into the last segment.
-        // - Otherwise, add a new segment.
+        if (lastNode != null)
+        {
+            lastNode.y += tiles;
+            // CodeReview: need to check if lastNode became zero, if so remove the node.
+        }
+        else
+        {
+            // If the robot is moving in the positive y direction, heading should be north (0)--otherwise, heading
+            // should be south (180).
+            lastNode = new TrcPose2D(0.0, tiles, (-Math.signum(tiles) + 1) * 90.0);
+            gridDriveQueue.add(lastNode);
+        }
+
         setTaskEnabled(true);
     }   //setRelativeYTileTarget
 
-    /**
-     * This method adds a turn segment to the array list.
-     *
-     * @param AbsHeading specifies the new heading of the robot after the turn.
-     */
-//    public void setAbsoluteTargetHeading(double AbsHeading)
-//    {
-//        // - Check if the new heading is the same as the last segment end heading.
-//        // - If so, do nothing.
-//        // - Otherwise, add a new segment for the turn.
-//        It turns out that we probably don't need to do this, because we set a heading in setRelativeXTileTarget
-//        and setRelativeYTileTarget
-//        setTaskEnabled(true);
-//    }   //setAbsoluteTargetHeading
-//
     /**
      * This periodic task navigates the robot through the field maze according to the array list of movement segments.
      *
@@ -199,7 +184,7 @@ public class TaskTileGridDrive
             switch (state)
             {
                 case START:
-                    TrcPose2D targetTilePose = !targetSegments.isEmpty()? targetSegments.remove(0): null;
+                    TrcPose2D targetTilePose = !gridDriveQueue.isEmpty()? gridDriveQueue.remove(0): null;
                     if (targetTilePose != null)
                     {
                         TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
