@@ -41,7 +41,7 @@ public class TaskTileGridDrive
 {
     private static final String moduleName = "TaskTileGridDrive";
 
-    public enum State
+    public static enum State
     {
         START,
         DONE
