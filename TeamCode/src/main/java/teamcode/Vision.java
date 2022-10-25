@@ -98,25 +98,40 @@ public class Vision
         this.robot = robot;
         if (RobotParams.Preferences.useEasyOpenCV)
         {
-            int[] viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(
-                cameraViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
-            OpenCvCamera frontWebcam =
-                OpenCvCameraFactory.getInstance().createWebcam(
-                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM),
-                    viewportContainerIds[0]);
-            OpenCvCamera elevatorWebcam =
-                OpenCvCameraFactory.getInstance().createWebcam(
-                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM),
-                    viewportContainerIds[1]);
+            OpenCvCamera frontWebcam, elevatorWebcam;
+
+            if (RobotParams.Preferences.showEasyOpenCvView)
+            {
+                int[] viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(
+                    cameraViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
+
+                frontWebcam =
+                    OpenCvCameraFactory.getInstance().createWebcam(
+                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM),
+                        viewportContainerIds[0]);
+                elevatorWebcam =
+                    OpenCvCameraFactory.getInstance().createWebcam(
+                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM),
+                        viewportContainerIds[1]);
+                frontWebcam.showFpsMeterOnViewport(false);
+                elevatorWebcam.showFpsMeterOnViewport(false);
+            }
+            else
+            {
+                frontWebcam =
+                    OpenCvCameraFactory.getInstance().createWebcam(
+                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM));
+                elevatorWebcam =
+                    OpenCvCameraFactory.getInstance().createWebcam(
+                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM));
+            }
 
             frontEocvVision = new EocvVision(
                 "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,
-                RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT,
-                RobotParams.Preferences.showEasyOpenCvView, null);
+                RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT, null);
             elevatorEocvVision = new EocvVision(
                 "elevatorEocvVision", RobotParams.ELEVATORCAM_IMAGE_WIDTH, RobotParams.ELEVATORCAM_IMAGE_HEIGHT,
-                null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_LEFT,
-                RobotParams.Preferences.showEasyOpenCvView, null);
+                null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_LEFT, null);
         }
         else if (RobotParams.Preferences.useVuforia || RobotParams.Preferences.useTensorFlow)
         {

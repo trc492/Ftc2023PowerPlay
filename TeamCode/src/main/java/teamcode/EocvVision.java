@@ -94,16 +94,14 @@ public class EocvVision extends FtcEocvDetector
      * @param worldRect specifies the homography world coordinate rectangle, can be null if not provided.
      * @param openCvCam specifies the OpenCV camera object.
      * @param cameraRotation specifies the camera orientation.
-     * @param showEocvView specifies true to show the annotated image on robot controller screen, false to hide it.
      * @param tracer specifies the tracer for trace info, null if none provided.
      */
     public EocvVision(
         String instanceName, int imageWidth, int imageHeight,
         TrcHomographyMapper.Rectangle cameraRect, TrcHomographyMapper.Rectangle worldRect,
-        OpenCvCamera openCvCam, OpenCvCameraRotation cameraRotation, boolean showEocvView, TrcDbgTrace tracer)
+        OpenCvCamera openCvCam, OpenCvCameraRotation cameraRotation, TrcDbgTrace tracer)
     {
-        super(instanceName, openCvCam, imageWidth, imageHeight, cameraRotation, showEocvView, cameraRect, worldRect,
-              tracer);
+        super(instanceName, openCvCam, imageWidth, imageHeight, cameraRotation, cameraRect, worldRect, tracer);
 
         this.tracer = tracer;
         TrcOpenCvColorBlobPipeline.FilterContourParams coneFilterContourParams =
