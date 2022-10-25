@@ -126,10 +126,10 @@ public class TaskTileGridDrive
         if (lastNode != null)
         {
             lastNode.x += tiles;
-            if (lastNode.x == 0.0){
-                gridDriveQueue.remove(gridDriveQueue.size()-1);
+            if (lastNode.x == 0.0)
+            {
+                gridDriveQueue.remove(lastNode);
             }
-            // CodeReview: need to check if lastNode became zero, if so remove the node.
         }
         else
         {
@@ -152,10 +152,10 @@ public class TaskTileGridDrive
         if (lastNode != null)
         {
             lastNode.y += tiles;
-            if (lastNode.y == 0.0){
-                gridDriveQueue.remove(gridDriveQueue.size()-1);
+            if (lastNode.y == 0.0)
+            {
+                gridDriveQueue.remove(lastNode);
             }
-            // CodeReview: need to check if lastNode became zero, if so remove the node.
         }
         else
         {
