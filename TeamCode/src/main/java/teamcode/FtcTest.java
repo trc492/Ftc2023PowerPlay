@@ -268,10 +268,17 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.vuforiaVision.setEnabled(true);
                     }
 
-                    if (robot.vision.eocvVision != null)
+                    if (robot.vision.frontEocvVision != null || robot.vision.elevatorEocvVision != null)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
-                        robot.vision.eocvVision.setEnabled(true);
+                        if (RobotParams.Preferences.testFrontEocv)
+                        {
+                            robot.vision.frontEocvVision.setEnabled(true);
+                        }
+                        else
+                        {
+                            robot.vision.elevatorEocvVision.setEnabled(true);
+                        }
                     }
                     else if (robot.vision.tensorFlowVision != null)
                     {
@@ -556,9 +563,9 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_B:
                     if (testChoices.test == Test.VISION_TEST)
                     {
-                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
+                        if (pressed && robot.vision != null && robot.vision.frontEocvVision != null)
                         {
-                            robot.vision.eocvVision.setNextObjectType();
+                            robot.vision.frontEocvVision.setNextObjectType();
                         }
                         processed = true;
                     }
@@ -567,9 +574,9 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_X:
                     if (testChoices.test == Test.VISION_TEST)
                     {
-                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
+                        if (pressed && robot.vision != null && robot.vision.frontEocvVision != null)
                         {
-                            robot.vision.eocvVision.toggleColorFilterOutput();
+                            robot.vision.frontEocvVision.toggleColorFilterOutput();
                         }
                         processed = true;
                     }
@@ -932,7 +939,8 @@ public class FtcTest extends FtcTeleOp
     {
         if (robot.vision != null)
         {
-            if (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null)
+            if (robot.vision.tensorFlowVision != null ||
+                robot.vision.frontEocvVision != null || robot.vision.elevatorEocvVision != null)
             {
                 final int maxNumLines = 3;
                 int lineIndex = 10;
@@ -962,7 +970,7 @@ public class FtcTest extends FtcTeleOp
             if (robot.vision.vuforiaVision != null)
             {
                 TrcPose2D robotPose = robot.vision.vuforiaVision.getRobotPose(null, false);
-                robot.dashboard.displayPrintf(13, "RobotLoc %s: %s",
+                robot.dashboard.displayPrintf(14, "RobotLoc %s: %s",
                                               robot.vision.vuforiaVision.getLastSeenImageName(), robotPose);
             }
         }

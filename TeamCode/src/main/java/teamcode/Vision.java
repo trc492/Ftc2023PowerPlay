@@ -77,7 +77,8 @@ public class Vision
     private final Robot robot;
     public VuforiaVision vuforiaVision;
     public TensorFlowVision tensorFlowVision;
-    public EocvVision eocvVision;
+    public EocvVision frontEocvVision;
+    public EocvVision elevatorEocvVision;
 
     private int lastSignal = 0;
 
@@ -97,13 +98,24 @@ public class Vision
         this.robot = robot;
         if (RobotParams.Preferences.useEasyOpenCV)
         {
-            OpenCvCamera webcam =
+            int[] viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(
+                cameraViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
+            OpenCvCamera frontWebcam =
                 OpenCvCameraFactory.getInstance().createWebcam(
-                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM), cameraViewId);
+                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM),
+                    viewportContainerIds[0]);
+            OpenCvCamera elevatorWebcam =
+                OpenCvCameraFactory.getInstance().createWebcam(
+                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM),
+                    viewportContainerIds[1]);
 
-            eocvVision = new EocvVision(
-                "EocvVision", RobotParams.CAMERA_IMAGE_WIDTH, RobotParams.CAMERA_IMAGE_HEIGHT,
-                RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT,
+            frontEocvVision = new EocvVision(
+                "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,
+                RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT,
+                RobotParams.Preferences.showEasyOpenCvView, null);
+            elevatorEocvVision = new EocvVision(
+                "elevatorEocvVision", RobotParams.ELEVATORCAM_IMAGE_WIDTH, RobotParams.ELEVATORCAM_IMAGE_HEIGHT,
+                null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_RIGHT,
                 RobotParams.Preferences.showEasyOpenCvView, null);
         }
         else if (RobotParams.Preferences.useVuforia || RobotParams.Preferences.useTensorFlow)
@@ -121,7 +133,7 @@ public class Vision
                     new VuforiaLocalizer.Parameters(cameraViewId): new VuforiaLocalizer.Parameters();
 
             vuforiaParams.vuforiaLicenseKey = VUFORIA_LICENSE_KEY;
-            vuforiaParams.cameraName = opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM);
+            vuforiaParams.cameraName = opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM);
             vuforiaParams.useExtendedTracking = false;
             vuforiaParams.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
             FtcVuforia vuforia = new FtcVuforia(vuforiaParams);
@@ -192,7 +204,7 @@ public class Vision
                         break;
                 }
             }
-            else if (eocvVision != null && eocvVision.getPipeline() instanceof FtcEocvAprilTagPipeline)
+            else if (frontEocvVision != null && frontEocvVision.getPipeline() instanceof FtcEocvAprilTagPipeline)
             {
                 FtcEocvAprilTagPipeline.DetectedObject detectedObj =
                     (FtcEocvAprilTagPipeline.DetectedObject) target.detectedObj;
@@ -254,12 +266,17 @@ public class Vision
         if (tensorFlowVision != null && tensorFlowVision.isEnabled())
         {
             targets = tensorFlowVision.getDetectedTargetsInfo(
-                label, null, this::compareConfidence, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
+                label, null, this::compareConfidence,
+                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
         }
-        else if (eocvVision != null && eocvVision.isEnabled())
+        else if (frontEocvVision != null && frontEocvVision.isEnabled())
         {
-            targets = eocvVision.getDetectedTargetsInfo(
-                null, null, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
+            targets = frontEocvVision.getDetectedTargetsInfo(
+                null, null, RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+        }
+        else if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
+        {
+            targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
         }
 
         return targets;
@@ -292,12 +309,17 @@ public class Vision
         {
             targets = tensorFlowVision.getDetectedTargetsInfo(
                 label, null, this::compareDistanceFromCamera,
-                RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
+                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
         }
-        else if (eocvVision != null && eocvVision.isEnabled())
+        else if (frontEocvVision != null && frontEocvVision.isEnabled())
         {
-            targets = eocvVision.getDetectedTargetsInfo(
-                null, this::compareDistanceFromCamera, RobotParams.TAG_HEIGHT_OFFSET, RobotParams.CAMERA_HEIGHT_OFFSET);
+            targets = frontEocvVision.getDetectedTargetsInfo(
+                null, this::compareDistanceFromCamera,
+                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+        }
+        else if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
+        {
+            targets = elevatorEocvVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera, 0.0, 0.0);
         }
 
         return targets != null? targets[0]: null;

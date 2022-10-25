@@ -23,11 +23,9 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcEvent;
-import TrcCommonLib.trclib.TrcNotifier;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTimer;
-import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 
 class CmdVisionTest implements TrcRobot.RobotCommand
@@ -128,7 +126,7 @@ class CmdVisionTest implements TrcRobot.RobotCommand
 
                 case TURN_TO_CONES:
                     double angle = 0;
-                    if(robot.vision.eocvVision!= null){
+                    if(robot.vision.frontEocvVision != null){
                         TrcVisionTargetInfo<?> target = robot.vision.getBestDetectedTargetInfo(null);
                         if(target != null){
                             angle = target.horizontalAngle;

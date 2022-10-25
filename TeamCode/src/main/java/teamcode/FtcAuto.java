@@ -198,11 +198,11 @@ public class FtcAuto extends FtcOpMode
         if (robot.vision != null)
         {
             // Enabling vision early so we can detect signal position before match starts.
-            if (robot.vision.eocvVision != null)
+            if (robot.vision.frontEocvVision != null)
             {
                 robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect AprilTag.");
-                robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
-                robot.vision.eocvVision.setEnabled(true);
+                robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
+                robot.vision.frontEocvVision.setEnabled(true);
             }
             else if (robot.vision.tensorFlowVision != null)
             {
@@ -224,7 +224,7 @@ public class FtcAuto extends FtcOpMode
     public void initPeriodic()
     {
         // Use vision to detect objects before the match starts.
-        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null))
+        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.frontEocvVision != null))
         {
             robot.vision.getDetectedSignal();
         }
@@ -269,11 +269,11 @@ public class FtcAuto extends FtcOpMode
             }
 
             // Enabling EOCV vision to detect cones and junction poles.
-            if (robot.vision.eocvVision != null)
+            if (robot.vision.frontEocvVision != null)
             {
                 robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect yellow pole.");
-                robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.YELLOW_POLE);
-                robot.vision.eocvVision.setEnabled(true);
+                robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.YELLOW_POLE);
+                robot.vision.frontEocvVision.setEnabled(true);
             }
         }
 

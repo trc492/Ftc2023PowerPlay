@@ -299,10 +299,16 @@ public class Robot
                 vision.tensorFlowShutdown();
             }
 
-            if (vision.eocvVision != null)
+            if (vision.frontEocvVision != null)
             {
-                globalTracer.traceInfo(funcName, "Disabling EocvVision.");
-                vision.eocvVision.setEnabled(false);
+                globalTracer.traceInfo(funcName, "Disabling FrontEocvVision.");
+                vision.frontEocvVision.setEnabled(false);
+            }
+
+            if (vision.elevatorEocvVision != null)
+            {
+                globalTracer.traceInfo(funcName, "Disabling ElevatorEocvVision.");
+                vision.elevatorEocvVision.setEnabled(false);
             }
         }
 

@@ -82,7 +82,7 @@ public class EocvVision extends FtcEocvDetector
     private final FtcEocvColorBlobPipeline blueConePipeline;
     private final FtcEocvColorBlobPipeline yellowPolePipeline;
     private final FtcEocvAprilTagPipeline aprilTagPipeline;
-    private ObjectType objectType = ObjectType.APRIL_TAG;
+    private ObjectType objectType = null;
 
     /**
      * Constructor: Create an instance of the object.
@@ -115,16 +115,28 @@ public class EocvVision extends FtcEocvDetector
                 .setSolidityRange(0.0, 100.0)
                 .setVerticesRange(0.0, 1000.0)
                 .setAspectRatioRange(0.0, 1000.0);
-        redConePipeline = new FtcEocvColorBlobPipeline(
-            "redConePipeline", false, colorThresholdsRedCone, filterContourParams, tracer);
-        blueConePipeline = new FtcEocvColorBlobPipeline(
-            "blueConePipeline", false, colorThresholdsBlueCone, filterContourParams, tracer);
-        yellowPolePipeline = new FtcEocvColorBlobPipeline(
-            "yellowPolePipeliine", false, colorThresholdsYellowPole, filterContourParams, tracer);
-        aprilTagPipeline = new FtcEocvAprilTagPipeline(
-            AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.CAMERA_TAGSIZE,
-            RobotParams.CAMERA_FX, RobotParams.CAMERA_FY, RobotParams.CAMERA_CX, RobotParams.CAMERA_CY, tracer);
-        updatePipeline();
+        if (instanceName.equals("frontEocvVision"))
+        {
+            redConePipeline = new FtcEocvColorBlobPipeline(
+                "redConePipeline", false, colorThresholdsRedCone, filterContourParams, tracer);
+            blueConePipeline = new FtcEocvColorBlobPipeline(
+                "blueConePipeline", false, colorThresholdsBlueCone, filterContourParams, tracer);
+            aprilTagPipeline = new FtcEocvAprilTagPipeline(
+                AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.APRILTAG_SIZE,
+                RobotParams.FRONTCAM_FX, RobotParams.FRONTCAM_FY, RobotParams.FRONTCAM_CX, RobotParams.FRONTCAM_CY,
+                tracer);
+            yellowPolePipeline = null;
+            setDetectObjectType(ObjectType.APRIL_TAG);
+        }
+        else
+        {
+            redConePipeline = null;
+            blueConePipeline = null;
+            aprilTagPipeline = null;
+            yellowPolePipeline = new FtcEocvColorBlobPipeline(
+                "yellowPolePipeliine", false, colorThresholdsYellowPole, filterContourParams, tracer);
+            setDetectObjectType(ObjectType.YELLOW_POLE);
+        }
     }   //EocvVision
 
     /**

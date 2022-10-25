@@ -52,18 +52,19 @@ public class RobotParams
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
         public static boolean showEasyOpenCvView = true;
+        public static boolean testFrontEocv = true;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
         // Drive Base
-        public static boolean useExternalOdometry = false;
+        public static boolean useExternalOdometry = true;
         public static boolean useVelocityControl = false;
         // Subsystems
         public static boolean initSubsystems = true;
-        public static boolean useTurret = false;
-        public static boolean useArm = false;
-        public static boolean useElevator = false;
-        public static boolean useIntake = false;
+        public static boolean useTurret = true;
+        public static boolean useElevator = true;
+        public static boolean useArm = true;
+        public static boolean useIntake = true;
         public static boolean hasIntakeSensor = false;
     }   //class Preferences
 
@@ -75,7 +76,8 @@ public class RobotParams
     // Hardware names.
     //
     public static final String HWNAME_IMU                       = "imu";
-    public static final String HWNAME_WEBCAM                    = "Webcam 1";
+    public static final String HWNAME_FRONT_WEBCAM              = "Webcam 1";
+    public static final String HWNAME_ELEVATOR_WEBCAM           = "Webcam 2";
     public static final String HWNAME_BLINKIN                   = "blinkin";
     public static final String HWNAME_LFDRIVE_MOTOR             = "lfDriveMotor";
     public static final String HWNAME_RFDRIVE_MOTOR             = "rfDriveMotor";
@@ -127,12 +129,13 @@ public class RobotParams
     public static TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
             -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
 
+    // Park positions are in tile units.
     public static final double PARKPOS_LEFTP1_FROM_FIELDCENTER_X    = 2.5;
     public static final double PARKPOS_LEFTP2_FROM_FIELDCENTER_X    = 1.5;
     public static final double PARKPOS_LEFTP3_FROM_FIELDCENTER_X    = 0.5;
-    public static final double PARKPOS_RIGHTP1_FROM_FIELDCENTER_X   = 0.5;
-    public static final double PARKPOS_RIGHTP2_FROM_FIELDCENTER_X   = 1.5;
-    public static final double PARKPOS_RIGHTP3_FROM_FIELDCENTER_X   = 2.5;
+//    public static final double PARKPOS_RIGHTP1_FROM_FIELDCENTER_X   = 0.5;
+//    public static final double PARKPOS_RIGHTP2_FROM_FIELDCENTER_X   = 1.5;
+//    public static final double PARKPOS_RIGHTP3_FROM_FIELDCENTER_X   = 2.5;
     public static final double PARKPOS_FAR_FROM_FIELDCENTER_Y       = 0.5;
     public static final double PARKPOS_NEAR_FROM_FIELDCENTER_Y      = 1.5;
 
@@ -149,44 +152,44 @@ public class RobotParams
     public static TrcPose2D PARKPOS_RED_LEFTP3_NEAR = new TrcPose2D(
         -PARKPOS_LEFTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
 
-    public static TrcPose2D PARKPOS_RED_RIGHTP1_FAR = new TrcPose2D(
-        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_RIGHTP1_NEAR = new TrcPose2D(
-        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_RIGHTP2_FAR = new TrcPose2D(
-        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_RIGHTP2_NEAR = new TrcPose2D(
-        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_RIGHTP3_FAR = new TrcPose2D(
-        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_RIGHTP3_NEAR = new TrcPose2D(
-        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-
-    public static TrcPose2D PARKPOS_BLUE_LEFTP1_FAR = new TrcPose2D(
-        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_LEFTP1_NEAR = new TrcPose2D(
-        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_LEFTP2_FAR = new TrcPose2D(
-        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_LEFTP2_NEAR = new TrcPose2D(
-        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_LEFTP3_FAR = new TrcPose2D(
-        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_LEFTP3_NEAR = new TrcPose2D(
-        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-
-    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_FAR = new TrcPose2D(
-        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_NEAR = new TrcPose2D(
-        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_FAR = new TrcPose2D(
-        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_NEAR = new TrcPose2D(
-        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_FAR = new TrcPose2D(
-        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_NEAR = new TrcPose2D(
-        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_RED_RIGHTP1_FAR = new TrcPose2D(
+//        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_RED_RIGHTP1_NEAR = new TrcPose2D(
+//        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_RED_RIGHTP2_FAR = new TrcPose2D(
+//        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_RED_RIGHTP2_NEAR = new TrcPose2D(
+//        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_RED_RIGHTP3_FAR = new TrcPose2D(
+//        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_RED_RIGHTP3_NEAR = new TrcPose2D(
+//        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//
+//    public static TrcPose2D PARKPOS_BLUE_LEFTP1_FAR = new TrcPose2D(
+//        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_LEFTP1_NEAR = new TrcPose2D(
+//        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_LEFTP2_FAR = new TrcPose2D(
+//        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_LEFTP2_NEAR = new TrcPose2D(
+//        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_LEFTP3_FAR = new TrcPose2D(
+//        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_LEFTP3_NEAR = new TrcPose2D(
+//        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//
+//    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_FAR = new TrcPose2D(
+//        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_NEAR = new TrcPose2D(
+//        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_FAR = new TrcPose2D(
+//        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_NEAR = new TrcPose2D(
+//        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_FAR = new TrcPose2D(
+//        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
+//    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_NEAR = new TrcPose2D(
+//        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
 
     //both arays use TILE_COORDINATES
     public static TrcPose2D[] PARKPOS_RED_LEFT_NEAR = {
@@ -204,29 +207,37 @@ public class RobotParams
     //
     // Vision subsystem.
     //
-    public static final double CAMERA_FRONT_OFFSET              = 7.5;  //Camera offset from front of robot in inches
-    public static final double CAMERA_LEFT_OFFSET               = 6.0;  //Camera offset from left of robot in inches
-    public static final double CAMERA_HEIGHT_OFFSET             = 16.0; //Camera offset from floor in inches
-    public static final double CAMERA_TILT_DOWN                 = 36.0; //Camera tilt down angle from horizontal in deg
-    public static final double CAMERA_TAGSIZE                   = 0.05; // in meters
-    public static final double TAG_HEIGHT_OFFSET                = 1.5;  // in inches
-    // Camera: Logitech C310
-    public static final int CAMERA_IMAGE_WIDTH                  = 640;
-    public static final int CAMERA_IMAGE_HEIGHT                 = 480;
-    public static final double CAMERA_FX                        = 821.993;  // in pixels
-    public static final double CAMERA_FY                        = 821.993;  // in pixels
-    public static final double CAMERA_CX                        = 330.489;  // in pixels
-    public static final double CAMERA_CY                        = 248.997;  // in pixels
     public static final int FRAME_QUEUE_CAPACITY                = 2;
+    public static final double APRILTAG_SIZE                    = 0.05; // in meters
+    public static final double APRILTAG_HEIGHT_OFFSET           = 1.5;  // in inches
+
+    public static final double FRONTCAM_FRONT_OFFSET            = 2.25; //Camera offset from front of robot in inches
+    public static final double FRONTCAM_LEFT_OFFSET             = 7.50; //Camera offset from left of robot in inches
+    public static final double FRONTCAM_HEIGHT_OFFSET           = 3.75; //Camera offset from floor in inches
+    public static final double FRONTCAM_TILT_DOWN               = 0.00; //Camera tilt down angle from horizontal in deg
+    // Front Camera: Logitech C310
+    public static final int FRONTCAM_IMAGE_WIDTH                = 640;
+    public static final int FRONTCAM_IMAGE_HEIGHT               = 480;
+    public static final double FRONTCAM_FX                      = 821.993;  // in pixels
+    public static final double FRONTCAM_FY                      = 821.993;  // in pixels
+    public static final double FRONTCAM_CX                      = 330.489;  // in pixels
+    public static final double FRONTCAM_CY                      = 248.997;  // in pixels
+    // Elevator Camera: Logitech C310
+    public static final int ELEVATORCAM_IMAGE_WIDTH             = 640;
+    public static final int ELEVATORCAM_IMAGE_HEIGHT            = 480;
+    public static final double ELEVATORCAM_FX                   = 821.993;  // in pixels
+    public static final double ELEVATORCAM_FY                   = 821.993;  // in pixels
+    public static final double ELEVATORCAM_CX                   = 330.489;  // in pixels
+    public static final double ELEVATORCAM_CY                   = 248.997;  // in pixels
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 0.0;
-    public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X     = CAMERA_IMAGE_WIDTH - 1;
+    public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X     = FRONTCAM_IMAGE_WIDTH - 1;
     public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_Y     = 0.0;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_X   = 0.0;
-    public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y   = CAMERA_IMAGE_HEIGHT - 1;
-    public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X  = CAMERA_IMAGE_WIDTH - 1;
-    public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y  = CAMERA_IMAGE_HEIGHT - 1;
+    public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y   = FRONTCAM_IMAGE_HEIGHT - 1;
+    public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X  = FRONTCAM_IMAGE_WIDTH - 1;
+    public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y  = FRONTCAM_IMAGE_HEIGHT - 1;
 
     // These should be in real-world robot coordinates. Needs calibration after camera is actually mounted in position.
     // Measurement unit: inches
