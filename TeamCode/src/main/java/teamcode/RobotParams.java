@@ -60,11 +60,11 @@ public class RobotParams
         public static boolean useExternalOdometry = true;
         public static boolean useVelocityControl = false;
         // Subsystems
-        public static boolean initSubsystems = true;
-        public static boolean useTurret = true;
-        public static boolean useElevator = true;
-        public static boolean useArm = true;
-        public static boolean useIntake = true;
+        public static boolean initSubsystems = false;
+        public static boolean useTurret = false;
+        public static boolean useElevator = false;
+        public static boolean useArm = false;
+        public static boolean useIntake = false;
         public static boolean hasIntakeSensor = false;
     }   //class Preferences
 
@@ -263,11 +263,17 @@ public class RobotParams
     //
     // Motor Odometries.
     //
+
     // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
-    public static final double GOBILDA_5203_312_ENCODER_PPR     = ((((1.0 + (46.0/17.0)))*(1.0 + (46.0/11.0)))*28.0);
+    public static final double GOBILDA_5203_312_ENCODER_PPR     = (((1.0 + 46.0/17.0)*(1.0 + 46.0/11.0))*28.0);
     public static final double GOBILDA_5203_312_RPM             = 312.0;
     public static final double GOBILDA_5203_312_MAX_VELOCITY_PPS=
-        GOBILDA_5203_312_ENCODER_PPR*GOBILDA_5203_312_RPM/60.0; // 2795.987 pps
+        GOBILDA_5203_312_ENCODER_PPR*GOBILDA_5203_312_RPM/60.0; // 2795.9872 pps
+    //https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-13-7-1-ratio-24mm-length-8mm-rex-shaft-435-rpm-3-3-5v-encoder/
+    public static final double GOBILDA_5203_435_ENCODER_PPR     = (((1.0 + 46.0/17.0)*(1.0 + 46.0/17.0))*28.0);
+    public static final double GOBILDA_5203_435_RPM             = 435.0;
+    public static final double GOBILDA_5203_435_MAX_VELOCITY_PPS=
+        GOBILDA_5203_435_ENCODER_PPR*GOBILDA_5203_435_RPM/60.0; // 2787.9135 pps
     //
     // DriveBase subsystem.
     //

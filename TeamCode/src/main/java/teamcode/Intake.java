@@ -51,6 +51,10 @@ class Intake
                     instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
                     new double[]{params.analogThreshold}, this::analogTriggerEvent, false);
         }
+        else
+        {
+            // Todo: set up stall detection.
+        }
 
         trcIntake = new TrcIntake(instanceName, motor, params, analogTrigger);
     }   //Intake
