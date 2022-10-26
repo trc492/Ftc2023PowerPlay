@@ -202,7 +202,7 @@ public class RobotParams
         PARKPOS_RED_LEFTP2_FAR,
         PARKPOS_RED_LEFTP3_FAR
     };
-    //In tile coordinates
+    // In tile units.
     public static TrcPose2D CONE_STACK_RED_LEFT = new TrcPose2D(-2.95, -0.5, 0.0);
     //
     // Vision subsystem.
