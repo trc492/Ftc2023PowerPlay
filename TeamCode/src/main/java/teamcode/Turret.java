@@ -44,6 +44,8 @@ public class Turret
     private double turretPowerLimit = 1.0;
     private TrcEvent turretEvent = null;
     private TrcNotifier.Receiver turretCallback = null;
+    private boolean armLevelSafe = false;
+    private boolean elevatorLevelSafe = false;
 
     public Turret(Robot robot)
     {
@@ -109,18 +111,30 @@ public class Turret
      */
     public void setTarget(double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback)
     {
-        if (robot.arm.getPosition() >= RobotParams.ARM_MIN_POS_FOR_TURRET)
+        double armPos = robot.arm.getPosition();
+        double elevatorPos = robot.elevator.getPosition();
+
+        armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
+        elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
+        if (!turnTurretToPos(target, powerLimit, event, callback))
         {
-            // We are safe to turn the turret, do it.
-            pidTurret.setTarget(target, true, powerLimit, event, callback);
-        }
-        else
-        {
+            // Either the arm or the elevator are not at safe level, we need to raise them first before the turn.
             turretTarget = target;
             turretPowerLimit = powerLimit;
             turretEvent = event;
             turretCallback = callback;
-            robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null, this::armRaiseDoneCallback);
+
+            if (!armLevelSafe)
+            {
+                robot.arm.setTarget(
+                    RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null, this::armRaiseDoneCallback);
+            }
+
+            if (!elevatorLevelSafe)
+            {
+                robot.elevator.setTarget(
+                    RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true, 1.0, null, this::elevatorRaiseDoneCallback);
+            }
         }
     }   //setTarget
 
@@ -150,21 +164,6 @@ public class Turret
     }   //setTarget
 
     /**
-     * This method is called after raising the arm to above safe level is done so that we can finish the setTarget
-     * call.
-     *
-     * @param context not used.
-     */
-    private void armRaiseDoneCallback(Object context)
-    {
-        pidTurret.setTarget(turretTarget, true, turretPowerLimit, turretEvent, turretCallback);
-        turretTarget = 0.0;
-        turretPowerLimit = 1.0;
-        turretEvent = null;
-        turretCallback = null;
-    }   //armRaiseDoneCallback
-
-    /**
      * This method sets the turret in motion with the given power but it will first check if it's safe to turn the
      * turret. If not, it will instead raise the arm to above the safe level. Since setPower is generally called by
      * TeleOp code, it will not do the actual setPower after raising the arm because by the time the arm is raised
@@ -175,16 +174,100 @@ public class Turret
      */
     public void setPower(double power)
     {
-        if (robot.arm.getPosition() >= RobotParams.ARM_MIN_POS_FOR_TURRET)
+        double armPos = robot.arm.getPosition();
+        double elevatorPos = robot.elevator.getPosition();
+
+        armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
+        elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
+        if (!turnTurretWithPower(power))
         {
-            // We are safe to turn the turret, do it.
-            pidTurret.setPidPower(power);
-        }
-        else if (!robot.arm.isPidActive())
-        {
-            // Need to raise the arm to the safe position if not already.
-            robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET);
+            if (!armLevelSafe)
+            {
+                robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET, false);
+            }
+
+            if (!elevatorLevelSafe)
+            {
+                robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true);
+            }
         }
     }   //setPower
+
+    /**
+     * This method checks if the arm and elevator positions are safe to turn the turret to the given position without
+     * hitting anything.
+     *
+     * @param target specifies the target position of the turret in degrees.
+     * @param powerLimit specifies the maximum power the turret will turn.
+     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
+     * @param callback specifies the notify callback to call when the turret is on target, can be null if not provided.
+     * @return true if it was safe and we successfully initiated the turn, false if we did not turn.
+     */
+    private boolean turnTurretToPos(double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback)
+    {
+        boolean doTurn = armLevelSafe && elevatorLevelSafe;
+
+        if (doTurn)
+        {
+            pidTurret.setTarget(target, true, powerLimit, event, callback);
+        }
+
+        return doTurn;
+    }   //turnTurretToPos
+
+    /**
+     * This method checks if the arm and elevator positions are safe to turn the turret at the given power without
+     * hitting anything.
+     *
+     * @param power specifies the power to turn the turret.
+     * @return true if it was safe and we successfully initiated the turn, false if we did not turn.
+     */
+    private boolean turnTurretWithPower(double power)
+    {
+        boolean doTurn = armLevelSafe && elevatorLevelSafe;
+
+        if (doTurn)
+        {
+            pidTurret.setPower(power);
+        }
+
+        return doTurn;
+    }   //turnTurretWithPower
+
+    /**
+     * This method is called when the arm is done raising to the safe level. It will try to check if the elevator is
+     * at safe level and turn the turret.
+     *
+     * @param context not used
+     */
+    private void armRaiseDoneCallback(Object context)
+    {
+        armLevelSafe = true;
+        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback))
+        {
+            turretTarget = 0.0;
+            turretPowerLimit = 1.0;
+            turretEvent = null;
+            turretCallback = null;
+        }
+    }   //armRaiseDoneCallback
+
+    /**
+     * This method is called when the elevator is done raising to the safe level. It will try to check if the arm is
+     * at safe level and turn the turret.
+     *
+     * @param context not used
+     */
+    private void elevatorRaiseDoneCallback(Object context)
+    {
+        elevatorLevelSafe = true;
+        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback))
+        {
+            turretTarget = 0.0;
+            turretPowerLimit = 1.0;
+            turretEvent = null;
+            turretCallback = null;
+        }
+    }   //elevatorRaiseDoneCallback
 
 }   //class Turret

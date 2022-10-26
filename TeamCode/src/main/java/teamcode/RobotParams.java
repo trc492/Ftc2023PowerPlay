@@ -390,6 +390,7 @@ public class RobotParams
     static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_312_ENCODER_PPR;
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
     static final double ELEVATOR_GEAR_RATIO                     = 28.0;
+    static final double ELEVATOR_MIN_POS_FOR_TURRET             = 90.0;
     static final double ELEVATOR_MIN_POS                        = 0.0;
     static final double ELEVATOR_MAX_POS                        = 140.0;
     static final boolean ELEVATOR_MOTOR_INVERTED                = true;
