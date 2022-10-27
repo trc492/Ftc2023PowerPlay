@@ -63,7 +63,7 @@ public class RobotParams
         public static boolean initSubsystems = false;
         public static boolean useTurret = false;
         public static boolean useElevator = false;
-        public static boolean useArm = false;
+        public static boolean useArm = true;
         public static boolean useIntake = false;
         public static boolean hasIntakeSensor = false;
     }   //class Preferences

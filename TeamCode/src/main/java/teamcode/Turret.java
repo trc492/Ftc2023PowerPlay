@@ -73,6 +73,36 @@ public class Turret
     }   //Turret
 
     /**
+     * This method returns the current turret position in degrees.
+     *
+     * @return turret position in degrees.
+     */
+    public double getPosition()
+    {
+        return pidTurret.getPosition();
+    }   //getPosition
+
+    /**
+     * This method checks if the zero position switch is active.
+     *
+     * @return true if the zero position switch is active, false otherwise.
+     */
+    public boolean isZeroPosSwitchActive()
+    {
+        return pidTurret.isLowerLimitSwitchActive();
+    }   //isZeroPosSwitchActive
+
+    /**
+     * This method checks if the zero calibration direction switch is active.
+     *
+     * @return true if the zero calibration direction switch is active, false otherwise.
+     */
+    public boolean isCalDirSwitchActive()
+    {
+        return calDirectionSwitch.isActive();
+    }   //isCalDirSwitchActive
+
+    /**
      * This method zero calibrates the turret by first zero calibrating the arm and elevator. Once the arm and
      * elevator are zero calibrated, we will know the exact arm and elevator positions. Also, the arm is zero
      * calibrated upward. This allows the turret to turn without hitting anything. Therefore, zero calibrating
@@ -171,15 +201,16 @@ public class Turret
      * the new power value and this time it is safe to turn the turret.
      *
      * @param power specifies the power value to turn the turret.
+     * @param usePid specifies true to use PID control, false otherwise.
      */
-    public void setPower(double power)
+    public void setPower(double power, boolean usePid)
     {
         double armPos = robot.arm.getPosition();
         double elevatorPos = robot.elevator.getPosition();
 
         armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
         elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
-        if (!turnTurretWithPower(power))
+        if (!turnTurretWithPower(power, usePid))
         {
             if (!armLevelSafe)
             {
@@ -220,15 +251,23 @@ public class Turret
      * hitting anything.
      *
      * @param power specifies the power to turn the turret.
+     * @param usePid specifies true to use PID control, false otherwise.
      * @return true if it was safe and we successfully initiated the turn, false if we did not turn.
      */
-    private boolean turnTurretWithPower(double power)
+    private boolean turnTurretWithPower(double power, boolean usePid)
     {
         boolean doTurn = armLevelSafe && elevatorLevelSafe;
 
         if (doTurn)
         {
-            pidTurret.setPower(power);
+            if (usePid)
+            {
+                pidTurret.setPidPower(power);
+            }
+            else
+            {
+                pidTurret.setPower(power);
+            }
         }
 
         return doTurn;
