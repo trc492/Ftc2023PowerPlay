@@ -60,7 +60,7 @@ public class RobotParams
         public static boolean useExternalOdometry = true;
         public static boolean useVelocityControl = false;
         // Subsystems
-        public static boolean initSubsystems = false;
+        public static boolean initSubsystems = true;
         public static boolean useTurret = false;
         public static boolean useElevator = false;
         public static boolean useArm = true;
@@ -420,31 +420,28 @@ public class RobotParams
     //
     // Arm subsystem.
     //
-    static final double ARM_KP                                  = 0.2;
+    static final double ARM_KP                                  = 0.15;
     static final double ARM_KI                                  = 0.0;
     static final double ARM_KD                                  = 0.0;
     static final double ARM_TOLERANCE                           = 0.5;
-    static final double ARM_ENCODER_PPR                         = GOBILDA_5203_312_ENCODER_PPR;
+    static final double ARM_ENCODER_PPR                         = GOBILDA_5203_435_ENCODER_PPR;
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
     static final double ARM_GEAR_RATIO                          = 28.0;
-    static final double ARM_DEG_PER_COUNT                       = 360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO);
-    static final double ARM_OFFSET                              = 34.0;
+    static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
+    static final double ARM_OFFSET                              = 7.0;
     /**
      * Arm Zero-Calibrated to Up Position
-     */
-    static final double ARM_MIN_POS                             = 0.0;
-    /**
      * Arm Max Position is Down
      */
-    static final double ARM_MAX_POS                             = 180.0;
-    static final double ARM_MIN_POS_FOR_TURRET                  = 42.0;
-    static final double ARM_TRAVEL_POS                          = ARM_MIN_POS+2.0;
+    static final double ARM_MIN_POS                             = 8.0;
+    static final double ARM_MAX_POS                             = 140.0;
+    static final double ARM_MIN_POS_FOR_TURRET                  = 90.0;
     static final boolean ARM_MOTOR_INVERTED                     = true;
     static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
     static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
-    static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = true;
+    static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = false;
     static final boolean ARM_UPPER_LIMIT_INVERTED               = false;
-    static final double ARM_CAL_POWER                           = -0.5;
+    static final double ARM_CAL_POWER                           = -0.3;
     static final double ARM_STALL_MIN_POWER                     = 0.3;
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
