@@ -63,9 +63,9 @@ public class Turret
             .setPidParams(new TrcPidController.PidParameters(
                 RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
                 RobotParams.TURRET_TOLERANCE))
-            .setStallProtectionParams(
-                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
-                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
+//            .setStallProtectionParams(
+//                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
+//                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
             .setZeroCalibratePower(RobotParams.TURRET_CAL_POWER)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
@@ -125,8 +125,10 @@ public class Turret
      */
     private void armZeroCalDoneCallback(Object context)
     {
+        double calPower = Math.abs(RobotParams.TURRET_CAL_POWER);
+
         pidTurret.zeroCalibrate(
-            calDirectionSwitch.isActive()? RobotParams.TURRET_CAL_POWER: -RobotParams.TURRET_CAL_POWER);
+            calDirectionSwitch.isActive()? calPower: -calPower);
     }   //armZeroCalDoneCallback
 
     /**
@@ -205,23 +207,44 @@ public class Turret
      */
     public void setPower(double power, boolean usePid)
     {
-        double armPos = robot.arm.getPosition();
-        double elevatorPos = robot.elevator.getPosition();
-
-        armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
-        elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
-        if (!turnTurretWithPower(power, usePid))
+        if (power == 0.0)
         {
-            if (!armLevelSafe)
-            {
-                robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET, false);
-            }
+            pidTurret.setPidPower(power, false);
+        }
+        else
+        {
+            double armPos = robot.arm.getPosition();
+            double elevatorPos = robot.elevator.getPosition();
 
-            if (!elevatorLevelSafe)
+            armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
+            elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
+            if (!turnTurretWithPower(power, usePid))
             {
-                robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true);
+                if (!armLevelSafe)
+                {
+                    robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET, false);
+                }
+
+                if (!elevatorLevelSafe)
+                {
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true);
+                }
             }
         }
+    }   //setPower
+
+    /**
+     * This method sets the turret in motion with the given power but it will first check if it's safe to turn the
+     * turret. If not, it will instead raise the arm to above the safe level. Since setPower is generally called by
+     * TeleOp code, it will not do the actual setPower after raising the arm because by the time the arm is raised
+     * the gamepad control may have a different turret power value. Therefore, the TeleOp code will call again with
+     * the new power value and this time it is safe to turn the turret.
+     *
+     * @param power specifies the power value to turn the turret.
+     */
+    public void setPower(double power)
+    {
+        setPower(power, true);
     }   //setPower
 
     /**
@@ -266,6 +289,7 @@ public class Turret
             }
             else
             {
+                robot.dashboard.displayPrintf(6, "Turret: power=%.1f", power);
                 pidTurret.setPower(power);
             }
         }

@@ -131,7 +131,7 @@ public class Vision
                 RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT, null);
             elevatorEocvVision = new EocvVision(
                 "elevatorEocvVision", RobotParams.ELEVATORCAM_IMAGE_WIDTH, RobotParams.ELEVATORCAM_IMAGE_HEIGHT,
-                null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_LEFT, null);
+                null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_RIGHT, null);
         }
         else if (RobotParams.Preferences.useVuforia || RobotParams.Preferences.useTensorFlow)
         {

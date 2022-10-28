@@ -141,19 +141,21 @@ public class Robot
                 if (RobotParams.Preferences.useElevator)
                 {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
-                            RobotParams.ELEVATOR_MOTOR_INVERTED,
-                            RobotParams.ELEVATOR_HAS_LOWER_LIMIT_SWITCH, RobotParams.ELEVATOR_LOWER_LIMIT_INVERTED,
-                            RobotParams.ELEVATOR_HAS_UPPER_LIMIT_SWITCH, RobotParams.ELEVATOR_UPPER_LIMIT_INVERTED);
+                        RobotParams.ELEVATOR_MOTOR_INVERTED,
+                        RobotParams.ELEVATOR_HAS_LOWER_LIMIT_SWITCH, RobotParams.ELEVATOR_LOWER_LIMIT_INVERTED,
+                        RobotParams.ELEVATOR_HAS_UPPER_LIMIT_SWITCH, RobotParams.ELEVATOR_UPPER_LIMIT_INVERTED);
                     final TrcPidActuator.Parameters elevatorParams = new TrcPidActuator.Parameters()
-                            .setPosRange(RobotParams.ELEVATOR_MIN_POS, RobotParams.ELEVATOR_MAX_POS)
-                            .setPidParams(new TrcPidController.PidParameters(
-                                RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
-                                RobotParams.ELEVATOR_TOLERANCE))
-                            .setStallProtectionParams(
-                                RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
-                                RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
-                            .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
-                            .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
+                        .setPosRange(RobotParams.ELEVATOR_MIN_POS, RobotParams.ELEVATOR_MAX_POS)
+                        .setScaleOffset(RobotParams.ELEVATOR_INCHES_PER_COUNT, RobotParams.ELEVATOR_OFFSET)
+                        .setPidParams(new TrcPidController.PidParameters(
+                            RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
+                            RobotParams.ELEVATOR_TOLERANCE))
+                        .setPowerCompensation(this::getElevatorPowerCompensation)
+//                        .setStallProtectionParams(
+//                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
+//                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
+                        .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
+                        .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     elevator.setMsgTracer(globalTracer);
@@ -163,19 +165,19 @@ public class Robot
                 if (RobotParams.Preferences.useArm)
                 {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
-                            RobotParams.ARM_MOTOR_INVERTED,
-                            RobotParams.ARM_HAS_LOWER_LIMIT_SWITCH, RobotParams.ARM_LOWER_LIMIT_INVERTED,
-                            RobotParams.ARM_HAS_UPPER_LIMIT_SWITCH, RobotParams.ARM_UPPER_LIMIT_INVERTED);
+                        RobotParams.ARM_MOTOR_INVERTED,
+                        RobotParams.ARM_HAS_LOWER_LIMIT_SWITCH, RobotParams.ARM_LOWER_LIMIT_INVERTED,
+                        RobotParams.ARM_HAS_UPPER_LIMIT_SWITCH, RobotParams.ARM_UPPER_LIMIT_INVERTED);
                     final TrcPidActuator.Parameters armParams = new TrcPidActuator.Parameters()
-                            .setPosRange(RobotParams.ARM_MIN_POS, RobotParams.ARM_MAX_POS)
-                            .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
-                            .setPidParams(new TrcPidController.PidParameters(
-                                RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
-                            .setStallProtectionParams(
-                                RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
-                                RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
-                            .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
-                            .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
+                        .setPosRange(RobotParams.ARM_MIN_POS, RobotParams.ARM_MAX_POS)
+                        .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
+                        .setPidParams(new TrcPidController.PidParameters(
+                            RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
+                        .setStallProtectionParams(
+                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
+                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
+                        .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
+                        .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);
                     arm.setBeep(androidTone);
@@ -184,16 +186,16 @@ public class Robot
                 if(RobotParams.Preferences.useTurret)
                 {
                     turret = new Turret(this);
-                    turret.zeroCalibrate();
+//                    turret.zeroCalibrate();
                 }
 
                 if (RobotParams.Preferences.useIntake)
                 {
                     TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
-                            .setMotorInverted(true)
-                            .setTriggerInverted(true)
-                            .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
-                            .setMsgTracer(globalTracer);
+                        .setMotorInverted(true)
+                        .setTriggerInverted(true)
+                        .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
+                        .setMsgTracer(globalTracer);
                     intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
                 }
                 //
@@ -327,6 +329,26 @@ public class Robot
             }
         }
     }   //stopMode
+
+    /**
+     * This method returns the power required to make the elevator gravity neutral.
+     *
+     * @param currPower specifies the current motor power.
+     * @return elevator gravity compensation power.
+     */
+    private double getElevatorPowerCompensation(double currPower)
+    {
+        double compensationPower =
+            Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
+                0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
+
+        if (currPower < 0.0)
+        {
+            compensationPower += 0.1;
+        }
+
+        return compensationPower;
+    }   //getElevatorPowerCompensation
 
     /**
      * This method sends the text string to the Driver Station to be spoken using text to speech.

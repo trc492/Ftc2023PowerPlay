@@ -62,9 +62,9 @@ public class RobotParams
         // Subsystems
         public static boolean initSubsystems = true;
         public static boolean useTurret = false;
-        public static boolean useElevator = false;
+        public static boolean useElevator = true;
         public static boolean useArm = true;
-        public static boolean useIntake = false;
+        public static boolean useIntake = true;
         public static boolean hasIntakeSensor = false;
     }   //class Preferences
 
@@ -104,9 +104,9 @@ public class RobotParams
     public static final double FULL_TILE_INCHES                 = 23.75;
     public static final double CONE_HEIGHT                      = 5.0;
     public static final double STACKED_CONE_ADDITION            = 1.5;
-    public static final double LOW_JUNCTION_HEIGHT              = 16.5;
+    public static final double LOW_JUNCTION_HEIGHT              = 20.0;
     public static final double MID_JUNCTION_HEIGHT              = 26.5;
-    public static final double HIGH_JUNCTION_HEIGHT             = 36.5;
+    public static final double HIGH_JUNCTION_HEIGHT             = 34.0;
     //
     // Robot dimensions.
     //
@@ -351,27 +351,29 @@ public class RobotParams
     static final double TURRET_KP                               = 0.2;
     static final double TURRET_KI                               = 0.0;
     static final double TURRET_KD                               = 0.0;
-    static final double TURRET_TOLERANCE                        = 0.0;
-    static final double TURRET_ENCODER_PPR                      = 2.0; //TODO
-    static final double TURRET_GEAR_RATIO                       = 1.0; //TODO
+    static final double TURRET_TOLERANCE                        = 0.5;
+    // Rev Core Hex Motor (https://www.revrobotics.com/rev-41-1300/)
+    static final double TURRET_ENCODER_PPR                      = 288.0;
+    static final double TURRET_GEAR_RATIO                       = 100.0/60.0;
     static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
     static final double TURRET_OFFSET                           = 0.0;
     static final double TURRET_MIN_POS                          = 0.0;
-    static final double TURRET_MAX_POS                          = 360-1E-10; //TODO: Will turret be able to spin continuously?
-    static final boolean TURRET_MOTOR_INVERTED                  = false;
+    static final double TURRET_MAX_POS                          = 359.0;
+    // continuously?
+    static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
-    static final boolean TURRET_LOWER_LIMIT_INVERTED            = false;
+    static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = -0.5;
+    static final double TURRET_CAL_POWER                        = 0.2;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
     static final double TURRET_RESET_TIMEOUT                    = 0.5;
     static final double TURRET_FRONT                            = 180.0;
-    static final double TURRET_RIGHT                            = -90.0;
-    static final double TURRET_LEFT                             = 90.0;
+    static final double TURRET_RIGHT                            = 90.0;
+    static final double TURRET_LEFT                             = 270.0;
     static final double TURRET_BACK                             = 0.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
             TURRET_BACK,                                        // Slot 0
@@ -383,27 +385,30 @@ public class RobotParams
     //
     // Elevator Subsystem
     //
-    static final double ELEVATOR_KP                             = 0.2;
+    static final double ELEVATOR_KP                             = 0.5;
     static final double ELEVATOR_KI                             = 0.0;
-    static final double ELEVATOR_KD                             = 0.0;
+    static final double ELEVATOR_KD                             = 0.025;
     static final double ELEVATOR_TOLERANCE                      = 0.5;
-    static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_312_ENCODER_PPR;
-    // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
-    static final double ELEVATOR_GEAR_RATIO                     = 28.0;
-    static final double ELEVATOR_MIN_POS_FOR_TURRET             = 90.0;
+    static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_435_ENCODER_PPR;
+    static final double ELEVATOR_PULLEY_DIAMETER                = 1.5*1.06;         // in inches
+    static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
+    static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
+    static final double ELEVATOR_OFFSET                         = 7.0;              // in inches
     static final double ELEVATOR_MIN_POS                        = 0.0;
-    static final double ELEVATOR_MAX_POS                        = 140.0;
-    static final boolean ELEVATOR_MOTOR_INVERTED                = true;
+    static final double ELEVATOR_MAX_POS                        = 36.0;
+    static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
+    static final boolean ELEVATOR_MOTOR_INVERTED                = false;
     static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH        = true;
     static final boolean ELEVATOR_LOWER_LIMIT_INVERTED          = false;
-    static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH        = true;
+    static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH        = false;
     static final boolean ELEVATOR_UPPER_LIMIT_INVERTED          = false;
-    static final double ELEVATOR_CAL_POWER                      = -0.5;
+    static final double ELEVATOR_CAL_POWER                      = -0.1;
+    static final double ELEVATOR_POWER_COMPENSATION             = 0.1;
     static final double ELEVATOR_STALL_MIN_POWER                = 0.3;
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double CONE_GRAB_HEIGHT                        = 4.0;
+    static final double CONE_GRAB_HEIGHT                        = 12.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
             CONE_GRAB_HEIGHT,                                   // Slot 1
@@ -416,7 +421,7 @@ public class RobotParams
             HIGH_JUNCTION_HEIGHT,                               // Slot 8
             ELEVATOR_MAX_POS                                    // Slot 9
     };
-    static final double ELEVATOR_SLOW_POWER_SCALE               = 0.5;
+    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.25;
     //
     // Arm subsystem.
     //
@@ -429,13 +434,13 @@ public class RobotParams
     static final double ARM_GEAR_RATIO                          = 28.0;
     static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
     static final double ARM_OFFSET                              = 7.0;
-    /**
+    /*s
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
      */
     static final double ARM_MIN_POS                             = 8.0;
     static final double ARM_MAX_POS                             = 140.0;
-    static final double ARM_MIN_POS_FOR_TURRET                  = 90.0;
+    static final double ARM_MIN_POS_FOR_TURRET                  = 90.0; //TODO: tune
     static final boolean ARM_MOTOR_INVERTED                     = true;
     static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
     static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
@@ -452,13 +457,12 @@ public class RobotParams
             ARM_EXTENDED,                                       // Slot 1: Horizontal position
             ARM_MAX_POS                                         // Slot 2: Down position
     };
-    static final double ARM_SLOW_POWER_SCALE                    = 0.5;
     //
     // Intake subsystem.
     //
     static final double INTAKE_POWER_PICKUP                     = 1.0;;
     static final double INTAKE_POWER_DUMP                       = -1.0;
-    static final double INTAKE_DUMP_TIME                        = 1.2;
+    static final double INTAKE_DUMP_TIME                        = 1.0;
     static final double INTAKE_SENSOR_THRESHOLD                 = 4.6;    //in cm
 
 }   //class RobotParams

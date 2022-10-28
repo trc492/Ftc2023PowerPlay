@@ -186,7 +186,7 @@ public class FtcTeleOp extends FtcOpMode
         if (robot.turret != null)
         {
             double turretPower = operatorGamepad.getRightTrigger(true) - operatorGamepad.getLeftTrigger(true);
-            robot.turret.setPower(turretPower, true);
+            robot.turret.setPower(turretPower, false);
 //            double turretX = operatorGamepad.getLeftStickX();
 //            double turretY = operatorGamepad.getLeftStickY();
 //            double turretPower = operatorGamepad.getMagnitude(turretX, turretY);
@@ -206,6 +206,12 @@ public class FtcTeleOp extends FtcOpMode
         if (robot.elevator != null)
         {
             double elevatorPower = operatorGamepad.getLeftStickY(true);
+
+            if (elevatorPower < 0.0)
+            {
+                elevatorPower *= RobotParams.ELEVATOR_DOWN_POWER_SCALE;
+            }
+
             if (manualOverride)
             {
                 robot.elevator.setPower(elevatorPower);
@@ -222,7 +228,7 @@ public class FtcTeleOp extends FtcOpMode
 
         if (robot.arm != null)
         {
-            double armPower = operatorGamepad.getRightStickY(true);
+            double armPower = -operatorGamepad.getRightStickY(true);
             if (manualOverride)
             {
                 robot.arm.setPower(armPower);
@@ -233,7 +239,7 @@ public class FtcTeleOp extends FtcOpMode
             }
 
             robot.dashboard.displayPrintf(
-                4, "Arm: power=%.1f, pos=%.1f, LimitSW=%s",
+                5, "Arm: power=%.1f, pos=%.1f, LimitSW=%s",
                 armPower, robot.arm.getPosition(), robot.arm.isLowerLimitSwitchActive());
         }
     }   //slowPeriodic
@@ -445,7 +451,8 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_X:
                 if(pressed){
-                    robot.arm.setPresetPosition(0);
+//                    robot.arm.setPresetPosition(0);
+                    robot.elevator.setTarget(30.0, true);
                 }
                 break;
 
