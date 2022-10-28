@@ -37,6 +37,7 @@ import TrcFtcLib.ftclib.FtcMotorActuator;
  */
 public class Turret
 {
+    private static final String moduleName = "Turret";
     private final Robot robot;
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcPidActuator pidTurret;
@@ -66,7 +67,6 @@ public class Turret
 //            .setStallProtectionParams(
 //                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
 //                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
-            .setZeroCalibratePower(RobotParams.TURRET_CAL_POWER)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
@@ -158,14 +158,24 @@ public class Turret
 
             if (!armLevelSafe)
             {
-                robot.arm.setTarget(
-                    RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null, this::armRaiseDoneCallback);
+                // Acquiring arm ownership will prevent teleop from interfering with our arm movement.
+                if (robot.arm.acquireExclusiveAccess(moduleName))
+                {
+                    robot.arm.setTarget(
+                        moduleName, RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null,
+                        this::armRaiseDoneCallbackWithTurretTurn, 0.0);
+                }
             }
 
             if (!elevatorLevelSafe)
             {
-                robot.elevator.setTarget(
-                    RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true, 1.0, null, this::elevatorRaiseDoneCallback);
+                // Acquiring elevator ownership will prevent teleop from interfering with our elevator movement.
+                if (robot.elevator.acquireExclusiveAccess(moduleName))
+                {
+                    robot.elevator.setTarget(
+                        moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true, 1.0, null,
+                        this::elevatorRaiseDoneCallbackWithTurretTurn, 0.0);
+                }
             }
         }
     }   //setTarget
@@ -222,12 +232,22 @@ public class Turret
             {
                 if (!armLevelSafe)
                 {
-                    robot.arm.setTarget(RobotParams.ARM_MIN_POS_FOR_TURRET, false);
+                    if (robot.arm.acquireExclusiveAccess(moduleName))
+                    {
+                        robot.arm.setTarget(
+                            moduleName, RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null,
+                            this::armRaiseDoneCallback, 0.0);
+                    }
                 }
 
                 if (!elevatorLevelSafe)
                 {
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true);
+                    if (robot.elevator.acquireExclusiveAccess(moduleName))
+                    {
+                        robot.elevator.setTarget(
+                            moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true, 1.0, null,
+                            this::elevatorRaiseDoneCallback, 0.0);
+                    }
                 }
             }
         }
@@ -259,14 +279,14 @@ public class Turret
      */
     private boolean turnTurretToPos(double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback)
     {
-        boolean doTurn = armLevelSafe && elevatorLevelSafe;
+        boolean safeToTurn = armLevelSafe && elevatorLevelSafe;
 
-        if (doTurn)
+        if (safeToTurn)
         {
             pidTurret.setTarget(target, true, powerLimit, event, callback);
         }
 
-        return doTurn;
+        return safeToTurn;
     }   //turnTurretToPos
 
     /**
@@ -279,9 +299,9 @@ public class Turret
      */
     private boolean turnTurretWithPower(double power, boolean usePid)
     {
-        boolean doTurn = armLevelSafe && elevatorLevelSafe;
+        boolean safeToTurn = armLevelSafe && elevatorLevelSafe;
 
-        if (doTurn)
+        if (safeToTurn)
         {
             if (usePid)
             {
@@ -294,8 +314,32 @@ public class Turret
             }
         }
 
-        return doTurn;
+        return safeToTurn;
     }   //turnTurretWithPower
+
+    /**
+     * This method is called when the arm is done raising to the safe level. It will release exclusive ownership of
+     * the arm.
+     *
+     * @param context not used
+     */
+    private void armRaiseDoneCallback(Object context)
+    {
+        armLevelSafe = true;
+        robot.arm.releaseExclusiveAccess(moduleName);
+    }   //armRaiseDoneCallback
+
+    /**
+     * This method is called when the elevator is done raising to the safe level. It will release exclusive ownership
+     * of the elevator.
+     *
+     * @param context not used
+     */
+    private void elevatorRaiseDoneCallback(Object context)
+    {
+        elevatorLevelSafe = true;
+        robot.elevator.releaseExclusiveAccess(moduleName);
+    }   //elevatorRaiseDoneCallback
 
     /**
      * This method is called when the arm is done raising to the safe level. It will try to check if the elevator is
@@ -303,9 +347,9 @@ public class Turret
      *
      * @param context not used
      */
-    private void armRaiseDoneCallback(Object context)
+    private void armRaiseDoneCallbackWithTurretTurn(Object context)
     {
-        armLevelSafe = true;
+        armRaiseDoneCallback(context);
         if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback))
         {
             turretTarget = 0.0;
@@ -313,7 +357,7 @@ public class Turret
             turretEvent = null;
             turretCallback = null;
         }
-    }   //armRaiseDoneCallback
+    }   //armRaiseDoneCallbackWithTurretTurn
 
     /**
      * This method is called when the elevator is done raising to the safe level. It will try to check if the arm is
@@ -321,9 +365,9 @@ public class Turret
      *
      * @param context not used
      */
-    private void elevatorRaiseDoneCallback(Object context)
+    private void elevatorRaiseDoneCallbackWithTurretTurn(Object context)
     {
-        elevatorLevelSafe = true;
+        elevatorRaiseDoneCallback(context);
         if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback))
         {
             turretTarget = 0.0;
@@ -331,6 +375,6 @@ public class Turret
             turretEvent = null;
             turretCallback = null;
         }
-    }   //elevatorRaiseDoneCallback
+    }   //elevatorRaiseDoneCallbackWithTurretTurn
 
 }   //class Turret
