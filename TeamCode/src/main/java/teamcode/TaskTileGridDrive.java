@@ -95,7 +95,7 @@ public class TaskTileGridDrive
         if (enabled && !sm.isEnabled())
         {
             sm.start(State.START);
-            tileGridDriveTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+            tileGridDriveTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
         }
         else if (!enabled && sm.isEnabled())
         {

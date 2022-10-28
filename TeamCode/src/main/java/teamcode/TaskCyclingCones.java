@@ -173,7 +173,7 @@ public class TaskCyclingCones
         this.conesRemaining = conesRemaining;
         this.onFinishEvent = event;
         this.onFinishCallback = callback;
-        cycleTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+        cycleTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
         sm.start(State.PREPARE_PICKUP);
         if(cycleType == CycleType.SCORING_ONLY){
             //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
