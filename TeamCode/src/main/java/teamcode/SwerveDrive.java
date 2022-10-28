@@ -169,14 +169,12 @@ public class SwerveDrive extends RobotDrive
         // AbsoluteTargetMode eliminates cumulative errors on multi-segment runs because drive base is keeping track
         // of the absolute target position.
         pidDrive.setAbsoluteTargetModeEnabled(true);
-        pidDrive.setStallDetectionEnabled(true);
         pidDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
 
         purePursuitDrive = new TrcPurePursuitDrive(
             "purePursuitDrive", driveBase,
             RobotParams.PPD_FOLLOWING_DISTANCE, RobotParams.PPD_POS_TOLERANCE, RobotParams.PPD_TURN_TOLERANCE,
             RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff, RobotParams.turnPidCoeff, RobotParams.velPidCoeff);
-        purePursuitDrive.setStallDetectionEnabled(true);
         purePursuitDrive.setFastModeEnabled(true);
         purePursuitDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
     }   //SwerveDrive
