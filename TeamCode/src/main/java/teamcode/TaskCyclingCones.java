@@ -22,8 +22,6 @@
 
 package teamcode;
 
-import org.checkerframework.checker.units.qual.C;
-
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcNotifier;
@@ -32,7 +30,6 @@ import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcUtil;
-import TrcCommonLib.trclib.TrcVisionTargetInfo;
 
 /**
  * Robot starts in between cone stack and high goal
@@ -191,7 +188,6 @@ public class TaskCyclingCones
 
         if (state != null)
         {
-            boolean traceState = true;
             double matchTime = TrcUtil.getModeElapsedTime();
 
             switch (state) {
@@ -297,7 +293,7 @@ public class TaskCyclingCones
                     break;
             }
 
-            if (msgTracer != null && traceState)
+            if (msgTracer != null)
             {
                 msgTracer.traceStateInfo(
                     sm.toString(), state, robot.robotDrive.driveBase, robot.robotDrive.pidDrive,

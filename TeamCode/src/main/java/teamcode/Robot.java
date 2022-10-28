@@ -69,6 +69,7 @@ public class Robot
     public Turret turret;
     public TrcIntake intake = null;
     public TaskCyclingCones cyclingTask;
+    public TaskTileGridDrive tileGridDriveTask;
 
     //zero intake
 
@@ -202,6 +203,7 @@ public class Robot
                 // Create and initialize auto-assist tasks.
                 //
                 cyclingTask = new TaskCyclingCones(this);
+                tileGridDriveTask = new TaskTileGridDrive(this);
             }
         }
 

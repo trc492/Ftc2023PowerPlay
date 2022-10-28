@@ -132,6 +132,22 @@ public class Turret
     }   //armZeroCalDoneCallback
 
     /**
+     * This method moves the turret to the next position up the preset list.
+     */
+    public void presetPositionUp()
+    {
+        pidTurret.presetPositionUp();
+    }   //presetPositionUp
+
+    /**
+     * This method moves the turret to the next position down the preset list.
+     */
+    public void presetPositionDown()
+    {
+        pidTurret.presetPositionDown();
+    }   //presetPositionDown
+
+    /**
      * This method sets the turret target position. It first checks if it's safe for the turret to turn without
      * hitting anything. If it's not safe, it will first raise the arm above the "safe level" before setting the
      * target for the turret.

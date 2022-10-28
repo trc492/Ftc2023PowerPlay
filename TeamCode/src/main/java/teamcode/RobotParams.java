@@ -102,11 +102,6 @@ public class RobotParams
     public static final double FULL_FIELD_INCHES                = 141.0;
     public static final double HALF_FIELD_INCHES                = FULL_FIELD_INCHES/2.0;
     public static final double FULL_TILE_INCHES                 = 23.75;
-    public static final double CONE_HEIGHT                      = 5.0;
-    public static final double STACKED_CONE_ADDITION            = 1.5;
-    public static final double LOW_JUNCTION_HEIGHT              = 20.0;
-    public static final double MID_JUNCTION_HEIGHT              = 26.5;
-    public static final double HIGH_JUNCTION_HEIGHT             = 34.0;
     //
     // Robot dimensions.
     //
@@ -204,6 +199,11 @@ public class RobotParams
     };
     // In tile units.
     public static TrcPose2D CONE_STACK_RED_LEFT = new TrcPose2D(-2.95, -0.5, 0.0);
+    // Game element dimensions
+    public static final double STACKED_CONE_ADDITION            = 1.5;
+    public static final double LOW_JUNCTION_HEIGHT              = 20.0;
+    public static final double MID_JUNCTION_HEIGHT              = 26.5;
+    public static final double HIGH_JUNCTION_HEIGHT             = 34.0;
     //
     // Vision subsystem.
     //
@@ -225,10 +225,6 @@ public class RobotParams
     // Elevator Camera: Logitech C310
     public static final int ELEVATORCAM_IMAGE_WIDTH             = 640;
     public static final int ELEVATORCAM_IMAGE_HEIGHT            = 480;
-    public static final double ELEVATORCAM_FX                   = 821.993;  // in pixels
-    public static final double ELEVATORCAM_FY                   = 821.993;  // in pixels
-    public static final double ELEVATORCAM_CX                   = 330.489;  // in pixels
-    public static final double ELEVATORCAM_CY                   = 248.997;  // in pixels
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 0.0;
@@ -263,7 +259,6 @@ public class RobotParams
     //
     // Motor Odometries.
     //
-
     // https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
     public static final double GOBILDA_5203_312_ENCODER_PPR     = (((1.0 + 46.0/17.0)*(1.0 + 46.0/11.0))*28.0);
     public static final double GOBILDA_5203_312_RPM             = 312.0;
@@ -297,7 +292,7 @@ public class RobotParams
     public static final boolean LBSTEER_INVERTED                = false;
     public static final boolean RBSTEER_INVERTED                = false;
 
-    public static final DcMotor.RunMode DRIVE_MOTOR_MODE        = DcMotor.RunMode.RUN_USING_ENCODER;
+    public static final DcMotor.RunMode DRIVE_MOTOR_MODE        = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
     public static final boolean DRIVE_WHEEL_BRAKE_MODE_ON       = true;
     public static final boolean LEFT_WHEEL_INVERTED             = true;
     public static final boolean RIGHT_WHEEL_INVERTED            = false;
@@ -345,44 +340,6 @@ public class RobotParams
     public static final double PPD_FOLLOWING_DISTANCE           = 6.0;
     public static final double PPD_POS_TOLERANCE                = 2.0;
     public static final double PPD_TURN_TOLERANCE               = 1.0;
-    //
-    // Turret subsystem.
-    //
-    static final double TURRET_KP                               = 0.2;
-    static final double TURRET_KI                               = 0.0;
-    static final double TURRET_KD                               = 0.0;
-    static final double TURRET_TOLERANCE                        = 0.5;
-    // Rev Core Hex Motor (https://www.revrobotics.com/rev-41-1300/)
-    static final double TURRET_ENCODER_PPR                      = 288.0;
-    static final double TURRET_GEAR_RATIO                       = 100.0/60.0;
-    static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
-    static final double TURRET_OFFSET                           = 0.0;
-    static final double TURRET_MIN_POS                          = 0.0;
-    static final double TURRET_MAX_POS                          = 359.0;
-    // continuously?
-    static final boolean TURRET_MOTOR_INVERTED                  = true;
-    static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
-    static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
-    static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
-    static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
-    static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = 0.2;
-    static final double TURRET_STALL_MIN_POWER                  = 0.3;
-    static final double TURRET_STALL_TOLERANCE                  = 0.0;
-    static final double TURRET_STALL_TIMEOUT                    = 1.0;
-    static final double TURRET_RESET_TIMEOUT                    = 0.5;
-    static final double TURRET_FRONT                            = 180.0;
-    static final double TURRET_RIGHT                            = 90.0;
-    static final double TURRET_LEFT                             = 270.0;
-    static final double TURRET_BACK                             = 0.0;
-    static final double[] TURRET_PRESET_LEVELS                  = new double[] {
-            TURRET_BACK,                                        // Slot 0
-            TURRET_RIGHT,
-            TURRET_LEFT,
-            TURRET_FRONT                                        // Slot 1
-    };
-    //In tile coordinates---how far from the cone the robot should be before trying to pick it up
-    static final double TURRET_PICKUP_OFFSET                    = 0.3; //todo: tune this
     //
     // Elevator Subsystem
     //
@@ -460,9 +417,47 @@ public class RobotParams
             ARM_MAX_POS                                         // Slot 2: Down position
     };
     //
+    // Turret subsystem.
+    //
+    static final double TURRET_KP                               = 0.2;
+    static final double TURRET_KI                               = 0.0;
+    static final double TURRET_KD                               = 0.0;
+    static final double TURRET_TOLERANCE                        = 0.5;
+    // Rev Core Hex Motor (https://www.revrobotics.com/rev-41-1300/)
+    static final double TURRET_ENCODER_PPR                      = 288.0;
+    static final double TURRET_GEAR_RATIO                       = 100.0/60.0;
+    static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
+    static final double TURRET_OFFSET                           = 0.0;
+    static final double TURRET_MIN_POS                          = 0.0;
+    static final double TURRET_MAX_POS                          = 359.0;
+    // continuously?
+    static final boolean TURRET_MOTOR_INVERTED                  = true;
+    static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
+    static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
+    static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
+    static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
+    static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
+    static final double TURRET_CAL_POWER                        = 0.2;
+    static final double TURRET_STALL_MIN_POWER                  = 0.3;
+    static final double TURRET_STALL_TOLERANCE                  = 0.0;
+    static final double TURRET_STALL_TIMEOUT                    = 1.0;
+    static final double TURRET_RESET_TIMEOUT                    = 0.5;
+    static final double TURRET_FRONT                            = 180.0;
+    static final double TURRET_RIGHT                            = 90.0;
+    static final double TURRET_LEFT                             = 270.0;
+    static final double TURRET_BACK                             = 0.0;
+    static final double[] TURRET_PRESET_LEVELS                  = new double[] {
+        TURRET_BACK,                                        // Slot 0
+        TURRET_RIGHT,
+        TURRET_LEFT,
+        TURRET_FRONT                                        // Slot 1
+    };
+    //In tile coordinates---how far from the cone the robot should be before trying to pick it up
+    static final double TURRET_PICKUP_OFFSET                    = 0.3; //todo: tune this
+    //
     // Intake subsystem.
     //
-    static final double INTAKE_POWER_PICKUP                     = 1.0;;
+    static final double INTAKE_POWER_PICKUP                     = 1.0;
     static final double INTAKE_POWER_DUMP                       = -1.0;
     static final double INTAKE_DUMP_TIME                        = 1.0;
     static final double INTAKE_SENSOR_THRESHOLD                 = 4.6;    //in cm

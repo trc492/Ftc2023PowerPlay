@@ -184,8 +184,6 @@ public class TaskTileGridDrive
         }
         else
         {
-            boolean traceState = true;
-
             robot.dashboard.displayPrintf(1, "State: %s", state);
             switch (state)
             {
@@ -214,7 +212,7 @@ public class TaskTileGridDrive
                     break;
             }
 
-            if (msgTracer != null && traceState)
+            if (msgTracer != null)
             {
                 msgTracer.traceStateInfo(
                     sm.toString(), state, robot.robotDrive.driveBase, robot.robotDrive.pidDrive,
