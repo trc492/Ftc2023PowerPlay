@@ -297,7 +297,7 @@ public class RobotParams
     public static final boolean LBSTEER_INVERTED                = false;
     public static final boolean RBSTEER_INVERTED                = false;
 
-    public static final DcMotor.RunMode DRIVE_MOTOR_MODE        = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+    public static final DcMotor.RunMode DRIVE_MOTOR_MODE        = DcMotor.RunMode.RUN_USING_ENCODER;
     public static final boolean DRIVE_WHEEL_BRAKE_MODE_ON       = true;
     public static final boolean LEFT_WHEEL_INVERTED             = true;
     public static final boolean RIGHT_WHEEL_INVERTED            = false;
@@ -378,6 +378,7 @@ public class RobotParams
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
             TURRET_BACK,                                        // Slot 0
             TURRET_RIGHT,
+            TURRET_LEFT,
             TURRET_FRONT                                        // Slot 1
     };
     //In tile coordinates---how far from the cone the robot should be before trying to pick it up
@@ -452,6 +453,7 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_EXTENDED                            = 90.0;
+    static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
             ARM_MIN_POS,                                        // Slot 0: Up position
             ARM_EXTENDED,                                       // Slot 1: Horizontal position

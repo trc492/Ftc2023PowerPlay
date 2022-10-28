@@ -34,6 +34,36 @@ import TrcFtcLib.ftclib.FtcOpMode;
  * This class contains the TeleOp Mode program.
  */
 @TeleOp(name="FtcTeleOp", group="Ftc3543")
+/*
+    *Operator:
+    * Intake- DONE
+        * button to spin for pickup - Right bumper
+        * button to spin for dump - Left Bumper
+    * Elevator - DONE
+        * todo: y advances 1 preset up, a advances 1 preset down (3 or 4 total): low pole, mid pole, high pole, ground junction?
+        * manual override(left stick for up and down)
+
+    * Arm - DONE
+       * button that extends(if retracted), retracts(if extended) - DONE, at button B
+    * Auto-Assists
+        * VERSION with intake sensor or stall-detection:  hold button to automatically pick up cone(assume ur already aligned)
+            *lowers elevator until intake sensor has the cone, autonomatically raises it up
+        * button to prepare the robot for picking up cones
+            * raise elevator to picking up preset, rotate turret to face the front
+    *Manual-Assist
+        * PICKUP
+            * If cone is stacked: hold button, elevator goes down, intake starts spinning, stops once released
+            * If single cone: press a button, elevator goes down, intake spins, both stops once elevator reaches set position
+        * PREPARE_FOR_PICKUP
+            *one button click, elevator and arm extends, swing turret to face front
+    * Turret - DONE
+        * click dpad to orient turret(UP-face front, DOWN-face back, RIGHT-face right, etc.) - DONE
+        * right trigger(spin turret clockwise, stops when released), left trigger(other way) (already implemented)
+        * if you spin turret automatically raises elevator and arm (already implemented)
+*/
+
+
+
 public class FtcTeleOp extends FtcOpMode
 {
     public enum DriveOrientation
@@ -72,6 +102,7 @@ public class FtcTeleOp extends FtcOpMode
     private DriveOrientation driveOrientation = DriveOrientation.ROBOT;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
+    private boolean armIsExtended = false;
 
     //
     // Implements FtcOpMode abstract method.
@@ -91,10 +122,13 @@ public class FtcTeleOp extends FtcOpMode
         //
         // Create and initialize Gamepads.
         //
+
         driverGamepad = new FtcGamepad("DriverGamepad", gamepad1, this::driverButtonEvent);
         operatorGamepad = new FtcGamepad("OperatorGamepad", gamepad2, this::operatorButtonEvent);
         driverGamepad.setYInverted(true);
         operatorGamepad.setYInverted(true);
+
+        //trigger = new TrcAnalogSensorTrigger("elevatorTrigger", );
     }   //initRobot
 
     //
@@ -117,6 +151,9 @@ public class FtcTeleOp extends FtcOpMode
         // Tell robot object opmode is about to start so it can do the necessary start initialization for the mode.
         //
         robot.startMode(nextMode);
+        //start teleop with arm extended
+        robot.arm.setTarget(RobotParams.ARM_EXTENDED);
+        armIsExtended = true;
     }   //startMode
 
     /**
@@ -218,7 +255,8 @@ public class FtcTeleOp extends FtcOpMode
             }
             else
             {
-                robot.elevator.setPidPower(elevatorPower, true);
+                //robot.elevator.setPidPower(elevatorPower, true);
+
             }
 
             robot.dashboard.displayPrintf(
@@ -434,7 +472,34 @@ public class FtcTeleOp extends FtcOpMode
 
         switch (button)
         {
+
             case FtcGamepad.GAMEPAD_A:
+                if(pressed){
+                    robot.elevator.presetPositionUp();
+                }
+                break;
+
+            case FtcGamepad.GAMEPAD_B:
+                //extends the arm to the same preset level as the elevator level
+                if(pressed){
+                    armIsExtended = !armIsExtended;
+                    robot.arm.setTarget(armIsExtended? RobotParams.ARM_EXTENDED : RobotParams.ARM_RETRACTED);
+                }
+                break;
+
+            case FtcGamepad.GAMEPAD_X:
+                if(pressed){
+                    robot.arm.setPresetPosition(0);
+                }
+                break;
+
+            case FtcGamepad.GAMEPAD_Y:
+                if(pressed){
+                    robot.elevator.presetPositionDown();
+                }
+                break;
+
+            case FtcGamepad.GAMEPAD_LBUMPER:
                 if (robot.intake != null)
                 {
                     robot.intake.cancelAutoAssist();    //cancel auto-assist if it is active.
@@ -442,54 +507,37 @@ public class FtcTeleOp extends FtcOpMode
                 }
                 break;
 
-            case FtcGamepad.GAMEPAD_B:
-                //extends the arm to the same preset level as the elevator level
-                if(pressed){
-                    robot.arm.setPresetPosition(robot.elevator.getPresetPosition());
-                }
-                break;
-
-            case FtcGamepad.GAMEPAD_X:
-                if(pressed){
-//                    robot.arm.setPresetPosition(0);
-                    robot.elevator.setTarget(30.0, true);
-                }
-                break;
-
-            case FtcGamepad.GAMEPAD_Y:
+            case FtcGamepad.GAMEPAD_RBUMPER:
                 if (robot.intake != null)
                 {
                     robot.intake.cancelAutoAssist();    //cancel auto-assist if it is active.
                     robot.intake.setPower(pressed? RobotParams.INTAKE_POWER_PICKUP: 0.0);
                 }
-
-
-                break;
-
-            case FtcGamepad.GAMEPAD_LBUMPER:
-                manualOverride = pressed;
-                break;
-
-            case FtcGamepad.GAMEPAD_RBUMPER:
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
                 if(pressed){
-                    robot.elevator.presetPositionUp();
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
                 if(pressed){
-                    robot.elevator.presetPositionDown();
+                    robot.turret.setTarget(RobotParams.TURRET_BACK);
                 }
 
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
+                if(pressed){
+                    robot.turret.setTarget(RobotParams.TURRET_LEFT);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
+                if(pressed){
+                    robot.turret.setTarget(RobotParams.TURRET_RIGHT);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_BACK:
