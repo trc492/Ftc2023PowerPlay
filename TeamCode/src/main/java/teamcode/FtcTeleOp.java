@@ -86,7 +86,7 @@ public class FtcTeleOp extends FtcOpMode
     private double drivePowerScale = 1.0;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
-    private TaskTileGridDrive gridDriveTask = new TaskTileGridDrive(robot);
+    private TaskTileGridDrive gridDriveTask;
 
     //
     // Implements FtcOpMode abstract method.
@@ -110,6 +110,11 @@ public class FtcTeleOp extends FtcOpMode
         operatorGamepad = new FtcGamepad("OperatorGamepad", gamepad2, this::operatorButtonEvent);
         driverGamepad.setYInverted(true);
         operatorGamepad.setYInverted(true);
+
+        if (robot.robotDrive != null)
+        {
+            gridDriveTask = new TaskTileGridDrive(robot);
+        }
     }   //initRobot
 
     //
@@ -427,28 +432,28 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
-                if (pressed)
+                if (gridDriveTask != null && pressed)
                 {
                     gridDriveTask.setRelativeYTileTarget(1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                if (pressed)
+                if (gridDriveTask != null && pressed)
                 {
                     gridDriveTask.setRelativeYTileTarget(-1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                if (pressed)
+                if (gridDriveTask != null && pressed)
                 {
                     gridDriveTask.setRelativeXTileTarget(-1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                if (pressed)
+                if (gridDriveTask != null && pressed)
                 {
                     gridDriveTask.setRelativeXTileTarget(1);
                 }
