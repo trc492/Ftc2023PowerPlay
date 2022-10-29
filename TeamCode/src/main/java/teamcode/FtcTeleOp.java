@@ -86,7 +86,7 @@ public class FtcTeleOp extends FtcOpMode
     private double drivePowerScale = 1.0;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
-    private TaskTileGridDrive grideDriveTask = new TaskTileGridDrive(robot);
+    private TaskTileGridDrive gridDriveTask = new TaskTileGridDrive(robot);
 
     //
     // Implements FtcOpMode abstract method.
@@ -258,6 +258,12 @@ public class FtcTeleOp extends FtcOpMode
                 turretPower, robot.turret.getPosition(),
                 robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive());
         }
+
+        if (robot.intake != null)
+        {
+            robot.dashboard.displayPrintf(
+                6, "Intake: power=%.2f, sensor=%.2f", robot.intake.getPower(), robot.intake.getSensorValue());
+        }
     }   //slowPeriodic
 
     /**
@@ -421,19 +427,31 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
-                grideDriveTask.setRelativeYTileTarget(1);
+                if (pressed)
+                {
+                    gridDriveTask.setRelativeYTileTarget(1);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                grideDriveTask.setRelativeYTileTarget(-1);
+                if (pressed)
+                {
+                    gridDriveTask.setRelativeYTileTarget(-1);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                grideDriveTask.setRelativeXTileTarget(-1);
+                if (pressed)
+                {
+                    gridDriveTask.setRelativeXTileTarget(-1);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                grideDriveTask.setRelativeXTileTarget(1);
+                if (pressed)
+                {
+                    gridDriveTask.setRelativeXTileTarget(1);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_BACK:
@@ -455,9 +473,9 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
-                if (robot.intake != null)
+                if (robot.intake != null && pressed)
                 {
-                    robot.intake.setPower(pressed? RobotParams.INTAKE_POWER_DUMP: 0.0);
+                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
                 }
                 break;
 
@@ -476,9 +494,9 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
-                if (robot.intake != null)
+                if (robot.intake != null && pressed)
                 {
-                    robot.intake.setPower(pressed? RobotParams.INTAKE_POWER_PICKUP: 0.0);
+                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
                 }
                 break;
 

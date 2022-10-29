@@ -69,7 +69,6 @@ public class Robot
     public Turret turret;
     public TrcIntake intake = null;
     public TaskCyclingCones cyclingTask;
-    public TaskTileGridDrive tileGridDriveTask;
 
     //zero intake
 
@@ -204,7 +203,6 @@ public class Robot
                 // Create and initialize auto-assist tasks.
                 //
                 cyclingTask = new TaskCyclingCones(this);
-                tileGridDriveTask = new TaskTileGridDrive(this);
             }
         }
 
@@ -341,11 +339,8 @@ public class Robot
      */
     private double getElevatorPowerCompensation(double currPower)
     {
-        double compensationPower =
-            Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
+        return Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
                 0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
-
-        return compensationPower;
     }   //getElevatorPowerCompensation
 
     /**

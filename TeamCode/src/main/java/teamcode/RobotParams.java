@@ -50,8 +50,8 @@ public class RobotParams
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
-        public static boolean useEasyOpenCV = false;
-        public static boolean showEasyOpenCvView = false;
+        public static boolean useEasyOpenCV = true;
+        public static boolean showEasyOpenCvView = true;
         public static boolean testFrontEocv = true;
         // Robot
         public static boolean noRobot = false;
@@ -65,7 +65,7 @@ public class RobotParams
         public static boolean useElevator = true;
         public static boolean useArm = true;
         public static boolean useIntake = true;
-        public static boolean hasIntakeSensor = false;
+        public static boolean hasIntakeSensor = true;
     }   //class Preferences
 
     public static final String ROBOT_NAME                       = "Robot3543";
@@ -462,6 +462,6 @@ public class RobotParams
     static final double INTAKE_POWER_PICKUP                     = 1.0;
     static final double INTAKE_POWER_DUMP                       = -1.0;
     static final double INTAKE_DUMP_TIME                        = 1.0;
-    static final double INTAKE_SENSOR_THRESHOLD                 = 4.6;    //in cm
+    static final double INTAKE_SENSOR_THRESHOLD                 = 5.0;      //in cm
 
 }   //class RobotParams

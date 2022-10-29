@@ -95,11 +95,15 @@ public class TaskTileGridDrive
     {
         if (enabled && !sm.isEnabled())
         {
-            sm.start(State.START);
-            tileGridDriveTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
+            if (robot.robotDrive.driveBase.acquireExclusiveAccess(moduleName))
+            {
+                sm.start(State.START);
+                tileGridDriveTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
+            }
         }
         else if (!enabled && sm.isEnabled())
         {
+            robot.robotDrive.driveBase.releaseExclusiveAccess(moduleName);
             sm.stop();
             tileGridDriveTaskObj.unregisterTask();
         }
