@@ -48,9 +48,6 @@ import TrcFtcLib.ftclib.FtcOpMode;
     - Intake: Hold A (Dump), Hold Y (Pickup)
 */
 
-/**
- * This class contains the TeleOp Mode program.
- */
 public class FtcTeleOp extends FtcOpMode
 {
     public enum DriveOrientation
@@ -200,26 +197,6 @@ public class FtcTeleOp extends FtcOpMode
         //
         // Other subsystems.
         //
-        if (robot.turret != null)
-        {
-            double turretPower = operatorGamepad.getLeftTrigger(true) - operatorGamepad.getRightTrigger(true);
-            robot.turret.setPower(turretPower, !manualOverride);
-//            double turretX = operatorGamepad.getLeftStickX();
-//            double turretY = operatorGamepad.getLeftStickY();
-//            double turretPower = operatorGamepad.getMagnitude(turretX, turretY);
-//            double turretDirDegrees = 90.0 - operatorGamepad.getDirectionDegrees(turretX, turretY);
-//            if (turretDirDegrees < 0.0)
-//            {
-//                turretDirDegrees += 360.0;
-//            }
-//            robot.turret.setTarget(turretDirDegrees, turretPower);
-
-            robot.dashboard.displayPrintf(
-                3, "Turret: power=%.1f, pos=%.1f, LimitSW=%s/%s",
-                turretPower, robot.turret.getPosition(),
-                robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive());
-        }
-
         if (robot.elevator != null)
         {
             double elevatorPower = operatorGamepad.getRightStickY(true);
@@ -240,13 +217,13 @@ public class FtcTeleOp extends FtcOpMode
             }
 
             robot.dashboard.displayPrintf(
-                4, "Elevator: power=%.1f, pos=%.1f, LimitSW=%s",
+                3, "Elevator: power=%.2f, pos=%.1f, LimitSW=%s",
                 elevatorPower, robot.elevator.getPosition(), robot.elevator.isLowerLimitSwitchActive());
         }
 
         if (robot.arm != null)
         {
-            double armPower = -operatorGamepad.getLeftStickY(true);
+            double armPower = operatorGamepad.getLeftStickY(true);
             if (manualOverride)
             {
                 robot.arm.setPower(armPower);
@@ -257,8 +234,28 @@ public class FtcTeleOp extends FtcOpMode
             }
 
             robot.dashboard.displayPrintf(
-                5, "Arm: power=%.1f, pos=%.1f, LimitSW=%s",
+                4, "Arm: power=%.2f, pos=%.1f, LimitSW=%s",
                 armPower, robot.arm.getPosition(), robot.arm.isLowerLimitSwitchActive());
+        }
+
+        if (robot.turret != null)
+        {
+            double turretPower = operatorGamepad.getLeftTrigger(true) - operatorGamepad.getRightTrigger(true);
+            robot.turret.setPower(turretPower, !manualOverride);
+//            double turretX = operatorGamepad.getLeftStickX();
+//            double turretY = operatorGamepad.getLeftStickY();
+//            double turretPower = operatorGamepad.getMagnitude(turretX, turretY);
+//            double turretDirDegrees = 90.0 - operatorGamepad.getDirectionDegrees(turretX, turretY);
+//            if (turretDirDegrees < 0.0)
+//            {
+//                turretDirDegrees += 360.0;
+//            }
+//            robot.turret.setTarget(turretDirDegrees, turretPower);
+
+            robot.dashboard.displayPrintf(
+                5, "Turret: power=%.2f, pos=%.1f, LimitSW=%s/%s",
+                turretPower, robot.turret.getPosition(),
+                robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive());
         }
     }   //slowPeriodic
 
@@ -516,6 +513,10 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_BACK:
+                if (robot.turret != null && pressed)
+                {
+                    robot.turret.zeroCalibrate();
+                }
                 break;
         }
     }   //operatorButtonEvent

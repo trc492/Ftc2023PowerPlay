@@ -47,6 +47,7 @@ public class Turret
     private TrcNotifier.Receiver turretCallback = null;
     private boolean armLevelSafe = false;
     private boolean elevatorLevelSafe = false;
+    private double prevTurretPower = 0.0;
 
     public Turret(Robot robot)
     {
@@ -61,6 +62,7 @@ public class Turret
         final TrcPidActuator.Parameters turretParams = new TrcPidActuator.Parameters()
             .setPosRange(RobotParams.TURRET_MIN_POS, RobotParams.TURRET_MAX_POS)
             .setScaleOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
+            .resetPositionOnLowerLimit(false)
             .setPidParams(new TrcPidController.PidParameters(
                 RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
                 RobotParams.TURRET_TOLERANCE))
@@ -132,11 +134,25 @@ public class Turret
     }   //armZeroCalDoneCallback
 
     /**
+     * This method sets the turret to the specified preset position.
+     *
+     * @param preset specifies the index to the preset position array.
+     */
+    public void setPresetPosition(int preset)
+    {
+        preset = pidTurret.validatePresetIndex(preset);
+        if (preset >= 0)
+        {
+            setTarget(RobotParams.TURRET_PRESET_LEVELS[preset], 1.0, null, null);
+        }
+    }   //setPresetPosition
+
+    /**
      * This method moves the turret to the next position up the preset list.
      */
     public void presetPositionUp()
     {
-        pidTurret.presetPositionUp();
+        setPresetPosition(pidTurret.getPresetPosition() + 1);
     }   //presetPositionUp
 
     /**
@@ -144,7 +160,7 @@ public class Turret
      */
     public void presetPositionDown()
     {
-        pidTurret.presetPositionDown();
+        setPresetPosition(pidTurret.getPresetPosition() - 1);
     }   //presetPositionDown
 
     /**
@@ -178,7 +194,7 @@ public class Turret
                 if (robot.arm.acquireExclusiveAccess(moduleName))
                 {
                     robot.arm.setTarget(
-                        moduleName, RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null,
+                        moduleName, RobotParams.ARM_POS_FOR_TURRET_TURN, false, 1.0, null,
                         this::armRaiseDoneCallbackWithTurretTurn, 0.0);
                 }
             }
@@ -189,7 +205,7 @@ public class Turret
                 if (robot.elevator.acquireExclusiveAccess(moduleName))
                 {
                     robot.elevator.setTarget(
-                        moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true, 1.0, null,
+                        moduleName, RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, true, 1.0, null,
                         this::elevatorRaiseDoneCallbackWithTurretTurn, 0.0);
                 }
             }
@@ -233,36 +249,40 @@ public class Turret
      */
     public void setPower(double power, boolean usePid)
     {
-        if (power == 0.0)
+        if (power != prevTurretPower)
         {
-            pidTurret.setPidPower(power, false);
-        }
-        else
-        {
-            double armPos = robot.arm.getPosition();
-            double elevatorPos = robot.elevator.getPosition();
-
-            armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
-            elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
-            if (!turnTurretWithPower(power, usePid))
+            if (power == 0.0)
             {
-                if (!armLevelSafe)
-                {
-                    if (robot.arm.acquireExclusiveAccess(moduleName))
-                    {
-                        robot.arm.setTarget(
-                            moduleName, RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, null,
-                            this::armRaiseDoneCallback, 0.0);
-                    }
-                }
+                prevTurretPower = power;
+                pidTurret.setPidPower(power, false);
+            }
+            else
+            {
+                double armPos = robot.arm.getPosition();
+                double elevatorPos = robot.elevator.getPosition();
 
-                if (!elevatorLevelSafe)
+                armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
+                elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
+                if (!turnTurretWithPower(power, usePid))
                 {
-                    if (robot.elevator.acquireExclusiveAccess(moduleName))
+                    if (!armLevelSafe)
                     {
-                        robot.elevator.setTarget(
-                            moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, true, 1.0, null,
-                            this::elevatorRaiseDoneCallback, 0.0);
+                        if (robot.arm.acquireExclusiveAccess(moduleName))
+                        {
+                            robot.arm.setTarget(
+                                moduleName, RobotParams.ARM_POS_FOR_TURRET_TURN, false, 1.0, null,
+                                this::armRaiseDoneCallback, 0.0);
+                        }
+                    }
+
+                    if (!elevatorLevelSafe)
+                    {
+                        if (robot.elevator.acquireExclusiveAccess(moduleName))
+                        {
+                            robot.elevator.setTarget(
+                                moduleName, RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, true, 1.0, null,
+                                this::elevatorRaiseDoneCallback, 0.0);
+                        }
                     }
                 }
             }
@@ -325,9 +345,9 @@ public class Turret
             }
             else
             {
-                robot.dashboard.displayPrintf(6, "Turret: power=%.1f", power);
                 pidTurret.setPower(power);
             }
+            prevTurretPower = power;
         }
 
         return safeToTurn;

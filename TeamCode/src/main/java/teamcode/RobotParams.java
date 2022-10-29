@@ -50,8 +50,8 @@ public class RobotParams
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
-        public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = true;
+        public static boolean useEasyOpenCV = false;
+        public static boolean showEasyOpenCvView = false;
         public static boolean testFrontEocv = true;
         // Robot
         public static boolean noRobot = false;
@@ -61,7 +61,7 @@ public class RobotParams
         public static boolean useVelocityControl = false;
         // Subsystems
         public static boolean initSubsystems = true;
-        public static boolean useTurret = false;
+        public static boolean useTurret = true;
         public static boolean useElevator = true;
         public static boolean useArm = true;
         public static boolean useIntake = true;
@@ -355,6 +355,7 @@ public class RobotParams
     static final double ELEVATOR_MIN_POS                        = 0.0;
     static final double ELEVATOR_MAX_POS                        = 36.0;
     static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
+    static final double ELEVATOR_POS_FOR_TURRET_TURN            = ELEVATOR_MIN_POS_FOR_TURRET + 2.0;
     static final boolean ELEVATOR_MOTOR_INVERTED                = false;
     static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH        = true;
     static final boolean ELEVATOR_LOWER_LIMIT_INVERTED          = false;
@@ -379,7 +380,7 @@ public class RobotParams
             HIGH_JUNCTION_HEIGHT,                               // Slot 8
             ELEVATOR_MAX_POS                                    // Slot 9
     };
-    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.25;
+    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.1001;
     //
     // Arm subsystem.
     //
@@ -398,7 +399,8 @@ public class RobotParams
      */
     static final double ARM_MIN_POS                             = 8.0;
     static final double ARM_MAX_POS                             = 140.0;
-    static final double ARM_MIN_POS_FOR_TURRET                  = 90.0; //TODO: tune
+    static final double ARM_MIN_POS_FOR_TURRET                  = 65.0;
+    static final double ARM_POS_FOR_TURRET_TURN                 = ARM_MIN_POS_FOR_TURRET - 5.0;
     static final boolean ARM_MOTOR_INVERTED                     = true;
     static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
     static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
@@ -419,7 +421,7 @@ public class RobotParams
     //
     // Turret subsystem.
     //
-    static final double TURRET_KP                               = 0.2;
+    static final double TURRET_KP                               = 0.028;
     static final double TURRET_KI                               = 0.0;
     static final double TURRET_KD                               = 0.0;
     static final double TURRET_TOLERANCE                        = 0.5;
@@ -437,7 +439,7 @@ public class RobotParams
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = 0.2;
+    static final double TURRET_CAL_POWER                        = 0.3;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;

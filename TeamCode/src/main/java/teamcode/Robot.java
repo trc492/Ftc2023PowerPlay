@@ -159,6 +159,7 @@ public class Robot
                         .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
+                    elevator.getPidController().setOutputRange(-RobotParams.ELEVATOR_DOWN_POWER_SCALE, 1.0);
                     elevator.setMsgTracer(globalTracer);
                     elevator.setBeep(androidTone);
                 }
@@ -343,11 +344,6 @@ public class Robot
         double compensationPower =
             Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
                 0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
-
-        if (currPower < 0.0)
-        {
-            compensationPower += 0.1;
-        }
 
         return compensationPower;
     }   //getElevatorPowerCompensation
