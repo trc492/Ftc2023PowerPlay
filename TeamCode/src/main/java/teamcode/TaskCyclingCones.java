@@ -192,14 +192,12 @@ public class TaskCyclingCones
 
             switch (state) {
                 case PREPARE_PICKUP: //1. drive forward to the cone and prepare turret to pick it up
-                    if(targetLocation != null){
-                        //todo: check math, find offset
-                        //drive to the cone stack
-                        robot.robotDrive.purePursuitDrive.start(
-                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT.x - RobotParams.TURRET_PICKUP_OFFSET,
-                                        RobotParams.CONE_STACK_RED_LEFT.y, -90.0, autoChoices));
-                    }
+                    //drive to the cone stack
+                    robot.robotDrive.purePursuitDrive.start(
+                            driveEvent, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT.x - RobotParams.TURRET_PICKUP_OFFSET,
+                                    RobotParams.CONE_STACK_RED_LEFT.y, -90.0, autoChoices));
+
                     //set elevator to height so that intake is several inches above the cone stack
                     //todo: tune elevator height
                     robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);

@@ -52,6 +52,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     // Todo: CodeReview: why public? Nobody outside of this class will access it.
     //tells us number cones left on the conestack
     public int conesRemaining = 5;
+    private boolean driveOnly = true;
 
     /**
      * Constructor: Create an instance of the object.
@@ -161,11 +162,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         break;
                     }
 
-                // CodeReview: Please change the code to do the following instead of the current complicated code
-                // because TaskCycleCones encapsulates the complexity for you.
-                // 1. Call TaskCycleCones to score the preloaded cone and set cycle count to 5.
-                // 2. If cycle count > 0 and we still have time, call TaskCycleCones to full score a cone from the
-                //    the substation and decrement cycle count else we are done.
+
                 case DRIVE_TO_HIGH:
                     // CodeReview: simplify this code by using robot.robotDrive.getAutoTargetPoint.
                     //drive to score position
@@ -175,16 +172,17 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // Todo: add option to do center high poles
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
-                    // Todo: CodeReview: please change all purePursuit points to use robot.getAutoTargetPoint.
-
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-0.5, -0.5,0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
-                    robot.arm.setTarget(RobotParams.ARM_EXTENDED);
-                    robot.turret.setTarget(RobotParams.TURRET_RIGHT);
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, null);
+                    if(!driveOnly){
+                        robot.arm.setTarget(RobotParams.ARM_EXTENDED);
+                        robot.turret.setTarget(RobotParams.TURRET_RIGHT);
+                        robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, null);
+                    }
+
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
                 // CodeReview: add code to call TaskCyclingCones to vision align the junction pole.
@@ -198,12 +196,23 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //if time >= 26 or no more cones on the conestack, go to park
                 //otherwise call the doCycle method for each cone on the stack
                 case DO_CYCLE:
+                    //if driveOnly, just drive back and forth to simulate it
                     if (TrcUtil.getModeElapsedTime() >= 27 || conesRemaining == 0)
                     {
                         sm.setState(State.PARK);
                     }
                     else{
-                        robot.cyclingTask.doFullAutoCycle(TaskCyclingCones.VisionType.NO_VISION, conesRemaining, event);
+                        if(driveOnly){
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT.x - RobotParams.TURRET_PICKUP_OFFSET,
+                                            RobotParams.CONE_STACK_RED_LEFT.y, -90.0, autoChoices),
+                                    robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
+
+                        }
+                        else{
+                            robot.cyclingTask.doFullAutoCycle(TaskCyclingCones.VisionType.NO_VISION, conesRemaining, event);
+                        }
                         conesRemaining--;
                         sm.waitForSingleEvent(event, State.DO_CYCLE);
                     }
