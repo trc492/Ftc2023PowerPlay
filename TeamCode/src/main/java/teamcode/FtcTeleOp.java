@@ -86,6 +86,7 @@ public class FtcTeleOp extends FtcOpMode
     private double drivePowerScale = 1.0;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
+    private TaskTileGridDrive grideDriveTask = new TaskTileGridDrive(robot);
 
     //
     // Implements FtcOpMode abstract method.
@@ -420,15 +421,19 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
+                grideDriveTask.setRelativeYTileTarget(1);
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
+                grideDriveTask.setRelativeYTileTarget(-1);
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
+                grideDriveTask.setRelativeXTileTarget(-1);
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
+                grideDriveTask.setRelativeXTileTarget(1);
                 break;
 
             case FtcGamepad.GAMEPAD_BACK:
