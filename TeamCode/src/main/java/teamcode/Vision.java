@@ -28,6 +28,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcOpenCvDetector;
 import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
@@ -298,11 +299,11 @@ public class Vision
     }   //getDetectedTargetsInfo
 
     /**
-     * This method returns an array of the detected cones info.
+     * This method returns the detected cone info.
      *
-     * @return an array of detected cones info.
+     * @return detected cone info, null if none detected.
      */
-    public TrcVisionTargetInfo<?>[] getDetectedConesInfo()
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedConeInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
@@ -311,16 +312,17 @@ public class Vision
             targets = frontEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
         }
 
-        return targets;
-    }   //getDetectedConesInfo
+        //noinspection unchecked
+        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
+    }   //getDetectedConeInfo
 
     /**/
     /**
-     * This method returns an array of the detected poles info.
+     * This method returns the detected pole info.
      *
-     * @return an array of detected poles info.
+     * @return detected pole info, null if none detected.
      */
-    public TrcVisionTargetInfo<?>[] getDetectedPolesInfo()
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedPoleInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
@@ -329,8 +331,9 @@ public class Vision
             targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
         }
 
-        return targets;
-    }   //getDetectedPolesInfo
+        //noinspection unchecked
+        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
+    }   //getDetectedPoleInfo
 
     /**
      * This method returns the best detected target info.

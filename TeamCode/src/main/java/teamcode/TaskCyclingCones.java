@@ -105,7 +105,7 @@ public class TaskCyclingCones
     private int conesRemaining;
     private Double visionExpireTime = null;
     boolean coneIsPreload = true;
-    private TrcVisionTargetInfo<?>[] targetInfo;
+    private TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo;
 
     //location of the cone or pole relative to the robot
     private TrcPose2D targetLocation;
@@ -271,8 +271,8 @@ public class TaskCyclingCones
                     break;
 
                 case CHECK_VISION:
-                    targetInfo = robot.vision.getDetectedPolesInfo();
-                    if (targetInfo != null)
+                    poleInfo = robot.vision.getDetectedPoleInfo();
+                    if (poleInfo != null)
                         sm.setState(State.SCORE);
                     break;
 
