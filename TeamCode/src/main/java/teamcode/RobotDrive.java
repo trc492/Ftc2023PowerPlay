@@ -206,10 +206,15 @@ public class RobotDrive
             {
                 tileX = -tileX;
             }
+            if(autoChoices.startPos == FtcAuto.StartPos.RIGHT){
+                heading = -heading;
+
+            }
         }
         else if (autoChoices.startPos == FtcAuto.StartPos.RIGHT)
         {
             tileX = -tileX;
+            heading = -heading;
         }
 
         return new TrcPose2D(tileX * RobotParams.FULL_TILE_INCHES, tileY * RobotParams.FULL_TILE_INCHES, heading);
