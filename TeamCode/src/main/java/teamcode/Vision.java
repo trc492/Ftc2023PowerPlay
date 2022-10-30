@@ -298,6 +298,40 @@ public class Vision
     }   //getDetectedTargetsInfo
 
     /**
+     * This method returns an array of the detected cones info.
+     *
+     * @return an array of detected cones info.
+     */
+    public TrcVisionTargetInfo<?>[] getDetectedConesInfo()
+    {
+        TrcVisionTargetInfo<?>[] targets = null;
+
+        if (frontEocvVision != null && frontEocvVision.isEnabled())
+        {
+            targets = frontEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
+        }
+
+        return targets;
+    }   //getDetectedConesInfo
+
+    /**
+     * This method returns an array of the detected poles info.
+     *
+     * @return an array of detected poles info.
+     */
+    public TrcVisionTargetInfo<?>[] getDetectedPolesInfo()
+    {
+        TrcVisionTargetInfo<?>[] targets = null;
+
+        if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
+        {
+            targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
+        }
+
+        return targets;
+    }   //getDetectedPolesInfo
+
+    /**
      * This method returns the best detected target info.
      *
      * @param label specifies the target label, only valid for TensorFlowVision, null for others.
