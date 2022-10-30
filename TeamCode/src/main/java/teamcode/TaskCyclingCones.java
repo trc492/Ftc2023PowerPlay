@@ -25,11 +25,15 @@ package teamcode;
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcNotifier;
+import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
+import TrcCommonLib.trclib.TrcOpenCvPipeline;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcUtil;
+import TrcCommonLib.trclib.TrcVisionTargetInfo;
+import TrcFtcLib.ftclib.FtcEocvDetector;
 
 /**
  * Robot starts in between cone stack and high goal
@@ -77,6 +81,7 @@ public class TaskCyclingCones
         PICKUP_CONE,
         RAISE_ELEVATOR,
         PREPARE_SCORE,
+        CHECK_VISION,
         ALIGN_ARM,
         SCORE,
         RESET,
@@ -100,6 +105,7 @@ public class TaskCyclingCones
     private int conesRemaining;
     private Double visionExpireTime = null;
     boolean coneIsPreload = true;
+    private TrcVisionTargetInfo<?>[] targetInfo;
 
     //location of the cone or pole relative to the robot
     private TrcPose2D targetLocation;
@@ -203,41 +209,41 @@ public class TaskCyclingCones
                     robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, turretEvent, null);
                     sm.waitForSingleEvent(driveEvent, State.PICKUP_CONE);
                     break;
-                //no vision for now
-//                case ALIGN_TO_CONE:
-//                    //if using vision turn the robot to face the cone
-//                    if (visionType != VisionType.NO_VISION) {
-//                        //use vision to find x, y, location of cone relative to robot
-//                        //set pipeline to look for red or blue cones
-//                        if(autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE){
-//                            robot.vision.eocvVision.setObjectType(EocvVision.ObjectType.RED_CONE);
-//                        }
-//                        else{
-//                            robot.vision.eocvVision.setObjectType(EocvVision.ObjectType.BLUE_CONE);
-//                        }
-//                        TrcVisionTargetInfo<?> targetInfo = robot.vision.getBestDetectedTargetInfo(null);
-//                        //Todo: not sure if this is correct
-//                        //relative location from camera to cone
-//                        targetLocation = new TrcPose2D(targetInfo.distanceFromCamera.x, targetInfo.distanceFromCamera.y, targetInfo.horizontalAngle);
-//                    }
-//                    //if we found the target, strafe so that the cone is centered with the robot(only for auto bc angle should be pretty accurate)
-//                    if (targetLocation != null && cycleType == CycleType.AUTO_FULL_CYCLE) {
-//                        robot.robotDrive.purePursuitDrive.start(
-//                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), true,
-//                                robot.robotDrive.getAutoTargetPoint(targetLocation.x, 0, 0, autoChoices));
-//
-//                        sm.waitForSingleEvent(driveEvent, State.PREPARE_PICKUP);
-//                    }
-//                    //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
-//                    else if(visionType == VisionType.ALIGN_VISION && visionExpireTime == null){
-//                        visionExpireTime = TrcUtil.getCurrentTime() + 1;
-//                    }
-//                    else if(visionType == VisionType.ALIGN_VISION && TrcUtil.getCurrentTime() == visionExpireTime){
-//                        //set vision expire time equal to null
-//                        visionExpireTime = null;
-//                        sm.setState(State.PREPARE_PICKUP);
-//                    }
-//                    break;
+
+                case ALIGN_TO_CONE:
+                    //if using vision turn the robot to face the cone
+                    if (visionType != VisionType.NO_VISION) {
+                        //use vision to find x, y, location of cone relative to robot
+                        //set pipeline to look for red or blue cones
+                        if(autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE){
+                            robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.RED_CONE);
+                        }
+                        else{
+                            robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.BLUE_CONE);
+                        }
+                        TrcVisionTargetInfo<?> targetInfo = robot.vision.getBestDetectedTargetInfo(null);
+                        //Todo: not sure if this is correct
+                        //relative location from camera to cone
+                        targetLocation = new TrcPose2D(targetInfo.distanceFromCamera.x, targetInfo.distanceFromCamera.y, targetInfo.horizontalAngle);
+                    }
+                    //if we found the target, strafe so that the cone is centered with the robot(only for auto bc angle should be pretty accurate)
+                    if (targetLocation != null && cycleType == CycleType.AUTO_FULL_CYCLE) {
+                        robot.robotDrive.purePursuitDrive.start(
+                                driveEvent, robot.robotDrive.driveBase.getFieldPosition(), true,
+                                robot.robotDrive.getAutoTargetPoint(targetLocation.x, 0, 0, autoChoices));
+
+                        sm.waitForSingleEvent(driveEvent, State.PREPARE_PICKUP);
+                    }
+                    //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
+                    else if(visionType == VisionType.ALIGN_VISION && visionExpireTime == null){
+                        visionExpireTime = TrcUtil.getCurrentTime() + 1;
+                    }
+                    else if(visionType == VisionType.ALIGN_VISION && TrcUtil.getCurrentTime() == visionExpireTime){
+                        //set vision expire time equal to null
+                        visionExpireTime = null;
+                        sm.setState(State.PREPARE_PICKUP);
+                    }
+                    break;
 
                 case PICKUP_CONE: //2. lower elevator to the cone, spin intake wheels
                     robot.elevator.setPresetPosition(conesRemaining, elevatorEvent, null);
@@ -261,10 +267,18 @@ public class TaskCyclingCones
                     //alternatively, use vision to drive until the pole is centered with the camera
                     //drive straight backwards until the middle of the robot is aligned with the pole
                     robot.turret.setTarget(RobotParams.TURRET_RIGHT);
-                    sm.waitForSingleEvent(driveEvent, State.SCORE);
+                    sm.waitForSingleEvent(driveEvent, State.CHECK_VISION);
+                    break;
+
+                case CHECK_VISION:
+                    targetInfo = robot.vision.getDetectedPolesInfo();
+                    if (targetInfo != null)
+                        sm.setState(State.SCORE);
                     break;
 
                 case SCORE: //7. spin intake backwards
+                    //TODO: Use target info to align robot
+                    //targetInfo[0].horizontalAngle
                     robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP, 1.0, intakeEvent);
                     sm.waitForSingleEvent(intakeEvent, State.DONE);
                     break;
