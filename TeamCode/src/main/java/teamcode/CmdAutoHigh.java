@@ -175,8 +175,9 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.5,0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
+                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.8,0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-2, -0.5, -90, autoChoices));
                     if(!driveOnly){
                         robot.arm.setTarget(RobotParams.ARM_EXTENDED);
                         robot.turret.setTarget(RobotParams.TURRET_RIGHT);
@@ -189,8 +190,14 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
                     //todo: write code for alignment to pole with vision
-                    robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP, 1.0, event);
-                    sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    if(!driveOnly){
+                        robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP, 1.0, event);
+                        sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    }
+                    else{
+                        sm.setState(State.DONE);//_CYCLE);
+                    }
+
                     break;
 
                 //if time >= 26 or no more cones on the conestack, go to park
