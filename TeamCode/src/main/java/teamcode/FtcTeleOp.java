@@ -46,6 +46,11 @@ import TrcFtcLib.ftclib.FtcOpMode;
     - Elevator: RightStickY (Up/Down), DPadUp (preset up), DPadDown (preset down)
     - Arm: LeftStickY (Up/Down), B (Extended), X (Retract)
     - Intake: Hold A (Dump), Hold Y (Pickup)
+    - Picking up cones - Operator Right bumper
+        -Prereqs: assumes intake is right above cone/ conestack
+        -while operator holds it, elevator goes down with intake spinning, stops
+
+    - FD
 */
 
 public class FtcTeleOp extends FtcOpMode
@@ -115,6 +120,7 @@ public class FtcTeleOp extends FtcOpMode
         {
             gridDriveTask = new TaskTileGridDrive(robot);
         }
+        robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
     }   //initRobot
 
     //
