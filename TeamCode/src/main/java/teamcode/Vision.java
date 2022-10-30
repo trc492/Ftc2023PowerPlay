@@ -314,6 +314,7 @@ public class Vision
         return targets;
     }   //getDetectedConesInfo
 
+    /**/
     /**
      * This method returns an array of the detected poles info.
      *
