@@ -238,12 +238,9 @@ public class Robot
                 robotDrive.gyro.setEnabled(true);
             }
             //
-            // Enable odometry only for autonomous or test modes.
+            // Enable odometry for all opmodes. We need odometry in TeleOp for GridDrive.
             //
-            if (runMode == TrcRobot.RunMode.AUTO_MODE || runMode == TrcRobot.RunMode.TEST_MODE)
-            {
-                robotDrive.driveBase.setOdometryEnabled(true);
-            }
+            robotDrive.driveBase.setOdometryEnabled(true);
         }
         //
         // The following are performance counters, could be disabled for competition if you want.

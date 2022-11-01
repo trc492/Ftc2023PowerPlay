@@ -34,8 +34,8 @@ import TrcCommonLib.trclib.TrcPurePursuitDrive;
  */
 public class MecanumDrive extends RobotDrive
 {
-    private static final boolean logPoseEvents = false;
-    private static final boolean tracePidInfo = false;
+    private static final boolean logPoseEvents = true;
+    private static final boolean tracePidInfo = true;
 
     /**
      * Constructor: Create an instance of the object.
@@ -102,7 +102,7 @@ public class MecanumDrive extends RobotDrive
             RobotParams.PPD_FOLLOWING_DISTANCE, RobotParams.PPD_POS_TOLERANCE, RobotParams.PPD_TURN_TOLERANCE,
             RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff, RobotParams.turnPidCoeff, RobotParams.velPidCoeff);
         purePursuitDrive.setFastModeEnabled(true);
-        purePursuitDrive.setMsgTracer(robot.globalTracer, true, true);
+        purePursuitDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
     }   //MecanumDrive
 
 }   //class MecanumDrive

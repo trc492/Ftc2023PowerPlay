@@ -27,6 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcOpenCvDetector;
@@ -99,7 +100,7 @@ public class Vision
         this.robot = robot;
         if (RobotParams.Preferences.useEasyOpenCV)
         {
-            OpenCvCamera frontWebcam, elevatorWebcam;
+            OpenCvWebcam frontWebcam, elevatorWebcam;
 
             if (RobotParams.Preferences.showEasyOpenCvView)
             {
@@ -126,6 +127,11 @@ public class Vision
                     OpenCvCameraFactory.getInstance().createWebcam(
                         opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM));
             }
+            // EOCV sometimes timed out on opening the camera. The default timeout was 2 seconds. It seems setting
+            // it to 3 seconds would do wonder here.
+            robot.globalTracer.traceInfo("Vision", "Starting EocvVision...");
+            frontWebcam.setMillisecondsPermissionTimeout(3000);
+            elevatorWebcam.setMillisecondsPermissionTimeout(3000);
 
             frontEocvVision = new EocvVision(
                 "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,

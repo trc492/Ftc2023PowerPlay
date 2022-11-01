@@ -51,7 +51,7 @@ public class RobotParams
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = true;
+        public static boolean showEasyOpenCvView = false;
         public static boolean testFrontEocv = true;
         // Robot
         public static boolean noRobot = false;
