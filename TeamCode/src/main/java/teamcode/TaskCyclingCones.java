@@ -188,6 +188,24 @@ public class TaskCyclingCones
         this.autoChoices = autoChoices;
     }
 
+    //
+    // Assumptions: robot is facing the cone stack approximate, the scoring junction is either at the left or right
+    //              of the robot.
+    // 1. Prepare the robot: turn turret to front, lower elevator to travel height, extend arm. Go to state 2.
+    // 2. If using vision, call vision to detect the cone stack location else set the cone stack location to its known
+    //    absolute location. If using vision and vision returns null, stay in this state to try again unless retry
+    //    count reaches zero in which case we will just use the absolute cone stack location. Go to state 3.
+    // 3. Either use the vision result or the known cone stack location, navigate the robot to the cone stack. Set
+    //    elevator height to the appropriate pickup height.
+    // 4. Start auto-assist pickup and lower the elevator onto the cone. Wait for pickup to signal, go to state 5.
+    // 5. Raise elevator to possession height. Go to state 6.
+    // 6. Navigate robot back to the junction pole. Turn turret toward the scoring junction. Retract arm. Go to state 7.
+    // 7. If using vision, call vision to detect the junction pole else assume we are aligned (go to next state). If
+    //    vision returns null stay in this state to try again unless retry count reaches zero in which case, just go
+    //    to next state.
+    // 8. Raise elevator to scoring height, extend arm. Go to state 9.
+    // 9. Auto-assist release cone. Go to DONE.
+    //
     private void cycleTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
     {
         State state = sm.checkReadyAndGetState();
