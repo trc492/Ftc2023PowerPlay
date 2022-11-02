@@ -446,15 +446,15 @@ public class RobotParams
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
     static final double TURRET_RESET_TIMEOUT                    = 0.5;
-    static final double TURRET_FRONT                            = 180.0;
-    static final double TURRET_RIGHT                            = 90.0;
-    static final double TURRET_LEFT                             = 270.0;
     static final double TURRET_BACK                             = 0.0;
+    static final double TURRET_RIGHT                            = 90.0;
+    static final double TURRET_FRONT                            = 180.0;
+    static final double TURRET_LEFT                             = 270.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
-        TURRET_BACK,                                        // Slot 0
-        TURRET_RIGHT,
-        TURRET_LEFT,
-        TURRET_FRONT                                        // Slot 1
+        TURRET_BACK,    // Slot 0
+        TURRET_RIGHT,   // Slot 1
+        TURRET_FRONT,   // Slot 2
+        TURRET_LEFT     // Slot 3
     };
     //In tile coordinates---how far from the cone the robot should be before trying to pick it up
     static final double TURRET_PICKUP_OFFSET                    = 0.3; //todo: tune this

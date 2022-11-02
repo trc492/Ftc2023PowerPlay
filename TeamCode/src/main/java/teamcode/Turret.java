@@ -140,8 +140,7 @@ public class Turret
      */
     public void setPresetPosition(int preset)
     {
-        preset = pidTurret.validatePresetIndex(preset);
-        if (preset >= 0)
+        if (pidTurret.validatePresetIndex(preset))
         {
             setTarget(RobotParams.TURRET_PRESET_LEVELS[preset], 1.0, null, null);
         }
@@ -152,7 +151,7 @@ public class Turret
      */
     public void presetPositionUp()
     {
-        setPresetPosition(pidTurret.getPresetPosition() + 1);
+        setPresetPosition(pidTurret.nextPresetIndexUp());
     }   //presetPositionUp
 
     /**
@@ -160,7 +159,7 @@ public class Turret
      */
     public void presetPositionDown()
     {
-        setPresetPosition(pidTurret.getPresetPosition() - 1);
+        setPresetPosition(pidTurret.nextPresetIndexDown());
     }   //presetPositionDown
 
     /**
