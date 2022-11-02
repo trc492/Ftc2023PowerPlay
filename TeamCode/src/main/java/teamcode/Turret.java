@@ -129,8 +129,7 @@ public class Turret
     {
         double calPower = Math.abs(RobotParams.TURRET_CAL_POWER);
 
-        pidTurret.zeroCalibrate(
-            calDirectionSwitch.isActive()? calPower: -calPower);
+        pidTurret.zeroCalibrate(calDirectionSwitch.isActive()? calPower: -calPower);
     }   //armZeroCalDoneCallback
 
     /**
