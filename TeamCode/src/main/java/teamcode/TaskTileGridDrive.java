@@ -97,6 +97,7 @@ public class TaskTileGridDrive
         {
             if (robot.robotDrive.driveBase.acquireExclusiveAccess(moduleName))
             {
+                robot.robotDrive.purePursuitDrive.setIncrementalTurnEnabled(false);
                 sm.start(State.START);
                 tileGridDriveTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
             }
@@ -106,6 +107,7 @@ public class TaskTileGridDrive
             robot.robotDrive.driveBase.releaseExclusiveAccess(moduleName);
             sm.stop();
             tileGridDriveTaskObj.unregisterTask();
+            robot.robotDrive.purePursuitDrive.setIncrementalTurnEnabled(true);
         }
     }   //setTaskEnabled
 
@@ -128,17 +130,26 @@ public class TaskTileGridDrive
     {
         TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
 
-        if (lastNode != null)
+        if (lastNode != null && lastNode.y == 0.0)
         {
+            // This movement is compatible with last movement, coalesce it.
             lastNode.x += tiles;
-            if (lastNode.x == 0.0)
+            if (lastNode.x == 0.0 && Math.abs(lastNode.angle) == 90.0)
             {
+                // Remove the last node only if there is no movement and the heading is parallel to the x-axis.
                 gridDriveQueue.remove(lastNode);
             }
         }
         else
         {
-            lastNode = new TrcPose2D(tiles, 0.0, Math.signum(tiles) * 90.0);
+            double heading = Math.signum(tiles) * 90.0;
+
+            if (lastNode != null)
+            {
+                // This movement has changed heading, make the previous movement end with the new heading.
+                lastNode.angle = heading;
+            }
+            lastNode = new TrcPose2D(tiles, 0.0, heading);
             gridDriveQueue.add(lastNode);
         }
 
@@ -154,19 +165,28 @@ public class TaskTileGridDrive
     {
         TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
 
-        if (lastNode != null)
+        if (lastNode != null && lastNode.x == 0.0)
         {
+            // This movement is compatible with last movement, coalesce it.
             lastNode.y += tiles;
-            if (lastNode.y == 0.0)
+            if (lastNode.y == 0.0 && (lastNode.angle == 0.0 || lastNode.angle == 180.0))
             {
+                // Remove the last node only if there is no movement and the heading is parallel to the y-axis.
                 gridDriveQueue.remove(lastNode);
             }
         }
         else
         {
-            // If the robot is moving in the positive y direction, heading should be north (0)--otherwise, heading
+            // If the robot is moving in the positive y direction, heading should be north (0); otherwise, heading
             // should be south (180).
-            lastNode = new TrcPose2D(0.0, tiles, (-Math.signum(tiles) + 1) * 90.0);
+            double heading = (-Math.signum(tiles) + 1) * 90.0;
+
+            if (lastNode != null)
+            {
+                // This movement has changed heading, make the previous movement end with the new heading.
+                lastNode.angle = heading;
+            }
+            lastNode = new TrcPose2D(0.0, tiles, heading);
             gridDriveQueue.add(lastNode);
         }
 

@@ -113,7 +113,7 @@ public class FtcAuto extends FtcOpMode
     private static final String moduleName = "FtcAuto";
     private Robot robot;
     private FtcMatchInfo matchInfo;
-    private final AutoChoices autoChoices = new AutoChoices();
+    public static final AutoChoices autoChoices = new AutoChoices();
     private TrcRobot.RobotCommand autoCommand;
 
     //
@@ -145,7 +145,8 @@ public class FtcAuto extends FtcOpMode
         // Create and run choice menus.
         //
         doAutoChoicesMenus();
-        if(robot.cyclingTask != null){
+        if (robot.cyclingTask != null)
+        {
             robot.cyclingTask.setAutoChoices(autoChoices);
         }
         //
@@ -306,6 +307,7 @@ public class FtcAuto extends FtcOpMode
         // Tell robot object opmode is about to stop so it can do the necessary cleanup for the mode.
         //
         robot.stopMode(prevMode);
+        robot.saveCurrentRobotPose();
 
         if (robot.battery != null)
         {

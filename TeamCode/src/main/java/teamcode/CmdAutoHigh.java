@@ -174,17 +174,16 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //corresponding cone stack, facing the cone stack
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.8,0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-2, -0.5, -90, autoChoices));
+                        robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0.0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.85, 0.0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -90.0, autoChoices));
                     if(!driveOnly){
                         robot.arm.setTarget(RobotParams.ARM_EXTENDED);
                         robot.turret.setTarget(RobotParams.TURRET_RIGHT);
                         robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, null);
                     }
 
-                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
+                    sm.waitForSingleEvent(event, State.DONE);//SCORE_PRELOAD);
                     break;
                 // CodeReview: add code to call TaskCyclingCones to vision align the junction pole.
                 //dump the cone with auto-assist

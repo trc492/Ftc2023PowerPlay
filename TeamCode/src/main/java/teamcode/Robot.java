@@ -24,12 +24,19 @@ package teamcode;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintStream;
+import java.util.Scanner;
+
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
 import TrcCommonLib.trclib.TrcIntake;
 import TrcCommonLib.trclib.TrcMotor;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
+import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
 import TrcFtcLib.ftclib.FtcAndroidTone;
@@ -339,6 +346,67 @@ public class Robot
         return Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
                 0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
     }   //getElevatorPowerCompensation
+
+    /**
+     * This method saves the current robot position to a data file. Typically, this is called at the end of autonomous
+     * so that at the beginning of TeleOp, we can restore the robot pose from this file.
+     */
+    public void saveCurrentRobotPose()
+    {
+        final String funcName = "saveCurrentRobotPose";
+
+        try (PrintStream out = new PrintStream(new FileOutputStream(
+            RobotParams.TEAM_FOLDER_PATH + "/" + RobotParams.CURRENT_ROBOT_POSE_FILE)))
+        {
+            TrcPose2D currPose = robotDrive.driveBase.getFieldPosition();
+
+            out.println(currPose.x + "," + currPose.y + "," + currPose.angle);
+            out.close();
+            globalTracer.traceInfo(funcName, "Saved robot pose=%s", currPose);
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+    }   //saveCurrentRobotPose
+
+    /**
+     * This method is typically called at the beginning of TeleOp to read the Robot Pose data file saved by the
+     * previous autonomous session. It restore the current robot's field position to this robot pose so that TeleOp
+     * can continue with the same position at the end of autonomous.
+     *
+     * @return true if the data is read successful, false if failed such as file not found.
+     */
+    public boolean restoreCurrentRobotPose()
+    {
+        final String funcName = "restoreCurrentRobotPose";
+        boolean success = true;
+
+        try (Scanner in = new Scanner(new FileReader(
+            RobotParams.TEAM_FOLDER_PATH + "/" + RobotParams.CURRENT_ROBOT_POSE_FILE)))
+        {
+            String[] poseData = in.nextLine().split(",", 3);
+            if (poseData.length == 3)
+            {
+                TrcPose2D robotPose = new TrcPose2D(
+                    Double.parseDouble(poseData[0]), Double.parseDouble(poseData[1]), Double.parseDouble(poseData[2]));
+                robotDrive.driveBase.setFieldPosition(robotPose);
+                globalTracer.traceInfo(funcName, "Restore RobotPose=%s", robotPose);
+            }
+            else
+            {
+                success = false;
+                globalTracer.traceWarn(funcName, "Invalid data (len=%d).", poseData.length);
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            success = false;
+            globalTracer.traceWarn(funcName, "Current Robot Pose data file not found.");
+        }
+
+        return success;
+    }   //restoreCurrentRobotPose
 
     /**
      * This method sends the text string to the Driver Station to be spoken using text to speech.

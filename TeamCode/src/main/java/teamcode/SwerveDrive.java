@@ -47,7 +47,6 @@ public class SwerveDrive extends RobotDrive
     private static final boolean logPoseEvents = false;
     private static final boolean tracePidInfo = false;
 
-    private static final String STEERING_CALIBRATION_DATA_FILE = "SteerCalibration.txt";
     public static final String[] servoNames = {
         RobotParams.HWNAME_LFSTEER_SERVO1, RobotParams.HWNAME_RFSTEER_SERVO1,
         RobotParams.HWNAME_LBSTEER_SERVO1, RobotParams.HWNAME_RBSTEER_SERVO1};
@@ -274,7 +273,7 @@ public class SwerveDrive extends RobotDrive
         final String funcName = "saveSteeringCalibrationData";
 
         try (PrintStream out = new PrintStream(new FileOutputStream(
-            RobotParams.TEAM_FOLDER_PATH + "/" + STEERING_CALIBRATION_DATA_FILE)))
+            RobotParams.TEAM_FOLDER_PATH + "/" + RobotParams.STEERING_CALIBRATION_DATA_FILE)))
         {
             for (int i = 0; i < servoNames.length; i++)
             {
@@ -300,7 +299,7 @@ public class SwerveDrive extends RobotDrive
         TrcDbgTrace tracer = TrcDbgTrace.getGlobalTracer();
 
         try (Scanner in = new Scanner(new FileReader(
-            RobotParams.TEAM_FOLDER_PATH + "/" + STEERING_CALIBRATION_DATA_FILE)))
+            RobotParams.TEAM_FOLDER_PATH + "/" + RobotParams.STEERING_CALIBRATION_DATA_FILE)))
         {
             for (int i = 0; i < servoNames.length; i++)
             {

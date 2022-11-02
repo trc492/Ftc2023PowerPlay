@@ -119,8 +119,8 @@ public class FtcTeleOp extends FtcOpMode
         if (robot.robotDrive != null)
         {
             gridDriveTask = new TaskTileGridDrive(robot);
+            robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
         }
-        robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
     }   //initRobot
 
     //
@@ -143,6 +143,15 @@ public class FtcTeleOp extends FtcOpMode
         // Tell robot object opmode is about to start so it can do the necessary start initialization for the mode.
         //
         robot.startMode(nextMode);
+        if (nextMode == TrcRobot.RunMode.TELEOP_MODE)
+        {
+            if (!robot.restoreCurrentRobotPose())
+            {
+                robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
+            }
+            robot.globalTracer.traceInfo(
+                "TeleOp.startMode", "set RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
+        }
     }   //startMode
 
     /**

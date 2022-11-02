@@ -72,6 +72,8 @@ public class RobotParams
     public static final String TEAM_FOLDER_PATH                 =
         Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftc3543";
     public static final String LOG_FOLDER_PATH                  = TEAM_FOLDER_PATH + "/logs";
+    public static final String CURRENT_ROBOT_POSE_FILE          = "CurrentRobotPose.txt";
+    public static final String STEERING_CALIBRATION_DATA_FILE   = "SteerCalibration.txt";
     //
     // Hardware names.
     //
@@ -318,8 +320,8 @@ public class RobotParams
     public static final double YPOS_INCHES_PER_COUNT            = 0.02166184604662450653409090909091;
 
     public static TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.03, 0.0, 0.000, 0.0);
-    public static final double TURN_TOLERANCE                   = 1.0;
+        new TrcPidController.PidCoefficients(0.025, 0.0, 0.003, 0.0);
+    public static final double TURN_TOLERANCE                   = 2.0;
 
     public static final double X_ODWHEEL_INCHES_PER_COUNT       = 7.6150160901199168116026724971383e-4;
     public static final double Y_ODWHEEL_INCHES_PER_COUNT       = 7.6301149255006038191364659148717e-4;
