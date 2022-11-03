@@ -98,6 +98,7 @@ public class TaskCyclingCones
     private Double visionExpireTime = null;
     //location of the cone or pole relative to the robot
     private TrcPose2D targetLocation;
+    private boolean targetIsRelative = false;
     private Double poleAngle;
 
     public TaskCyclingCones(Robot robot)
@@ -221,6 +222,7 @@ public class TaskCyclingCones
                     {
                         targetLocation = robot.robotDrive.getAutoTargetPoint(
                             RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices);
+                        targetIsRelative = false;
                     }
                     else
                     {
@@ -232,6 +234,7 @@ public class TaskCyclingCones
                             targetLocation = new TrcPose2D(
                                 coneInfo.distanceFromCamera.x, coneInfo.distanceFromCamera.y,
                                 coneInfo.horizontalAngle);
+                            targetIsRelative = true;
                         }
                         else
                         {
@@ -255,6 +258,7 @@ public class TaskCyclingCones
                         // set target location without vision.
                         targetLocation = robot.robotDrive.getAutoTargetPoint(
                             RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices);
+                        targetIsRelative = false;
                         sm.setState(State.DRIVE_TO_CONE);
                     }
                     break;
@@ -264,8 +268,7 @@ public class TaskCyclingCones
                     //otherwise drive to the absolute location of the cone stack
                     robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                     robot.robotDrive.purePursuitDrive.start(
-                        event, robot.robotDrive.driveBase.getFieldPosition(), visionType != VisionType.NO_VISION,
-                        targetLocation);
+                        event, robot.robotDrive.driveBase.getFieldPosition(), targetIsRelative, targetLocation);
                     sm.waitForSingleEvent(event, State.PICKUP_CONE);
                     break;
 
