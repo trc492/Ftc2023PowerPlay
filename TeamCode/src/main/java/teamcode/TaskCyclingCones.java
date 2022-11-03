@@ -97,8 +97,7 @@ public class TaskCyclingCones
     private int conesRemaining;
     private Double visionExpireTime = null;
     //location of the cone or pole relative to the robot
-    private TrcPose2D targetLocation;
-    private boolean targetIsRelative = false;
+    private TrcPose2D targetLocation = null;
     private Double poleAngle;
 
     public TaskCyclingCones(Robot robot)
@@ -218,15 +217,9 @@ public class TaskCyclingCones
                     break;
 
                 case LOOK_FOR_CONE:
-                    if (visionType == VisionType.NO_VISION)
+                    if (visionType != VisionType.NO_VISION)
                     {
-                        targetLocation = robot.robotDrive.getAutoTargetPoint(
-                            RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices);
-                        targetIsRelative = false;
-                    }
-                    else
-                    {
-                        //if using vision find the relative location of the cone
+                        // Use vision to find the relative location of the cone.
                         TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> coneInfo =
                             robot.vision.getDetectedConeInfo();
                         if (coneInfo != null)
@@ -234,41 +227,50 @@ public class TaskCyclingCones
                             targetLocation = new TrcPose2D(
                                 coneInfo.distanceFromCamera.x, coneInfo.distanceFromCamera.y,
                                 coneInfo.horizontalAngle);
-                            targetIsRelative = true;
-                        }
-                        else
-                        {
-                            targetLocation = null;
                         }
                     }
-                    //if we found the target with vision, go to the next state
+
                     if (targetLocation != null)
                     {
+                        // We found the target with vision, go to the next state.
                         sm.setState(State.DRIVE_TO_CONE);
                     }
-                    //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
-                    else if (visionExpireTime == null)
+                    else if (visionType != VisionType.NO_VISION)
                     {
-                        visionExpireTime = TrcUtil.getCurrentTime() + 0.5;
+                        // Vision did not detect anything, try again with timeout.
+                        if (visionExpireTime == null)
+                        {
+                            visionExpireTime = TrcUtil.getCurrentTime() + 0.5;
+                        }
+                        else if (TrcUtil.getCurrentTime() >= visionExpireTime)
+                        {
+                            // Times up, reset expireTime, go to next state.
+                            visionExpireTime = null;
+                            sm.setState(State.DRIVE_TO_CONE);
+                        }
                     }
-                    else if (TrcUtil.getCurrentTime() >= visionExpireTime)
+                    else
                     {
-                        //times up, reset expireTime, go to next state
-                        visionExpireTime = null;
-                        // set target location without vision.
-                        targetLocation = robot.robotDrive.getAutoTargetPoint(
-                            RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices);
-                        targetIsRelative = false;
                         sm.setState(State.DRIVE_TO_CONE);
                     }
                     break;
 
                 case DRIVE_TO_CONE:
-                    //if vision found a targetLocation, drive to it with incremental pure pursuit
-                    //otherwise drive to the absolute location of the cone stack
                     robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
-                    robot.robotDrive.purePursuitDrive.start(
-                        event, robot.robotDrive.driveBase.getFieldPosition(), targetIsRelative, targetLocation);
+                    if (targetLocation != null)
+                    {
+                        // Vision found the cone, drive to it with incremental pure pursuit.
+                        robot.robotDrive.purePursuitDrive.start(
+                            event, robot.robotDrive.driveBase.getFieldPosition(), true, targetLocation);
+                    }
+                    else
+                    {
+                        // Either we did not use vision or vision did not detect anything. Use the absolute cone
+                        // stack location.
+                        robot.robotDrive.purePursuitDrive.start(
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
+                    }
                     sm.waitForSingleEvent(event, State.PICKUP_CONE);
                     break;
 
