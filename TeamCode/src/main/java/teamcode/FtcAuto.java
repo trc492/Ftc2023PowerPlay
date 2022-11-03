@@ -145,10 +145,6 @@ public class FtcAuto extends FtcOpMode
         // Create and run choice menus.
         //
         doAutoChoicesMenus();
-        if (robot.cyclingTask != null)
-        {
-            robot.cyclingTask.setAutoChoices(autoChoices);
-        }
         //
         // Create autonomous command according to chosen strategy.
         //

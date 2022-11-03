@@ -145,10 +145,12 @@ public class FtcTeleOp extends FtcOpMode
         robot.startMode(nextMode);
         if (nextMode == TrcRobot.RunMode.TELEOP_MODE)
         {
-            if (!robot.restoreCurrentRobotPose())
-            {
-                robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
-            }
+            robot.globalTracer.traceInfo("TeleOp.startMode", "autoChoices=%s", FtcAuto.autoChoices);
+            robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
+//            if (!robot.restoreCurrentRobotPose())
+//            {
+//                robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
+//            }
             robot.globalTracer.traceInfo(
                 "TeleOp.startMode", "set RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
         }
@@ -502,7 +504,7 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_B:
                 if (robot.arm != null && pressed)
                 {
-                    robot.arm.setTarget(RobotParams.ARM_EXTENDED);
+                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                 }
                 break;
 

@@ -205,7 +205,7 @@ public class RobotParams
     public static final double STACKED_CONE_ADDITION            = 1.5;
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
     public static final double MID_JUNCTION_HEIGHT              = 26.5;
-    public static final double HIGH_JUNCTION_HEIGHT             = 34.0;
+    public static final double HIGH_JUNCTION_HEIGHT             = 32.0;
     //
     // Vision subsystem.
     //
@@ -225,8 +225,10 @@ public class RobotParams
     public static final double FRONTCAM_CX                      = 330.489;  // in pixels
     public static final double FRONTCAM_CY                      = 248.997;  // in pixels
     // Elevator Camera: Logitech C310
-    public static final int ELEVATORCAM_IMAGE_WIDTH             = 640;
-    public static final int ELEVATORCAM_IMAGE_HEIGHT            = 480;
+    public static final int ELEVATORCAM_IMAGE_WIDTH             = 480;
+    public static final int ELEVATORCAM_IMAGE_HEIGHT            = 640;
+    public static final double ELEVATORCAM_FOV                  = 53.0;
+    public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_FOV/ELEVATORCAM_IMAGE_HEIGHT;
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 0.0;
@@ -413,11 +415,13 @@ public class RobotParams
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
-    static final double ARM_EXTENDED                            = 90.0;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
+    static final double ARM_SCORE_POS                           = 24.0;
+    static final double ARM_PICKUP_POS                          = 90.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
             ARM_MIN_POS,                                        // Slot 0: Up position
-            ARM_EXTENDED,                                       // Slot 1: Horizontal position
+            ARM_SCORE_POS,                                      // Slot 1
+            ARM_PICKUP_POS,                                     // Slot 2
             ARM_MAX_POS                                         // Slot 2: Down position
     };
     //

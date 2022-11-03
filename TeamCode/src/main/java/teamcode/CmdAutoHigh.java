@@ -36,7 +36,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private enum State
     {
         START_DELAY,
-        DRIVE_TO_HIGH,
+        DRIVE_TO_SCORE_POSITION,
+        RAISE_ELEVATOR_TO_SCORE,
         SCORE_PRELOAD,
         DO_CYCLE,
         PARK,
@@ -49,10 +50,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private final TrcEvent event;
     private final TrcStateMachine<State> sm;
     private int signalPos = 0;
-    // Todo: CodeReview: why public? Nobody outside of this class will access it.
-    //tells us number cones left on the conestack
-    public int conesRemaining = 5;
-    private boolean driveOnly = true;
+    // Tells us number cones left on the conestack.
+    private int conesRemaining = 5;
 
     /**
      * Constructor: Create an instance of the object.
@@ -107,6 +106,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     @Override
     public boolean cmdPeriodic(double elapsedTime)
     {
+        final boolean driveOnly = true; //Todo: need to get rid of this since subsystems are ready.
         State state = sm.checkReadyAndGetState();
 
         if (state == null)
@@ -115,7 +115,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         }
         else
         {
-            boolean traceState = true;
             String msg;
 
             robot.dashboard.displayPrintf(1, "State: %s", state);
@@ -126,7 +125,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // Set robot starting position in the field.
                     //
                     robot.robotDrive.setAutoStartPosition(autoChoices);
-                    // Call vision at the beginning to figure out the position of the duck.
+                    // Call vision at the beginning to figure out the signal position.
                     if (robot.vision != null)
                     {
                         signalPos = robot.vision.getLastSignal();
@@ -153,17 +152,16 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         //
                         // Intentionally falling through to the next state.
                         //
-                        sm.setState(State.DRIVE_TO_HIGH);
+                        sm.setState(State.DRIVE_TO_SCORE_POSITION);
                     }
                     else
                     {
                         timer.set(autoChoices.startDelay, event);
-                        sm.waitForSingleEvent(event, State.DRIVE_TO_HIGH);
+                        sm.waitForSingleEvent(event, State.DRIVE_TO_SCORE_POSITION);
                         break;
                     }
 
-
-                case DRIVE_TO_HIGH:
+                case DRIVE_TO_SCORE_POSITION:
                     //drive to score position
                     //raise elevator to scoring height
                     //turn turret to score position
@@ -171,31 +169,38 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // Todo: add option to do center high poles
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
+                    if (!driveOnly)
+                    {
+                        robot.arm.setTarget(RobotParams.ARM_SCORE_POS);
+                        robot.turret.setTarget(
+                            autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                                RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT);
+                    }
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-0.5, -0.85, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -90.0, autoChoices));
-                    if(!driveOnly){
-                        robot.arm.setTarget(RobotParams.ARM_EXTENDED);
-                        robot.turret.setTarget(RobotParams.TURRET_RIGHT);
-                        robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, null);
-                    }
-
-                    sm.waitForSingleEvent(event, State.DONE);//SCORE_PRELOAD);
+                    sm.waitForSingleEvent(event, driveOnly? State.DO_CYCLE: State.RAISE_ELEVATOR_TO_SCORE);
                     break;
-                // CodeReview: add code to call TaskCyclingCones to vision align the junction pole.
+
+                case RAISE_ELEVATOR_TO_SCORE:
+                    if (!driveOnly)
+                    {
+                        robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event);
+                        sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
+                    }
+                    else
+                    {
+                        sm.setState(State.DO_CYCLE);
+                    }
+                    break;
+
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
                     //todo: write code for alignment to pole with vision
-                    if(!driveOnly){
-                        robot.intake.setPower(RobotParams.INTAKE_POWER_DUMP, 1.0, event);
-                        sm.waitForSingleEvent(event, State.DO_CYCLE);
-                    }
-                    else{
-                        sm.setState(State.DONE);//_CYCLE);
-                    }
-
+                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
+                    sm.waitForSingleEvent(event, State.DO_CYCLE);
                     break;
 
                 //if time >= 26 or no more cones on the conestack, go to park
@@ -206,22 +211,27 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     {
                         sm.setState(State.PARK);
                     }
-                    else{
-                        if(driveOnly){
-                            robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT.x - RobotParams.TURRET_PICKUP_OFFSET,
-                                            RobotParams.CONE_STACK_RED_LEFT.y, -90.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
-
-                        }
-                        else{
-                            robot.cyclingTask.doFullAutoCycle(TaskCyclingCones.VisionType.NO_VISION, conesRemaining, event);
-                        }
+                    else
+                    {
+                        robot.cyclingTask.doFullAutoCycle(TaskCyclingCones.VisionType.NO_VISION, conesRemaining, event);
                         conesRemaining--;
                         sm.waitForSingleEvent(event, State.DO_CYCLE);
                     }
                     break;
+//                        if (driveOnly)
+//                        {
+//                            robot.robotDrive.purePursuitDrive.start(
+//                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+//                                robot.robotDrive.getAutoTargetPoint(
+//                                    RobotParams.CONE_STACK_RED_LEFT.x - RobotParams.TURRET_PICKUP_OFFSET,
+//                                    RobotParams.CONE_STACK_RED_LEFT.y, -90.0, autoChoices),
+//                                robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, autoChoices));
+//
+//                        }
+//                        else{
+//                            robot.cyclingTask.doFullAutoCycle(TaskCyclingCones.VisionType.NO_VISION, conesRemaining, event);
+//                        }
+//                    }
 
                 case PARK:
                     if (autoChoices.parking == FtcAuto.Parking.NO_PARKING)
@@ -229,10 +239,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         // We are not parking anywhere, just stop and be done.
                         sm.setState(State.DONE);
                     }
-                    else{
-                        TrcPose2D parkPos;
-                        parkPos = (autoChoices.parking == FtcAuto.Parking.NEAR_TILE)?
-                            RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
+                    else
+                    {
+                        // CodeReview: check if there are any obstacles in the path.
+                        TrcPose2D parkPos =
+                            autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
+                                RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
+                                RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
                         robot.robotDrive.purePursuitDrive.start(
                             event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90, autoChoices));
@@ -249,12 +262,9 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
             }
 
-            if (traceState)
-            {
-                robot.globalTracer.traceStateInfo(
-                        sm.toString(), state, robot.robotDrive.driveBase, robot.robotDrive.pidDrive,
-                        robot.robotDrive.purePursuitDrive, null);
-            }
+            robot.globalTracer.traceStateInfo(
+                sm.toString(), state, robot.robotDrive.driveBase, robot.robotDrive.pidDrive,
+                robot.robotDrive.purePursuitDrive, null);
         }
 
         return !sm.isEnabled();

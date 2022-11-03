@@ -220,4 +220,16 @@ public class RobotDrive
         return new TrcPose2D(tileX * RobotParams.FULL_TILE_INCHES, tileY * RobotParams.FULL_TILE_INCHES, heading);
     }   //getAutoTargetPoint
 
+    /**
+     * This method adjusts the target point according to the alliance and startPos in autoChoices.
+     *
+     * @param targetPos specifies the target position in tile units.
+     * @param autoChoices specifies auto choices.
+     * @return adjusted target point as TrcPose2D.
+     */
+    public TrcPose2D getAutoTargetPoint(TrcPose2D targetPos, FtcAuto.AutoChoices autoChoices)
+    {
+        return getAutoTargetPoint(targetPos.x, targetPos.y, targetPos.angle, autoChoices);
+    }   //getAutoTargetPoint
+
 }   //class RobotDrive
