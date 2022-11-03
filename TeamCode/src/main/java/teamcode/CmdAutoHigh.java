@@ -164,7 +164,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
 
                 case DRIVE_TO_HIGH:
-                    // CodeReview: simplify this code by using robot.robotDrive.getAutoTargetPoint.
                     //drive to score position
                     //raise elevator to scoring height
                     //turn turret to score position
