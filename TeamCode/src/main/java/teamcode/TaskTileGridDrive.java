@@ -26,6 +26,8 @@ import java.util.ArrayList;
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
+import TrcCommonLib.trclib.TrcPath;
+import TrcCommonLib.trclib.TrcPathBuilder;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
@@ -42,7 +44,7 @@ public class TaskTileGridDrive
 
     private enum State
     {
-        START,
+        DRIVE,
         DONE
     }   //enum State
 
@@ -81,6 +83,7 @@ public class TaskTileGridDrive
      */
     public void cancel()
     {
+        robot.robotDrive.purePursuitDrive.cancel();
         setTaskEnabled(false);
         gridDriveQueue.clear();
     }   //cancel
@@ -98,7 +101,7 @@ public class TaskTileGridDrive
             if (robot.robotDrive.driveBase.acquireExclusiveAccess(moduleName))
             {
                 robot.robotDrive.purePursuitDrive.setIncrementalTurnEnabled(false);
-                sm.start(State.START);
+                sm.start(State.DRIVE);
                 tileGridDriveTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
             }
         }
@@ -128,31 +131,34 @@ public class TaskTileGridDrive
      */
     public void setRelativeXTileTarget(int tiles)
     {
-        TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
-
-        if (lastNode != null && lastNode.y == 0.0)
-        {
-            // This movement is compatible with last movement, coalesce it.
-            lastNode.x += tiles;
-            if (lastNode.x == 0.0 && Math.abs(lastNode.angle) == 90.0)
-            {
-                // Remove the last node only if there is no movement and the heading is parallel to the x-axis.
-                gridDriveQueue.remove(lastNode);
-            }
-        }
-        else
-        {
-            double heading = Math.signum(tiles) * 90.0;
-
-            if (lastNode != null)
-            {
-                // This movement has changed heading, make the previous movement end with the new heading.
-                lastNode.angle = heading;
-            }
-            lastNode = new TrcPose2D(tiles, 0.0, heading);
-            gridDriveQueue.add(lastNode);
-        }
-
+        gridDriveQueue.add(new TrcPose2D(tiles, 0.0, Math.signum(tiles) * 90.0));
+//        TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
+//
+//        robot.globalTracer.traceInfo("setRelXTile", "tiles=%d, lastNode=%s", tiles, lastNode);
+//        if (lastNode != null && lastNode.y == 0.0)
+//        {
+//            // This movement is compatible with last movement, coalesce it.
+//            lastNode.x += tiles;
+//            if (lastNode.x == 0.0 && Math.abs(lastNode.angle) == 90.0)
+//            {
+//                // Remove the last node only if there is no movement and the heading is parallel to the x-axis.
+//                gridDriveQueue.remove(lastNode);
+//            }
+//        }
+//        else
+//        {
+//            double heading = Math.signum(tiles) * 90.0;
+//
+//            if (lastNode != null)
+//            {
+//                // This movement has changed heading, make the previous movement end with the new heading.
+//                lastNode.angle = heading;
+//            }
+//            lastNode = new TrcPose2D(tiles, 0.0, heading);
+//            robot.globalTracer.traceInfo("setRelXTile", "addNode=%s", lastNode);
+//            gridDriveQueue.add(lastNode);
+//        }
+//
         setTaskEnabled(true);
     }   //setRelativeXTileTarget
 
@@ -163,33 +169,36 @@ public class TaskTileGridDrive
      */
     public void setRelativeYTileTarget(int tiles)
     {
-        TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
-
-        if (lastNode != null && lastNode.x == 0.0)
-        {
-            // This movement is compatible with last movement, coalesce it.
-            lastNode.y += tiles;
-            if (lastNode.y == 0.0 && (lastNode.angle == 0.0 || lastNode.angle == 180.0))
-            {
-                // Remove the last node only if there is no movement and the heading is parallel to the y-axis.
-                gridDriveQueue.remove(lastNode);
-            }
-        }
-        else
-        {
-            // If the robot is moving in the positive y direction, heading should be north (0); otherwise, heading
-            // should be south (180).
-            double heading = (-Math.signum(tiles) + 1) * 90.0;
-
-            if (lastNode != null)
-            {
-                // This movement has changed heading, make the previous movement end with the new heading.
-                lastNode.angle = heading;
-            }
-            lastNode = new TrcPose2D(0.0, tiles, heading);
-            gridDriveQueue.add(lastNode);
-        }
-
+        gridDriveQueue.add(new TrcPose2D(0.0, tiles, (-Math.signum(tiles) + 1) * 90.0));
+//        TrcPose2D lastNode = !gridDriveQueue.isEmpty()? gridDriveQueue.get(gridDriveQueue.size() - 1): null;
+//
+//        robot.globalTracer.traceInfo("setRelYTile", "tiles=%d, lastNode=%s", tiles, lastNode);
+//        if (lastNode != null && lastNode.x == 0.0)
+//        {
+//            // This movement is compatible with last movement, coalesce it.
+//            lastNode.y += tiles;
+//            if (lastNode.y == 0.0 && (lastNode.angle == 0.0 || lastNode.angle == 180.0))
+//            {
+//                // Remove the last node only if there is no movement and the heading is parallel to the y-axis.
+//                gridDriveQueue.remove(lastNode);
+//            }
+//        }
+//        else
+//        {
+//            // If the robot is moving in the positive y direction, heading should be north (0); otherwise, heading
+//            // should be south (180).
+//            double heading = (-Math.signum(tiles) + 1) * 90.0;
+//
+//            if (lastNode != null)
+//            {
+//                // This movement has changed heading, make the previous movement end with the new heading.
+//                lastNode.angle = heading;
+//            }
+//            lastNode = new TrcPose2D(0.0, tiles, heading);
+//            robot.globalTracer.traceInfo("setRelYTile", "addNode=%s", lastNode);
+//            gridDriveQueue.add(lastNode);
+//        }
+//
         setTaskEnabled(true);
     }   //setRelativeYTileTarget
 
@@ -212,23 +221,39 @@ public class TaskTileGridDrive
             robot.dashboard.displayPrintf(1, "State: %s", state);
             switch (state)
             {
-                case START:
-                    TrcPose2D targetTilePose = !gridDriveQueue.isEmpty()? gridDriveQueue.remove(0): null;
-                    if (targetTilePose != null)
+                case DRIVE:
+                    TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
+                    TrcPath path = buildPath(robotPose);
+
+                    if (path != null)
                     {
-                        TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
-                        robot.robotDrive.purePursuitDrive.start(
-                            moduleName, event, 0.0, robotPose, false,
-                            new TrcPose2D(
-                                (tileCenterPosition(robotPose.x) + targetTilePose.x) * RobotParams.FULL_TILE_INCHES,
-                                (tileCenterPosition(robotPose.y) + targetTilePose.y) * RobotParams.FULL_TILE_INCHES,
-                                targetTilePose.angle));
-                        sm.waitForSingleEvent(event, State.START);
+                        robot.robotDrive.purePursuitDrive.start(moduleName, path, event, 0.0);
+                        sm.waitForSingleEvent(event, State.DRIVE);
                     }
                     else
                     {
                         sm.setState(State.DONE);
                     }
+//                    TrcPose2D targetTilePose = !gridDriveQueue.isEmpty()? gridDriveQueue.remove(0): null;
+//                    if (targetTilePose != null)
+//                    {
+//                        TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
+//                        double xTile = (tileCenterPosition(robotPose.x) + targetTilePose.x);
+//                        double yTile = (tileCenterPosition(robotPose.y) + targetTilePose.y);
+//                        robot.globalTracer.traceInfo(
+//                            "gridDriveTask", "xTile=%.2f, yTile=%.2f, angle=%.2f", xTile, yTile, targetTilePose.angle);
+//                        robot.robotDrive.purePursuitDrive.start(
+//                            moduleName, event, 0.0, robotPose, false,
+//                            new TrcPose2D(
+//                                (tileCenterPosition(robotPose.x) + targetTilePose.x) * RobotParams.FULL_TILE_INCHES,
+//                                (tileCenterPosition(robotPose.y) + targetTilePose.y) * RobotParams.FULL_TILE_INCHES,
+//                                targetTilePose.angle));
+//                        sm.waitForSingleEvent(event, State.DRIVE);
+//                    }
+//                    else
+//                    {
+//                        sm.setState(State.DONE);
+//                    }
                     break;
 
                 case DONE:
@@ -246,6 +271,91 @@ public class TaskTileGridDrive
         }
     }   //tileGridDriveTask
 
+    private TrcPath buildPath(TrcPose2D robotPose)
+    {
+        final double turnAdj = 0.35;
+        double xRobotTile = tileCenterPosition(robotPose.x);
+        double yRobotTile = tileCenterPosition(robotPose.y);
+        TrcPathBuilder pathBuilder = new TrcPathBuilder(robotPose, false);
+        TrcPath path;
+
+        while (gridDriveQueue.size() > 1)
+        {
+            TrcPose2D firstNode = gridDriveQueue.get(0);
+            TrcPose2D nextNode = gridDriveQueue.get(1);
+
+            if (firstNode.x == 0.0 && nextNode.x == 0.0 || firstNode.y == 0.0 && nextNode.y == 0.0)
+            {
+                // Not turning, can coalesce the nextNode to the firstNode.
+                firstNode.x += nextNode.x;
+                firstNode.y += nextNode.y;
+                gridDriveQueue.remove(nextNode);
+            }
+            else
+            {
+                // Turning, create a segment endpoint and a startpoint of the next segment.
+                if (firstNode.angle == 0.0)
+                {
+                    // Heading is North.
+                    firstNode.y += turnAdj;
+                    nextNode.y++;
+                }
+                else if (firstNode.angle == 180.0)
+                {
+                    // Heading is South.
+                    firstNode.y -= turnAdj;
+                    nextNode.y--;
+                }
+                else if (firstNode.angle == 90.0)
+                {
+                    // Headihg is East.
+                    firstNode.x += turnAdj;
+                    nextNode.x++;
+                }
+                else
+                {
+                    // Heading is West.
+                    firstNode.x -= turnAdj;
+                    nextNode.x--;
+                }
+                // Create endpoint of this segment.
+                pathBuilder.append(
+                    new TrcPose2D((xRobotTile + firstNode.x)*RobotParams.FULL_TILE_INCHES,
+                                  (yRobotTile + firstNode.y)*RobotParams.FULL_TILE_INCHES,
+                                  firstNode.angle));
+                // Create startpoint of the next segment.
+                pathBuilder.append(
+                    new TrcPose2D((xRobotTile + firstNode.x + nextNode.x)*RobotParams.FULL_TILE_INCHES,
+                                  (yRobotTile + firstNode.y + nextNode.y)*RobotParams.FULL_TILE_INCHES,
+                                  nextNode.angle));
+                gridDriveQueue.remove(nextNode);
+                gridDriveQueue.remove(firstNode);
+            }
+        }
+
+        if (gridDriveQueue.size() > 0)
+        {
+            TrcPose2D lastNode = gridDriveQueue.get(0);
+
+            pathBuilder.append(
+                new TrcPose2D((xRobotTile + lastNode.x)*RobotParams.FULL_TILE_INCHES,
+                              (yRobotTile + lastNode.y)*RobotParams.FULL_TILE_INCHES,
+                              lastNode.angle));
+            gridDriveQueue.remove(lastNode);
+        }
+
+        try
+        {
+            path = pathBuilder.toRelativeStartPath();
+        }
+        catch (IllegalArgumentException e)
+        {
+            path = null;
+        }
+
+        return path;
+    }   //buildPath
+
     /**
      * This method rounds the given position value to the center of a full tile, meaning it will round the value so
      * that the position will be at the center of the tile in tile unit.
@@ -255,7 +365,9 @@ public class TaskTileGridDrive
      */
     private double tileCenterPosition(double position)
     {
-        return ((int) (position/RobotParams.FULL_TILE_INCHES)) + 0.5;
+        double tilePos = Math.signum(position)*(((int) (Math.abs(position)/RobotParams.FULL_TILE_INCHES)) + 0.5);
+        robot.globalTracer.traceInfo("tileCenterPosition", "pos=%.2f, tilePos=%.2f", position, tilePos);
+        return tilePos;
     }   //tileCenterPosition
 
 }   //class TaskTileGridDrive

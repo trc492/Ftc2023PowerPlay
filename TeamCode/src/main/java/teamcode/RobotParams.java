@@ -107,10 +107,10 @@ public class RobotParams
     //
     // Robot dimensions.
     //
-    public static final double ROBOT_LENGTH                     = 17.50;
-    public static final double ROBOT_WIDTH                      = 14.50;
-    public static final double DRIVE_BASE_LENGTH                = 13.25;
-    public static final double DRIVE_BASE_WIDTH                 = 12.50;
+    public static final double ROBOT_LENGTH                     = 17.375;
+    public static final double ROBOT_WIDTH                      = 14.625;
+    public static final double DRIVE_BASE_LENGTH                = 13.250;
+    public static final double DRIVE_BASE_WIDTH                 = 12.375;
     //
     // Game positions.
     //
@@ -210,13 +210,14 @@ public class RobotParams
     // Vision subsystem.
     //
     public static final int FRAME_QUEUE_CAPACITY                = 2;
-    public static final double APRILTAG_SIZE                    = 0.05; // in meters
+    public static final double APRILTAG_SIZE                    = 0.043;// in meters
     public static final double APRILTAG_HEIGHT_OFFSET           = 1.5;  // in inches
 
-    public static final double FRONTCAM_FRONT_OFFSET            = 2.25; //Camera offset from front of robot in inches
-    public static final double FRONTCAM_LEFT_OFFSET             = 7.50; //Camera offset from left of robot in inches
-    public static final double FRONTCAM_HEIGHT_OFFSET           = 3.75; //Camera offset from floor in inches
-    public static final double FRONTCAM_TILT_DOWN               = 0.00; //Camera tilt down angle from horizontal in deg
+    public static final double FRONTCAM_FRONT_OFFSET            = 2.000;//Camera offset from front of robot in inches
+    public static final double FRONTCAM_LEFT_OFFSET             = 7.125;//Camera offset from left of robot in inches
+    public static final double FRONTCAM_HEIGHT_OFFSET           = 3.750;//Camera offset from floor in inches
+    public static final double FRONTCAM_TILT_DOWN               = -2.00;//Camera tilt down angle from horizontal in
+    // deg
     // Front Camera: Logitech C310
     public static final int FRONTCAM_IMAGE_WIDTH                = 640;
     public static final int FRONTCAM_IMAGE_HEIGHT               = 480;
@@ -225,10 +226,10 @@ public class RobotParams
     public static final double FRONTCAM_CX                      = 330.489;  // in pixels
     public static final double FRONTCAM_CY                      = 248.997;  // in pixels
     // Elevator Camera: Logitech C310
-    public static final int ELEVATORCAM_IMAGE_WIDTH             = 480;
-    public static final int ELEVATORCAM_IMAGE_HEIGHT            = 640;
-    public static final double ELEVATORCAM_FOV                  = 53.0;
-    public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_FOV/ELEVATORCAM_IMAGE_HEIGHT;
+    public static final int ELEVATORCAM_IMAGE_WIDTH             = 640;
+    public static final int ELEVATORCAM_IMAGE_HEIGHT            = 480;
+    public static final double ELEVATORCAM_VERTICAL_FOV         = 26.0;
+    public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_VERTICAL_FOV/ELEVATORCAM_IMAGE_HEIGHT;
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 0.0;
@@ -427,9 +428,9 @@ public class RobotParams
     //
     // Turret subsystem.
     //
-    static final double TURRET_KP                               = 0.028;
+    static final double TURRET_KP                               = 0.03;
     static final double TURRET_KI                               = 0.0;
-    static final double TURRET_KD                               = 0.0;
+    static final double TURRET_KD                               = 0.001;
     static final double TURRET_TOLERANCE                        = 0.5;
     // Rev Core Hex Motor (https://www.revrobotics.com/rev-41-1300/)
     static final double TURRET_ENCODER_PPR                      = 288.0;
@@ -446,6 +447,7 @@ public class RobotParams
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
     static final double TURRET_CAL_POWER                        = 0.3;
+    static final double TURRET_POWER_SCALE                      = 1.0;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;

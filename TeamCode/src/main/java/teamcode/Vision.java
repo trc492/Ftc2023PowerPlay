@@ -24,7 +24,6 @@ package teamcode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -49,8 +48,8 @@ public class Vision
     public static final String LABEL_BOLT = "1 Bolt";
     public static final String LABEL_BULB = "2 Bulb";
     public static final String LABEL_PANEL = "3 Panel";
-    public static final String SAW_TARGET = "SawTarget";
-    public static final String GOT_TARGET = "GotTarget";
+    public static final String GOT_CONE = "GotCone";
+    public static final String GOT_POLE = "GotPole";
     public static final String IMAGE1_NAME = "Red Audience Wall";
     public static final String IMAGE2_NAME = "Red Rear Wall";
     public static final String IMAGE3_NAME = "Blue Audience Wall";
@@ -65,13 +64,13 @@ public class Vision
             new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
             new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
             new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
-            new TrcRevBlinkin.Pattern(SAW_TARGET, TrcRevBlinkin.RevLedPattern.SolidViolet),
-            new TrcRevBlinkin.Pattern(GOT_TARGET, TrcRevBlinkin.RevLedPattern.SolidAqua),
+            new TrcRevBlinkin.Pattern(GOT_CONE, TrcRevBlinkin.RevLedPattern.SolidAqua),
+            new TrcRevBlinkin.Pattern(GOT_POLE, TrcRevBlinkin.RevLedPattern.SolidYellow),
             new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
             new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
             new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
             new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidYellow),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray)
         };
@@ -318,6 +317,11 @@ public class Vision
             targets = frontEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
         }
 
+        if (robot.blinkin != null)
+        {
+            robot.blinkin.setPatternState(Vision.GOT_CONE, targets != null);
+        }
+
         //noinspection unchecked
         return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
     }   //getDetectedConeInfo
@@ -335,6 +339,11 @@ public class Vision
         if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
         {
             targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
+        }
+
+        if (robot.blinkin != null)
+        {
+            robot.blinkin.setPatternState(Vision.GOT_POLE, targets != null);
         }
 
         //noinspection unchecked

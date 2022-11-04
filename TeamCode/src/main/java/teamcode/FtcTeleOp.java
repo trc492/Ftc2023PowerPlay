@@ -143,6 +143,7 @@ public class FtcTeleOp extends FtcOpMode
         // Tell robot object opmode is about to start so it can do the necessary start initialization for the mode.
         //
         robot.startMode(nextMode);
+        updateDriveModeLeds();
         if (nextMode == TrcRobot.RunMode.TELEOP_MODE)
         {
             robot.globalTracer.traceInfo("TeleOp.startMode", "autoChoices=%s", FtcAuto.autoChoices);
@@ -263,7 +264,8 @@ public class FtcTeleOp extends FtcOpMode
 
         if (robot.turret != null)
         {
-            double turretPower = operatorGamepad.getLeftTrigger(true) - operatorGamepad.getRightTrigger(true);
+            double turretPower = (operatorGamepad.getLeftTrigger(true) - operatorGamepad.getRightTrigger(true)) *
+                                 RobotParams.TURRET_POWER_SCALE;
             robot.turret.setPower(turretPower, !manualOverride);
 //            double turretX = operatorGamepad.getLeftStickX();
 //            double turretY = operatorGamepad.getLeftStickY();
@@ -523,10 +525,18 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
+//                if (pressed)
+//                {
+//                    robot.turret.setTarget(robot.turret.getPosition() + RobotParams.ELEVATORCAM_VERTICAL_FOV);
+//                }
                 manualOverride = pressed;
                 break;
 
             case FtcGamepad.GAMEPAD_RBUMPER:
+//                if (pressed)
+//                {
+//                    robot.turret.setTarget(robot.turret.getPosition() - RobotParams.ELEVATORCAM_VERTICAL_FOV);
+//                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
