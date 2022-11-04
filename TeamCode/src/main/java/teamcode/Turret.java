@@ -69,10 +69,22 @@ public class Turret
 //            .setStallProtectionParams(
 //                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
 //                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
+            .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
+        pidTurret.getPidController().setOutputLimit(0.5);
     }   //Turret
+
+    /**
+     * This method returns the PID actuator object.
+     *
+     * @return PID Actuator object.
+     */
+    public TrcPidActuator getPidActuator()
+    {
+        return pidTurret;
+    }   //getPidActuator
 
     /**
      * This method returns the current turret position in degrees.

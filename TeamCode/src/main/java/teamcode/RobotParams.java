@@ -373,6 +373,7 @@ public class RobotParams
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
     static final double CONE_GRAB_HEIGHT                        = 12.0;
+    static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
             CONE_GRAB_HEIGHT,                                   // Slot 1
@@ -419,6 +420,7 @@ public class RobotParams
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
     static final double ARM_SCORE_POS                           = 24.0;
     static final double ARM_PICKUP_POS                          = 90.0;
+    static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
             ARM_MIN_POS,                                        // Slot 0: Up position
             ARM_SCORE_POS,                                      // Slot 1
@@ -428,10 +430,10 @@ public class RobotParams
     //
     // Turret subsystem.
     //
-    static final double TURRET_KP                               = 0.03;
+    static final double TURRET_KP                               = 0.05;
     static final double TURRET_KI                               = 0.0;
-    static final double TURRET_KD                               = 0.001;
-    static final double TURRET_TOLERANCE                        = 0.5;
+    static final double TURRET_KD                               = 0.0;
+    static final double TURRET_TOLERANCE                        = 1.0;
     // Rev Core Hex Motor (https://www.revrobotics.com/rev-41-1300/)
     static final double TURRET_ENCODER_PPR                      = 288.0;
     static final double TURRET_GEAR_RATIO                       = 100.0/60.0;
@@ -456,6 +458,7 @@ public class RobotParams
     static final double TURRET_RIGHT                            = 90.0;
     static final double TURRET_FRONT                            = 180.0;
     static final double TURRET_LEFT                             = 270.0;
+    static final double TURRET_PRESET_TOLERANCE                 = 10.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
         TURRET_BACK,    // Slot 0
         TURRET_RIGHT,   // Slot 1

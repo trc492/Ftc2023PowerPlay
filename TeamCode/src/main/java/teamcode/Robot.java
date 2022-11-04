@@ -162,6 +162,7 @@ public class Robot
 //                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
 //                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
+                        .setPresetTolerance(RobotParams.ELEVATOR_PRESET_TOLERANCE)
                         .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
@@ -185,6 +186,7 @@ public class Robot
                             RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
                             RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
+                        .setPresetTolerance(RobotParams.ARM_PRESET_TOLERANCE)
                         .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);

@@ -149,6 +149,7 @@ public class FtcTeleOp extends FtcOpMode
         //
         robot.startMode(nextMode);
         updateDriveModeLeds();
+
         if (nextMode == TrcRobot.RunMode.TELEOP_MODE)
         {
             robot.globalTracer.traceInfo("TeleOp.startMode", "autoChoices=%s", FtcAuto.autoChoices);
