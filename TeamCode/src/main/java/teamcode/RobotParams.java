@@ -357,7 +357,7 @@ public class RobotParams
     static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
     static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
     static final double ELEVATOR_OFFSET                         = 7.0;              // in inches
-    static final double ELEVATOR_MIN_POS                        = 0.0;
+    static final double ELEVATOR_MIN_POS                        = 6.7;
     static final double ELEVATOR_MAX_POS                        = 36.0;
     static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
     static final double ELEVATOR_POS_FOR_TURRET_TURN            = ELEVATOR_MIN_POS_FOR_TURRET + 2.0;
@@ -366,7 +366,7 @@ public class RobotParams
     static final boolean ELEVATOR_LOWER_LIMIT_INVERTED          = false;
     static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH        = false;
     static final boolean ELEVATOR_UPPER_LIMIT_INVERTED          = false;
-    static final double ELEVATOR_CAL_POWER                      = -0.1;
+    static final double ELEVATOR_CAL_POWER                      = -0.4;
     static final double ELEVATOR_POWER_COMPENSATION             = 0.1;
     static final double ELEVATOR_STALL_MIN_POWER                = 0.3;
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
@@ -376,12 +376,12 @@ public class RobotParams
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
             CONE_GRAB_HEIGHT,                                   // Slot 1
-            STACKED_CONE_ADDITION + CONE_GRAB_HEIGHT,           // Slot 2
-            STACKED_CONE_ADDITION * 2 + CONE_GRAB_HEIGHT,       // Slot 3
-            STACKED_CONE_ADDITION * 3 + CONE_GRAB_HEIGHT,       // Slot 4
-            STACKED_CONE_ADDITION * 4 + CONE_GRAB_HEIGHT,       // Slot 5
-            LOW_JUNCTION_HEIGHT,                                // Slot 6
-            MID_JUNCTION_HEIGHT,                                // Slot 7
+//            STACKED_CONE_ADDITION + CONE_GRAB_HEIGHT,           // Slot 2
+//            STACKED_CONE_ADDITION * 2 + CONE_GRAB_HEIGHT,       // Slot 3
+//            STACKED_CONE_ADDITION * 3 + CONE_GRAB_HEIGHT,       // Slot 4
+//            STACKED_CONE_ADDITION * 4 + CONE_GRAB_HEIGHT,       // Slot 5
+//            LOW_JUNCTION_HEIGHT,                                // Slot 6
+//            MID_JUNCTION_HEIGHT,                                // Slot 7
             HIGH_JUNCTION_HEIGHT,                               // Slot 8
             ELEVATOR_MAX_POS                                    // Slot 9
     };

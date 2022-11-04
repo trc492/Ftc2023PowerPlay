@@ -33,6 +33,10 @@ import TrcFtcLib.ftclib.FtcOpMode;
 @TeleOp(name="FtcTeleOp", group="Ftc3543")
 
 /*
+
+    //TODOS:
+    // - OPERATOR BUTTON: after dropping cone buttons to retract everyting: bring turret to the front while lowering elevator(add a delay to elevator), extend armvds
+    // --
     Driver Controls:
     - LeftStickX (Rotation)
     - RightStickX (Strafe Left/Right), RightStickY (Forward/Backward)
@@ -44,7 +48,8 @@ import TrcFtcLib.ftclib.FtcOpMode;
     - Turret: LeftTrigger (anti-clockwise), RightTrigger (clockwise),
               DPadLeft (anti-clockwise preset), DPadRight (clockwise preset)
     - Elevator: RightStickY (Up/Down), DPadUp (preset up), DPadDown (preset down)
-    - Arm: LeftStickY (Up/Down), B (Extended), X (Retract)
+    - Arm: LeftStickY (Up/Down)
+    - Retract Everything: B
     - Intake: Hold A (Dump), Hold Y (Pickup)
     - Picking up cones - Operator Right bumper
         -Prereqs: assumes intake is right above cone/ conestack
@@ -247,7 +252,7 @@ public class FtcTeleOp extends FtcOpMode
 
         if (robot.arm != null)
         {
-            double armPower = operatorGamepad.getLeftStickY(true);
+            double armPower = -operatorGamepad.getLeftStickY(true);
             if (manualOverride)
             {
                 robot.arm.setPower(armPower);
@@ -502,12 +507,17 @@ public class FtcTeleOp extends FtcOpMode
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
                 }
                 break;
-
+            //extend arm(1s delay), turn turret to face front, lower elevator after half a second
             case FtcGamepad.GAMEPAD_B:
-                if (robot.arm != null && pressed)
-                {
-                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
+                if(pressed){
+                    robot.arm.setTarget(RobotParams.ARM_MAX_POS);
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT);
+                    robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, null, 0.0);
                 }
+//                if (robot.arm != null && pressed)
+//                {
+//                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
+//                }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
