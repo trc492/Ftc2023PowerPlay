@@ -456,28 +456,28 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
-                if (gridDriveTask != null && pressed)
+                if (pressed && gridDriveTask != null)
                 {
                     gridDriveTask.setRelativeYTileTarget(1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                if (gridDriveTask != null && pressed)
+                if (pressed && gridDriveTask != null)
                 {
                     gridDriveTask.setRelativeYTileTarget(-1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                if (gridDriveTask != null && pressed)
+                if (pressed && gridDriveTask != null)
                 {
                     gridDriveTask.setRelativeXTileTarget(-1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                if (gridDriveTask != null && pressed)
+                if (pressed && gridDriveTask != null)
                 {
                     gridDriveTask.setRelativeXTileTarget(1);
                 }
@@ -502,12 +502,12 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
-                if (robot.intake != null && pressed)
+                if (pressed && robot.intake != null)
                 {
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
                 }
                 break;
-            //extend arm(1s delay), turn turret to face front, lower elevator after half a second
+            // Extend arm, turn turret to face front, lower elevator after half a second
             case FtcGamepad.GAMEPAD_B:
                 if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null)
                 {
@@ -515,71 +515,63 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.setTarget(RobotParams.TURRET_FRONT);
                     robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, null, 0.0);
                 }
-//                if (robot.arm != null && pressed)
+//                if (pressed && robot.arm != null)
 //                {
 //                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
 //                }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
-                if (robot.arm != null && pressed)
+                if (pressed && robot.arm != null)
                 {
                     robot.arm.setTarget(RobotParams.ARM_RETRACTED);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
-                if (robot.intake != null && pressed)
+                if (pressed && robot.intake != null)
                 {
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
-//                if (pressed)
-//                {
-//                    robot.turret.setTarget(robot.turret.getPosition() + RobotParams.ELEVATORCAM_VERTICAL_FOV);
-//                }
                 manualOverride = pressed;
                 break;
 
             case FtcGamepad.GAMEPAD_RBUMPER:
-//                if (pressed)
-//                {
-//                    robot.turret.setTarget(robot.turret.getPosition() - RobotParams.ELEVATORCAM_VERTICAL_FOV);
-//                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
-                if (robot.elevator != null && pressed)
+                if (pressed && robot.elevator != null)
                 {
                     robot.elevator.presetPositionUp();
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                if (robot.elevator != null && pressed)
+                if (pressed && robot.elevator != null)
                 {
                     robot.elevator.presetPositionDown();
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                if (robot.turret != null && pressed)
+                if (pressed && robot.turret != null)
                 {
                     robot.turret.presetPositionUp();
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                if (robot.turret != null && pressed)
+                if (pressed && robot.turret != null)
                 {
                     robot.turret.presetPositionDown();
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_BACK:
-                if (robot.turret != null && pressed)
+                if (pressed && robot.turret != null)
                 {
                     robot.turret.zeroCalibrate();
                 }
