@@ -366,7 +366,7 @@ public class RobotParams
     static final boolean ELEVATOR_LOWER_LIMIT_INVERTED          = false;
     static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH        = false;
     static final boolean ELEVATOR_UPPER_LIMIT_INVERTED          = false;
-    static final double ELEVATOR_CAL_POWER                      = -0.4;
+    static final double ELEVATOR_CAL_POWER                      = -0.1;
     static final double ELEVATOR_POWER_COMPENSATION             = 0.1;
     static final double ELEVATOR_STALL_MIN_POWER                = 0.3;
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;

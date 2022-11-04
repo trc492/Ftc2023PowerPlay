@@ -509,7 +509,8 @@ public class FtcTeleOp extends FtcOpMode
                 break;
             //extend arm(1s delay), turn turret to face front, lower elevator after half a second
             case FtcGamepad.GAMEPAD_B:
-                if(pressed){
+                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null)
+                {
                     robot.arm.setTarget(RobotParams.ARM_MAX_POS);
                     robot.turret.setTarget(RobotParams.TURRET_FRONT);
                     robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, null, 0.0);
