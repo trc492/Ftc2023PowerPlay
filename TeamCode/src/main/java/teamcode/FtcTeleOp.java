@@ -515,27 +515,19 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_B:
                 if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null)
                 {
-                    robot.arm.setTarget(0.0, RobotParams.ARM_MAX_POS, true, 1.0, null, null, 0.0);
+                    robot.arm.setTarget(RobotParams.ARM_MAX_POS);
                     robot.turret.setTarget(RobotParams.TURRET_FRONT);
                     robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, true, 1.0, null, null, 0.0);
                 }
-//                if (pressed && robot.arm != null)
-//                {
-//                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
-//                }
                 break;
             //Prepares for scoring on the high pole: raises elevator
             case FtcGamepad.GAMEPAD_X:
-                if(pressed && robot.arm != null && robot.elevator != null && robot.turret != null){
+                if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null)
+                {
+                    robot.arm.setTarget( RobotParams.ARM_PARALLEL);
+                    robot.turret.setTarget(RobotParams.TURRET_LEFT);
                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT);
-                   robot.arm.setTarget( RobotParams.ARM_PARALLEL);
-                   robot.turret.setTarget(RobotParams.TURRET_LEFT);
                 }
-                ;
-//                if (pressed && robot.arm != null)
-//                {
-//                    robot.arm.setTarget(RobotParams.ARM_RETRACTED);
-//                }
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
