@@ -73,7 +73,7 @@ public class Turret
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
-        pidTurret.getPidController().setOutputLimit(0.5);
+        //pidTurret.getPidController().setOutputLimit(0.5);
     }   //Turret
 
     /**

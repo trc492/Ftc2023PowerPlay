@@ -256,7 +256,7 @@ public class TaskCyclingCones
                     break;
 
                 case DRIVE_TO_CONE:
-                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
+                    robot.arm.setTarget(RobotParams.ARM_PARALLEL);
                     if (targetLocation != null)
                     {
                         // Vision found the cone, drive to it with incremental pure pursuit.

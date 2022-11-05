@@ -371,11 +371,11 @@ public class RobotParams
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double CONE_GRAB_HEIGHT                        = 12.0;
+    static final double ELEVATOR_CONE_GRAB_HEIGHT                        = 13;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
-            CONE_GRAB_HEIGHT,                                   // Slot 1
+            ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
 //            STACKED_CONE_ADDITION + CONE_GRAB_HEIGHT,           // Slot 2
 //            STACKED_CONE_ADDITION * 2 + CONE_GRAB_HEIGHT,       // Slot 3
 //            STACKED_CONE_ADDITION * 3 + CONE_GRAB_HEIGHT,       // Slot 4
@@ -404,6 +404,7 @@ public class RobotParams
      */
     static final double ARM_MIN_POS                             = 8.0;
     static final double ARM_MAX_POS                             = 140.0;
+
     static final double ARM_MIN_POS_FOR_TURRET                  = 65.0;
     static final double ARM_POS_FOR_TURRET_TURN                 = ARM_MIN_POS_FOR_TURRET - 5.0;
     static final boolean ARM_MOTOR_INVERTED                     = true;
@@ -418,12 +419,12 @@ public class RobotParams
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
     static final double ARM_SCORE_POS                           = 24.0;
-    static final double ARM_PICKUP_POS                          = 90.0;
+    static final double ARM_PARALLEL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
             ARM_MIN_POS,                                        // Slot 0: Up position
             ARM_SCORE_POS,                                      // Slot 1
-            ARM_PICKUP_POS,                                     // Slot 2
+            ARM_PARALLEL,                                     // Slot 2
             ARM_MAX_POS                                         // Slot 2: Down position
     };
     //
