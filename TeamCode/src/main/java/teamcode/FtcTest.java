@@ -128,6 +128,7 @@ public class FtcTest extends FtcTeleOp
     private int posIndex = 0;
     private int wheelIndex = 0;
 
+    private boolean useFrontEocv = true;
     //
     // Overrides FtcOpMode abstract method.
     //
@@ -268,22 +269,24 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.vuforiaVision.setEnabled(true);
                     }
 
-                    if (robot.vision.frontEocvVision != null || robot.vision.elevatorEocvVision != null)
-                    {
-                        robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
-                        if (RobotParams.Preferences.testFrontEocv)
-                        {
-                            robot.vision.frontEocvVision.setEnabled(true);
-                        }
-                        else
-                        {
-                            robot.vision.elevatorEocvVision.setEnabled(true);
-                        }
-                    }
-                    else if (robot.vision.tensorFlowVision != null)
+                    if (robot.vision.tensorFlowVision != null)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling TensorFlow.");
                         robot.vision.tensorFlowVision.setEnabled(true);
+                    }
+                    else
+                    {
+                        if (robot.vision.frontEocvVision != null)
+                        {
+                            robot.globalTracer.traceInfo(funcName, "Enabling Front EocvVision.");
+                            robot.vision.frontEocvVision.setEnabled(true);
+                        }
+
+                        if (robot.vision.elevatorEocvVision != null)
+                        {
+                            robot.globalTracer.traceInfo(funcName, "Enabling Elevator EocvVision.");
+                            robot.vision.elevatorEocvVision.setEnabled(true);
+                        }
                     }
                 }
                 break;
@@ -566,6 +569,8 @@ public class FtcTest extends FtcTeleOp
                         if (pressed && robot.vision != null && robot.vision.frontEocvVision != null)
                         {
                             robot.vision.frontEocvVision.setNextObjectType();
+                            useFrontEocv =
+                                robot.vision.frontEocvVision.getDetectObjectType() != EocvVision.ObjectType.YELLOW_POLE;
                         }
                         processed = true;
                     }
@@ -574,9 +579,16 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_X:
                     if (testChoices.test == Test.VISION_TEST)
                     {
-                        if (pressed && robot.vision != null && robot.vision.frontEocvVision != null)
+                        if (pressed && robot.vision != null)
                         {
-                            robot.vision.frontEocvVision.toggleColorFilterOutput();
+                            if (useFrontEocv && robot.vision.frontEocvVision != null)
+                            {
+                                robot.vision.frontEocvVision.toggleColorFilterOutput();
+                            }
+                            else if (!useFrontEocv && robot.vision.elevatorEocvVision != null)
+                            {
+                                robot.vision.elevatorEocvVision.toggleColorFilterOutput();;
+                            }
                         }
                         processed = true;
                     }
@@ -946,7 +958,8 @@ public class FtcTest extends FtcTeleOp
                 int lineIndex = 10;
                 int endLine = lineIndex + maxNumLines;
                 int numTargets;
-                TrcVisionTargetInfo<?>[] targetsInfo = robot.vision.getDetectedTargetsInfo(null);
+                TrcVisionTargetInfo<?>[] targetsInfo = useFrontEocv? robot.vision.getDetectedTargetsInfo(null):
+                                                                     robot.vision.getDetectedPolesInfo();
 
                 if (targetsInfo != null)
                 {

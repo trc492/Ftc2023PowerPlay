@@ -52,7 +52,6 @@ public class RobotParams
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
         public static boolean showEasyOpenCvView = false;
-        public static boolean testFrontEocv = true;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -216,7 +215,7 @@ public class RobotParams
     public static final double FRONTCAM_FRONT_OFFSET            = 2.000;//Camera offset from front of robot in inches
     public static final double FRONTCAM_LEFT_OFFSET             = 7.125;//Camera offset from left of robot in inches
     public static final double FRONTCAM_HEIGHT_OFFSET           = 3.750;//Camera offset from floor in inches
-    public static final double FRONTCAM_TILT_DOWN               = -2.00;//Camera tilt down angle from horizontal in
+    public static final double FRONTCAM_TILT_DOWN               = 15.00;//Camera tilt down angle from horizontal in
     // deg
     // Front Camera: Logitech C310
     public static final int FRONTCAM_IMAGE_WIDTH                = 640;

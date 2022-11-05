@@ -221,7 +221,7 @@ public class TaskCyclingCones
                     {
                         // Use vision to find the relative location of the cone.
                         TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> coneInfo =
-                            robot.vision.getDetectedConeInfo();
+                            robot.vision.getBestDetectedConeInfo();
                         if (coneInfo != null)
                         {
                             targetLocation = new TrcPose2D(
@@ -303,7 +303,7 @@ public class TaskCyclingCones
                 case LOOK_FOR_POLE:
                     // Call vision to detect the junction pole
                     TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
-                        robot.vision.getDetectedPoleInfo();
+                        robot.vision.getBestDetectedPoleInfo();
                     if (poleInfo != null)
                     {
                         poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;

@@ -48,8 +48,9 @@ public class Vision
     public static final String LABEL_BOLT = "1 Bolt";
     public static final String LABEL_BULB = "2 Bulb";
     public static final String LABEL_PANEL = "3 Panel";
-    public static final String GOT_CONE = "GotCone";
-    public static final String GOT_POLE = "GotPole";
+    public static final String GOT_RED_CONE = "GotRedCone";
+    public static final String GOT_BLUE_CONE = "GotBlueCone";
+    public static final String GOT_YELLOW_POLE = "GotYellowPole";
     public static final String IMAGE1_NAME = "Red Audience Wall";
     public static final String IMAGE2_NAME = "Red Rear Wall";
     public static final String IMAGE3_NAME = "Blue Audience Wall";
@@ -60,19 +61,20 @@ public class Vision
     public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
 
     private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
-        {
-            new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
-            new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
-            new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
-            new TrcRevBlinkin.Pattern(GOT_CONE, TrcRevBlinkin.RevLedPattern.SolidAqua),
-            new TrcRevBlinkin.Pattern(GOT_POLE, TrcRevBlinkin.RevLedPattern.SolidYellow),
+        {   // Sorted in increasing priorities.
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
             new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
             new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
             new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
             new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray)
+            new TrcRevBlinkin.Pattern(GOT_RED_CONE, TrcRevBlinkin.RevLedPattern.SolidRed),
+            new TrcRevBlinkin.Pattern(GOT_BLUE_CONE, TrcRevBlinkin.RevLedPattern.SolidBlue),
+            new TrcRevBlinkin.Pattern(GOT_YELLOW_POLE, TrcRevBlinkin.RevLedPattern.SolidYellow),
+            new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
+            new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
+            new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
         };
 
     private final Robot robot;
@@ -247,15 +249,15 @@ public class Vision
                 switch (detectedSignal)
                 {
                     case 1:
-                        robot.blinkin.setPatternState(Vision.LABEL_BOLT, true);
+                        robot.blinkin.setPatternState(Vision.LABEL_BOLT, true, 1.0);
                         break;
 
                     case 2:
-                        robot.blinkin.setPatternState(Vision.LABEL_BULB, true);
+                        robot.blinkin.setPatternState(Vision.LABEL_BULB, true, 1.0);
                         break;
 
                     case 3:
-                        robot.blinkin.setPatternState(Vision.LABEL_PANEL, true);
+                        robot.blinkin.setPatternState(Vision.LABEL_PANEL, true, 1.0);
                         break;
                 }
             }
@@ -294,6 +296,15 @@ public class Vision
         {
             targets = frontEocvVision.getDetectedTargetsInfo(
                 null, null, RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+            if (targets != null && robot.blinkin != null)
+            {
+                EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
+                if (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE)
+                {
+                    robot.blinkin.setPatternState(
+                        detectObjType == EocvVision.ObjectType.RED_CONE ? GOT_RED_CONE : GOT_BLUE_CONE, true, 1.0);
+                }
+            }
         }
         else if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
         {
@@ -304,51 +315,75 @@ public class Vision
     }   //getDetectedTargetsInfo
 
     /**
-     * This method returns the detected cone info.
+     * This method returns an array of detected cones info.
      *
-     * @return detected cone info, null if none detected.
+     * @return array of detected cones info, null if none detected.
      */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedConeInfo()
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] getDetectedConesInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
+        EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
 
-        if (frontEocvVision != null && frontEocvVision.isEnabled())
+        if (frontEocvVision != null && frontEocvVision.isEnabled() &&
+            (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE))
         {
             targets = frontEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
-        }
 
-        if (robot.blinkin != null)
-        {
-            robot.blinkin.setPatternState(Vision.GOT_CONE, targets != null);
+            if (targets != null && robot.blinkin != null)
+            {
+                robot.blinkin.setPatternState(
+                    detectObjType == EocvVision.ObjectType.RED_CONE? GOT_RED_CONE: GOT_BLUE_CONE, true, 1.0);
+            }
         }
 
         //noinspection unchecked
-        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
-    }   //getDetectedConeInfo
+        return (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[])targets;
+    }   //getDetectedConesInfo
 
-    /**/
     /**
-     * This method returns the detected pole info.
+     * This method returns the best detected cone info.
      *
-     * @return detected pole info, null if none detected.
+     * @return best detected cone info, null if none detected.
      */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedPoleInfo()
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getBestDetectedConeInfo()
+    {
+        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] targets = getDetectedConesInfo();
+        return targets != null ? targets[0] : null;
+    }   //getBestDetectedConeInfo
+
+    /**
+     * This method returns an array of detected poles info.
+     *
+     * @return an array of detected poles info, null if none detected.
+     */
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] getDetectedPolesInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
         if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
         {
             targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
-        }
 
-        if (robot.blinkin != null)
-        {
-            robot.blinkin.setPatternState(Vision.GOT_POLE, targets != null);
+            if (targets != null && robot.blinkin != null)
+            {
+                robot.blinkin.setPatternState(GOT_YELLOW_POLE, true, 1.0);
+            }
         }
 
         //noinspection unchecked
-        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
-    }   //getDetectedPoleInfo
+        return (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[])targets;
+    }   //getDetectedPolesInfo
+
+    /**
+     * This method returns the best detected pole info.
+     *
+     * @return best detected pole info, null if none detected.
+     */
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getBestDetectedPoleInfo()
+    {
+        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] targets = getDetectedPolesInfo();
+        return targets != null ? targets[0] : null;
+    }   //getBestDetectedPoleInfo
 
     /**
      * This method returns the best detected target info.

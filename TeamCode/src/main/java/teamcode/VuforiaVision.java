@@ -198,11 +198,7 @@ public class VuforiaVision
             {
                 if (robotLocation != null)
                 {
-                    blinkin.setPatternState(targetName, true);
-                }
-                else
-                {
-                    blinkin.reset();
+                    blinkin.setPatternState(targetName, true, 1.0);
                 }
             }
         }
