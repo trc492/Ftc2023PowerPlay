@@ -51,7 +51,7 @@ public class RobotParams
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = false;
+        public static boolean showEasyOpenCvView = true;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -241,20 +241,17 @@ public class RobotParams
 
     // These should be in real-world robot coordinates. Needs calibration after camera is actually mounted in position.
     // Measurement unit: inches
-    public static final double HOMOGRAPHY_WORLD_TOPLEFT_X       = -22.25;
-    public static final double HOMOGRAPHY_WORLD_TOPLEFT_Y       = 60.0;
-    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_X      = 23.0;
-    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_Y      = 60.0;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_X    = -8.75;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_Y    = 16.0;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_X   = 7.5;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y   = 16.0;
+    public static final double HOMOGRAPHY_WORLD_TOPLEFT_X       = -27.750;
+    public static final double HOMOGRAPHY_WORLD_TOPLEFT_Y       = 64.500;
+    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_X      = 19.000;
+    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_Y      = 58.500;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_X    = -2.250;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_Y    = 5.750;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_X   = 2.750;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y   = 5.875;
 
     public static final TrcHomographyMapper.Rectangle cameraRect = new TrcHomographyMapper.Rectangle(
-        RobotParams.HOMOGRAPHY_CAMERA_TOPLEFT_X, RobotParams.HOMOGRAPHY_CAMERA_TOPLEFT_Y,
-        RobotParams.HOMOGRAPHY_CAMERA_TOPRIGHT_X, RobotParams.HOMOGRAPHY_CAMERA_TOPRIGHT_Y,
-        RobotParams.HOMOGRAPHY_CAMERA_BOTTOMLEFT_X, RobotParams.HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y,
-        RobotParams.HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X, RobotParams.HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y);
+        0, 80, 639, 80, 0, 479, 639, 479);
     public static final TrcHomographyMapper.Rectangle worldRect = new TrcHomographyMapper.Rectangle(
         RobotParams.HOMOGRAPHY_WORLD_TOPLEFT_X, RobotParams.HOMOGRAPHY_WORLD_TOPLEFT_Y,
         RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_X, RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_Y,
@@ -350,7 +347,7 @@ public class RobotParams
     static final double ELEVATOR_KP                             = 0.5;
     static final double ELEVATOR_KI                             = 0.0;
     static final double ELEVATOR_KD                             = 0.025;
-    static final double ELEVATOR_TOLERANCE                      = 0.5;
+    static final double ELEVATOR_TOLERANCE                      = 2.0;
     static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_435_ENCODER_PPR;
     static final double ELEVATOR_PULLEY_DIAMETER                = 1.5*1.06;         // in inches
     static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
@@ -372,6 +369,7 @@ public class RobotParams
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
     static final double ELEVATOR_CONE_GRAB_HEIGHT                        = 13;
+    static final double ELEVATOR_SCORING_HEIGHT                 = 30;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
@@ -418,7 +416,7 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
-    static final double ARM_SCORE_POS                           = 24.0;
+    static final double ARM_SCORE_POS                           = 23;
     static final double ARM_PARALLEL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
@@ -430,7 +428,7 @@ public class RobotParams
     //
     // Turret subsystem.
     //
-    static final double TURRET_KP                               = 0.05;
+    static final double TURRET_KP                               = 0.06;
     static final double TURRET_KI                               = 0.0;
     static final double TURRET_KD                               = 0.0;
     static final double TURRET_TOLERANCE                        = 1.0;
@@ -448,7 +446,7 @@ public class RobotParams
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = 0.3;
+    static final double TURRET_CAL_POWER                        = 0.5;
     static final double TURRET_POWER_SCALE                      = 1.0;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;

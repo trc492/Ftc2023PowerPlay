@@ -40,8 +40,8 @@ import TrcFtcLib.ftclib.FtcEocvDetector;
  */
 public class EocvVision extends FtcEocvDetector
 {
-    private static final double[] colorThresholdsRedCone = {128.0, 255.0, 0.0, 100.0, 0.0, 60.0};
-    private static final double[] colorThresholdsBlueCone = {0.0, 100.0, 0.0, 100.0, 100.0, 255.0};
+    private static final double[] colorThresholdsRedCone = {100.0, 255.0, 0.0, 100.0, 0.0, 60.0};
+    private static final double[] colorThresholdsBlueCone = {0.0, 60.0, 0.0, 100.0, 100, 255.0};
     private static final double[] colorThresholdsYellowPole = {128.0, 255.0, 128.0, 255.0, 0.0, 120.0};
 
     public enum ObjectType
@@ -104,7 +104,7 @@ public class EocvVision extends FtcEocvDetector
         super(instanceName, openCvCam, imageWidth, imageHeight, cameraRotation, cameraRect, worldRect, tracer);
 
         this.tracer = tracer;
-        TrcOpenCvColorBlobPipeline.FilterContourParams coneFilterContourParams =
+        TrcOpenCvColorBlobPipeline.FilterContourParams redConeFilterContourParams =
             new TrcOpenCvColorBlobPipeline.FilterContourParams()
                 .setMinArea(500)
                 .setMinPerimeter(100.0)
@@ -113,6 +113,15 @@ public class EocvVision extends FtcEocvDetector
                 .setSolidityRange(0.0, 100.0)
                 .setVerticesRange(0.0, 1000.0)
                 .setAspectRatioRange(0.0, 1000.0);
+        TrcOpenCvColorBlobPipeline.FilterContourParams blueConeFilterContourParams =
+                new TrcOpenCvColorBlobPipeline.FilterContourParams()
+                        .setMinArea(1000)
+                        .setMinPerimeter(100.0)
+                        .setWidthRange(50.0, 1000.0)
+                        .setHeightRange(20.0, 1000.0)
+                        .setSolidityRange(0.0, 100.0)
+                        .setVerticesRange(0.0, 1000.0)
+                        .setAspectRatioRange(0.0, 1000.0);
         TrcOpenCvColorBlobPipeline.FilterContourParams poleFilterContourParams =
             new TrcOpenCvColorBlobPipeline.FilterContourParams()
                 .setMinArea(10000.0)
@@ -127,9 +136,9 @@ public class EocvVision extends FtcEocvDetector
             RobotParams.FRONTCAM_FX, RobotParams.FRONTCAM_FY, RobotParams.FRONTCAM_CX, RobotParams.FRONTCAM_CY,
             tracer);
         redConePipeline = new FtcEocvColorBlobPipeline(
-            "redConePipeline", false, colorThresholdsRedCone, coneFilterContourParams, tracer);
+            "redConePipeline", false, colorThresholdsRedCone, redConeFilterContourParams, tracer);
         blueConePipeline = new FtcEocvColorBlobPipeline(
-            "blueConePipeline", false, colorThresholdsBlueCone, coneFilterContourParams, tracer);
+            "blueConePipeline", false, colorThresholdsBlueCone, blueConeFilterContourParams, tracer);
         yellowPolePipeline = new FtcEocvColorBlobPipeline(
             "yellowPolePipeliine", false, colorThresholdsYellowPole, poleFilterContourParams, tracer);
         if (instanceName.equals("frontEocvVision"))

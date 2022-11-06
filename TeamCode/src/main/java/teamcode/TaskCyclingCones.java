@@ -50,7 +50,9 @@ public class TaskCyclingCones
     {
         AUTO_FULL_CYCLE, //does a full cycle(pickup and scoring), used for auto
         SCORING_ONLY,//assumes robot already has a cone, scores it onto the pole
-        PICKUP_ONLY//picks up a cone from the stack
+        PICKUP_ONLY,//picks up a cone from the stack
+
+        SCORE_WITH_VISION
     }
 
     public enum VisionType
@@ -168,10 +170,13 @@ public class TaskCyclingCones
         this.onFinishEvent = event;
         this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
-        sm.start(State.START);
         if (cycleType == CycleType.SCORING_ONLY)
         {
-            //sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.ALIGN_TO_CONE);
+            sm.start(State.LOOK_FOR_POLE);
+        }
+        else{
+            sm.start(State.START);
+
         }
     }   //startCycling
 
@@ -209,10 +214,8 @@ public class TaskCyclingCones
                             FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                                 EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                     }
-                    robot.arm.setTarget(RobotParams.ARM_SCORE_POS);
-                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, event, null);
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, event, null, 0.0, RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, RobotParams.ARM_SCORE_POS);
                     // CodeReview: may have to delay elevator until it clears the pole.
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_POS_FOR_TURRET_TURN);
                     sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                     break;
 
@@ -302,38 +305,46 @@ public class TaskCyclingCones
 
                 case LOOK_FOR_POLE:
                     // Call vision to detect the junction pole
-                    TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
-                        robot.vision.getBestDetectedPoleInfo();
-                    if (poleInfo != null)
-                    {
-                        poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
-                    }
-                    else
-                    {
-                        poleAngle = null;
-                    }
-
-                    if (poleAngle != null)
-                    {
-                        sm.setState(State.ALIGN_TO_POLE);
-                    }
-                    //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
-                    else if (visionExpireTime == null)
-                    {
-                        visionExpireTime = TrcUtil.getCurrentTime() + 0.5;
-                    }
-                    else if (TrcUtil.getCurrentTime() >= visionExpireTime)
-                    {
-                        //times up, reset expireTime, assume it's aligned and score.
-                        visionExpireTime = null;
+                    if(visionType == VisionType.NO_VISION){
                         sm.setState(State.SCORE);
                     }
+                    else{
+                        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
+                                robot.vision.getBestDetectedPoleInfo();
+                        if (poleInfo != null)
+                        {
+                            poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
+                        }
+                        else
+                        {
+                            poleAngle = null;
+                        }
+
+                        if (poleAngle != null)
+                        {
+                            sm.setState(State.ALIGN_TO_POLE);
+                        }
+                        //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
+                        else if (visionExpireTime == null)
+                        {
+                            visionExpireTime = TrcUtil.getCurrentTime() + 0.5;
+                        }
+                        else if (TrcUtil.getCurrentTime() >= visionExpireTime)
+                        {
+                            //times up, reset expireTime, assume it's aligned and score.
+                            visionExpireTime = null;
+                            sm.setState(State.SCORE);
+                        }
+                    }
+
                     break;
 
                 case ALIGN_TO_POLE:
                     // Call vision to detect the junction pole
-                    robot.turret.setTarget(poleAngle, 1.0, event, null);
-                    sm.waitForSingleEvent(event, State.SCORE);
+                    TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
+                    globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle );
+                    robot.turret.setTarget(robot.turret.getPosition() + poleAngle, 1.0, event, null, 0.0, null, null);
+                    sm.waitForSingleEvent(event, State.DONE);//SCORE);
                     break;
 
                 case SCORE: //7. spin intake backwards

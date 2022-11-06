@@ -45,9 +45,12 @@ public class Turret
     private double turretPowerLimit = 1.0;
     private TrcEvent turretEvent = null;
     private TrcNotifier.Receiver turretCallback = null;
+    private double turretTimeout = 0.0;
     private boolean armLevelSafe = false;
     private boolean elevatorLevelSafe = false;
     private double prevTurretPower = 0.0;
+    Double turretElevatorTarget;
+    Double turretArmTarget;
 
     public Turret(Robot robot)
     {
@@ -73,6 +76,8 @@ public class Turret
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
+        pidTurret.setMsgTracer(robot.globalTracer, true);
+
         //pidTurret.getPidController().setOutputLimit(0.5);
     }   //Turret
 
@@ -153,7 +158,7 @@ public class Turret
     {
         if (pidTurret.validatePresetIndex(preset))
         {
-            setTarget(RobotParams.TURRET_PRESET_LEVELS[preset], 1.0, null, null);
+            setTarget(RobotParams.TURRET_PRESET_LEVELS[preset], 1.0, null, null, 0.0, null, null);
         }
     }   //setPresetPosition
 
@@ -183,20 +188,25 @@ public class Turret
      * @param event specifies the event to signal when the turret is on target, can be null if not provided.
      * @param callback specifies the notify callback to call when the turret is on target, can be null if not provided.
      */
-    public void setTarget(double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback)
+    public void setTarget(
+            double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback, double timeout,
+            Double elevatorTarget, Double armTarget)
     {
         double armPos = robot.arm.getPosition();
         double elevatorPos = robot.elevator.getPosition();
 
         armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
         elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
-        if (!turnTurretToPos(target, powerLimit, event, callback))
+        if (!turnTurretToPos(target, powerLimit, event, callback, timeout, elevatorTarget, armTarget))
         {
             // Either the arm or the elevator are not at safe level, we need to raise them first before the turn.
             turretTarget = target;
             turretPowerLimit = powerLimit;
             turretEvent = event;
             turretCallback = callback;
+            turretTimeout = timeout;
+            turretArmTarget = armTarget;
+            turretElevatorTarget = elevatorTarget;
 
             if (!armLevelSafe)
             {
@@ -232,7 +242,7 @@ public class Turret
      */
     public void setTarget(double target, double powerLimit)
     {
-        setTarget(target, powerLimit, null, null);
+        setTarget(target, powerLimit, null, null, 0.0, null, null);
     }   //setTarget
 
     /**
@@ -244,7 +254,7 @@ public class Turret
      */
     public void setTarget(double target)
     {
-        setTarget(target, 1.0, null, null);
+        setTarget(target, 1.0, null, null, 0.0, null, null);
     }   //setTarget
 
     /**
@@ -323,13 +333,20 @@ public class Turret
      * @param callback specifies the notify callback to call when the turret is on target, can be null if not provided.
      * @return true if it was safe and we successfully initiated the turn, false if we did not turn.
      */
-    private boolean turnTurretToPos(double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback)
+    private boolean turnTurretToPos(
+        double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback, double timeout, Double elevatorTarget, Double armTarget)
     {
         boolean safeToTurn = armLevelSafe && elevatorLevelSafe;
 
         if (safeToTurn)
         {
-            pidTurret.setTarget(target, true, powerLimit, event, callback);
+            if(elevatorTarget != null || armTarget != null){
+                turretCallback = callback;
+                callback = this::furtherProcessing;
+                turretElevatorTarget = elevatorTarget;
+                turretArmTarget = armTarget;
+            }
+            pidTurret.setTarget(target, true, powerLimit, event, callback, timeout);
         }
 
         return safeToTurn;
@@ -396,12 +413,13 @@ public class Turret
     private void armRaiseDoneCallbackWithTurretTurn(Object context)
     {
         armRaiseDoneCallback(context);
-        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback))
+        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback, turretTimeout, turretElevatorTarget, turretArmTarget))
         {
             turretTarget = 0.0;
             turretPowerLimit = 1.0;
             turretEvent = null;
             turretCallback = null;
+            turretTimeout = 0.0;
         }
     }   //armRaiseDoneCallbackWithTurretTurn
 
@@ -414,13 +432,25 @@ public class Turret
     private void elevatorRaiseDoneCallbackWithTurretTurn(Object context)
     {
         elevatorRaiseDoneCallback(context);
-        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback))
+        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretCallback, turretTimeout, turretElevatorTarget, turretArmTarget))
         {
             turretTarget = 0.0;
             turretPowerLimit = 1.0;
             turretEvent = null;
             turretCallback = null;
+            turretTimeout = 0.0;
         }
     }   //elevatorRaiseDoneCallbackWithTurretTurn
+    private void furtherProcessing(Object context){
+        if(turretElevatorTarget != null){
+            robot.elevator.setTarget(turretElevatorTarget, true, 1.0, null, turretCallback);
+            turretElevatorTarget = null;
+            turretCallback = null;
+        }
+        if(turretArmTarget != null){
+            robot.arm.setTarget(turretArmTarget);
+            turretArmTarget = null;
+        }
+    }
 
 }   //class Turret
