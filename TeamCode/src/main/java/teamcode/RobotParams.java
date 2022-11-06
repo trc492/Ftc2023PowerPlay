@@ -51,7 +51,7 @@ public class RobotParams
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = true;
+        public static boolean showEasyOpenCvView = false;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -231,9 +231,9 @@ public class RobotParams
     public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_VERTICAL_FOV/ELEVATORCAM_IMAGE_HEIGHT;
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
-    public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 0.0;
+    public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 80.0;
     public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X     = FRONTCAM_IMAGE_WIDTH - 1;
-    public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_Y     = 0.0;
+    public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_Y     = 80.0;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_X   = 0.0;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y   = FRONTCAM_IMAGE_HEIGHT - 1;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X  = FRONTCAM_IMAGE_WIDTH - 1;
@@ -251,7 +251,10 @@ public class RobotParams
     public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y   = 5.875;
 
     public static final TrcHomographyMapper.Rectangle cameraRect = new TrcHomographyMapper.Rectangle(
-        0, 80, 639, 80, 0, 479, 639, 479);
+        RobotParams.HOMOGRAPHY_CAMERA_TOPLEFT_X, RobotParams.HOMOGRAPHY_CAMERA_TOPLEFT_Y,
+        RobotParams.HOMOGRAPHY_CAMERA_TOPRIGHT_X, RobotParams.HOMOGRAPHY_CAMERA_TOPRIGHT_Y,
+        RobotParams.HOMOGRAPHY_CAMERA_BOTTOMLEFT_X, RobotParams.HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y,
+        RobotParams.HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X, RobotParams.HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y);
     public static final TrcHomographyMapper.Rectangle worldRect = new TrcHomographyMapper.Rectangle(
         RobotParams.HOMOGRAPHY_WORLD_TOPLEFT_X, RobotParams.HOMOGRAPHY_WORLD_TOPLEFT_Y,
         RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_X, RobotParams.HOMOGRAPHY_WORLD_TOPRIGHT_Y,
@@ -368,8 +371,8 @@ public class RobotParams
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double ELEVATOR_CONE_GRAB_HEIGHT                        = 13;
-    static final double ELEVATOR_SCORING_HEIGHT                 = 30;
+    static final double ELEVATOR_CONE_GRAB_HEIGHT               = 13.0;
+    static final double ELEVATOR_SCORING_HEIGHT                 = 30.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
@@ -416,14 +419,14 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
-    static final double ARM_SCORE_POS                           = 23;
-    static final double ARM_PARALLEL                          = 90.0;
+    static final double ARM_SCORE_POS                           = 23.0;
+    static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
-            ARM_MIN_POS,                                        // Slot 0: Up position
-            ARM_SCORE_POS,                                      // Slot 1
-            ARM_PARALLEL,                                     // Slot 2
-            ARM_MAX_POS                                         // Slot 2: Down position
+        ARM_MIN_POS,                                            // Slot 0: Up position
+        ARM_SCORE_POS,                                          // Slot 1
+        ARM_HORIZONTAL,                                         // Slot 2
+        ARM_MAX_POS                                             // Slot 2: Down position
     };
     //
     // Turret subsystem.

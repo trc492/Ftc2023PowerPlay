@@ -109,7 +109,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     @Override
     public boolean cmdPeriodic(double elapsedTime)
     {
-        final boolean driveOnly = false; //Todo: need to get rid of this since subsystems are ready.
         State state = sm.checkReadyAndGetState();
 
         if (state == null)
@@ -172,41 +171,34 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // Todo: add option to do center high poles
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
-                    if (!driveOnly)
-                    {
-
-                    }
                     robot.robotDrive.purePursuitDrive.start(
-                        event, 5, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        event, 5.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-0.5, -0.85, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -90.0, autoChoices));
-                    sm.waitForSingleEvent(event, driveOnly? State.DO_CYCLE: State.RAISE_ELEVATOR_TO_SCORE);
+                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE);
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
-                    if (!driveOnly)
-                    {
-                        robot.arm.setTarget(RobotParams.ARM_SCORE_POS);
-                        robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event, null, 2);
-                        sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
-                    }
-                    else
-                    {
-                        sm.setState(State.DO_CYCLE);
-                    }
+                    robot.arm.setTarget(RobotParams.ARM_SCORE_POS);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event, null, 2.0);
+                    sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
+
                 case TURN_TO_SCORE_PRELOAD:
-                    robot.turret.setTarget((autoChoices.startPos == FtcAuto.StartPos.LEFT)? RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT, 0.5, event, null, 1.5, null, null);
+                    robot.turret.setTarget(
+                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                            RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT,
+                        0.5, event, null, 1.5, null, null);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
+
                 case SCORE_PRELOAD_WITH_VISION:
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, event);
                     sm.waitForSingleEvent(event, State.DONE);//PARK);
                     break;
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
-                    //todo: write code for alignment to pole with vision
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, null, null, 2.0);
                     sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     break;

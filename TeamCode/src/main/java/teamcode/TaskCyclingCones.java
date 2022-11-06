@@ -170,14 +170,7 @@ public class TaskCyclingCones
         this.onFinishEvent = event;
         this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
-        if (cycleType == CycleType.SCORING_ONLY)
-        {
-            sm.start(State.LOOK_FOR_POLE);
-        }
-        else{
-            sm.start(State.START);
-
-        }
+        sm.start(cycleType == CycleType.SCORING_ONLY? State.LOOK_FOR_POLE: State.START);
     }   //startCycling
 
     //
@@ -214,7 +207,9 @@ public class TaskCyclingCones
                             FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                                 EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                     }
-                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, event, null, 0.0, RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, RobotParams.ARM_SCORE_POS);
+                    robot.turret.setTarget(
+                        RobotParams.TURRET_FRONT, 1.0, event, null, 0.0,
+                        RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, RobotParams.ARM_SCORE_POS);
                     // CodeReview: may have to delay elevator until it clears the pole.
                     sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                     break;
@@ -259,7 +254,7 @@ public class TaskCyclingCones
                     break;
 
                 case DRIVE_TO_CONE:
-                    robot.arm.setTarget(RobotParams.ARM_PARALLEL);
+                    robot.arm.setTarget(RobotParams.ARM_HORIZONTAL);
                     if (targetLocation != null)
                     {
                         // Vision found the cone, drive to it with incremental pure pursuit.
@@ -305,12 +300,14 @@ public class TaskCyclingCones
 
                 case LOOK_FOR_POLE:
                     // Call vision to detect the junction pole
-                    if(visionType == VisionType.NO_VISION){
+                    if (visionType == VisionType.NO_VISION)
+                    {
                         sm.setState(State.SCORE);
                     }
-                    else{
+                    else
+                    {
                         TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
-                                robot.vision.getBestDetectedPoleInfo();
+                            robot.vision.getBestDetectedPoleInfo();
                         if (poleInfo != null)
                         {
                             poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
@@ -336,7 +333,6 @@ public class TaskCyclingCones
                             sm.setState(State.SCORE);
                         }
                     }
-
                     break;
 
                 case ALIGN_TO_POLE:

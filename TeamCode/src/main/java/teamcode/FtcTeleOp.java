@@ -524,8 +524,9 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_X:
                 if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null)
                 {
-                   robot.turret.setTarget(RobotParams.TURRET_LEFT, 1.0, null, null, 0.0,
-                           RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS);
+                   robot.turret.setTarget(
+                       RobotParams.TURRET_LEFT, 1.0, null, null, 0.0,
+                       RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS);
                 }
                 break;
 
@@ -535,8 +536,10 @@ public class FtcTeleOp extends FtcOpMode
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
 
                 }
-                if(robot.elevator != null && pressed){
-                    robot.elevator.setPower(-0.5);
+
+                if (pressed && robot.elevator != null)
+                {
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
                 }
                 break;
 

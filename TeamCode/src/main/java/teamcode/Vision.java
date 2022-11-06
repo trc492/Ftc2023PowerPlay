@@ -260,8 +260,7 @@ public class Vision
                         robot.blinkin.setPatternState(Vision.LABEL_PANEL, true, 1.0);
                         break;
                 }
-                robot.dashboard.displayPrintf(10, "Found the signal at:%s", detectedSignal);
-
+                robot.dashboard.displayPrintf(15, "Found the signal at %d", detectedSignal);
             }
         }
 
