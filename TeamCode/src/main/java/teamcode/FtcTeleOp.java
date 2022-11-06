@@ -534,7 +534,6 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.intake != null)
                 {
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
-
                 }
 
                 if (pressed && robot.elevator != null)
