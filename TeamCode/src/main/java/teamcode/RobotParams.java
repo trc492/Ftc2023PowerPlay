@@ -204,7 +204,7 @@ public class RobotParams
     public static final double STACKED_CONE_ADDITION            = 1.5;
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
     public static final double MID_JUNCTION_HEIGHT              = 26.5;
-    public static final double HIGH_JUNCTION_HEIGHT             = 32.0;
+    public static final double HIGH_JUNCTION_HEIGHT             = 36.0;
     //
     // Vision subsystem.
     //
@@ -371,8 +371,8 @@ public class RobotParams
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double ELEVATOR_CONE_GRAB_HEIGHT               = 13.0;
-    static final double ELEVATOR_SCORING_HEIGHT                 = 30.0;
+    static final double ELEVATOR_CONE_GRAB_HEIGHT               = 18.0;
+    static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
@@ -419,7 +419,7 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
-    static final double ARM_SCORE_POS                           = 23.0;
+    static final double ARM_SCORE_POS                           = 25.0;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {

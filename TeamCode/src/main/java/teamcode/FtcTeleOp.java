@@ -24,10 +24,13 @@ package teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.util.Locale;
+
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcFtcLib.ftclib.FtcGamepad;
+import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcOpMode;
 
 @TeleOp(name="FtcTeleOp", group="Ftc3543")
@@ -100,6 +103,7 @@ public class FtcTeleOp extends FtcOpMode
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
     private TaskTileGridDrive gridDriveTask;
+    private FtcMatchInfo matchInfo;
 
     //
     // Implements FtcOpMode abstract method.
@@ -116,6 +120,12 @@ public class FtcTeleOp extends FtcOpMode
         // Create and initialize robot object.
         //
         robot = new Robot(TrcRobot.getRunMode());
+//        if (RobotParams.Preferences.useTraceLog)
+//        {
+//            matchInfo = FtcMatchInfo.getMatchInfo();
+//            String filePrefix = String.format(Locale.US, "%s%02d", matchInfo.matchType, matchInfo.matchNumber);
+//            robot.globalTracer.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
+//        }
         //
         // Create and initialize Gamepads.
         //
@@ -129,6 +139,7 @@ public class FtcTeleOp extends FtcOpMode
             gridDriveTask = new TaskTileGridDrive(robot);
             robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
         }
+
     }   //initRobot
 
     //
@@ -180,6 +191,11 @@ public class FtcTeleOp extends FtcOpMode
         // Tell robot object opmode is about to stop so it can do the necessary cleanup for the mode.
         //
         robot.stopMode(prevMode);
+
+        if (robot.globalTracer.tracerLogIsOpened())
+        {
+            robot.globalTracer.closeTraceLog();
+        }
         printPerformanceMetrics(robot.globalTracer);
     }   //stopMode
 
@@ -526,7 +542,7 @@ public class FtcTeleOp extends FtcOpMode
                 {
                    robot.turret.setTarget(
                        RobotParams.TURRET_LEFT, 1.0, null, null, 0.0,
-                       RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS);
+                       RobotParams.ELEVATOR_SCORING_HEIGHT, 33.0);
                 }
                 break;
 

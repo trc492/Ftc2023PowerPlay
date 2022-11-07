@@ -176,20 +176,22 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-0.5, -0.85, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -90.0, autoChoices));
-                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE);
+                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE); //State.PARK);
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
+
                     robot.arm.setTarget(RobotParams.ARM_SCORE_POS);
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event, null, 2.0);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event, null, 5.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
 
                 case TURN_TO_SCORE_PRELOAD:
+                    robot.elevator.setTarget(robot.elevator.getPosition());
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT,
-                        0.5, event, null, 1.5, null, null);
+                        0.9, event, null, 4, null, null);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
 
@@ -199,7 +201,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, null, null, 2.0);
+                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
                     sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     break;
 
@@ -241,6 +243,9 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
+                        robot.elevator.setTarget(7);
+                        robot.arm.setTarget(0);
+                        robot.turret.setTarget(RobotParams.TURRET_BACK);
                         // CodeReview: check if there are any obstacles in the path.
                         TrcPose2D parkPos =
                             autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
