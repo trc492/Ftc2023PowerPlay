@@ -248,7 +248,7 @@ public class FtcAuto extends FtcOpMode
         final String funcName = "startMode";
 
         robot.dashboard.clearDisplay();
-        if (RobotParams.Preferences.useTraceLog)
+        if (robot.globalTracer.isTraceLogOpened())
         {
             robot.globalTracer.setTraceLogEnabled(true);
         }
@@ -316,11 +316,6 @@ public class FtcAuto extends FtcOpMode
         }
 
         printPerformanceMetrics(robot.globalTracer);
-
-//        if (robot.globalTracer.tracerLogIsOpened())
-//        {
-//            robot.globalTracer.closeTraceLog();
-//        }
     }   //stopMode
 
     /**

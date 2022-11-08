@@ -92,6 +92,7 @@ public class FtcTeleOp extends FtcOpMode
 
     }   //enum DriveOrientation
 
+    private static final String moduleName = "FtcTeleOp";
     protected Robot robot;
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
@@ -147,6 +148,10 @@ public class FtcTeleOp extends FtcOpMode
     public void startMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
         robot.dashboard.clearDisplay();
+        if (robot.globalTracer.isTraceLogEnabled())
+        {
+            robot.globalTracer.traceInfo(moduleName, "***** Starting TeleOp *****");
+        }
         //
         // Tell robot object opmode is about to start so it can do the necessary start initialization for the mode.
         //
@@ -182,7 +187,7 @@ public class FtcTeleOp extends FtcOpMode
         robot.stopMode(prevMode);
         printPerformanceMetrics(robot.globalTracer);
 
-        if (robot.globalTracer.tracerLogIsOpened())
+        if (robot.globalTracer.isTraceLogOpened())
         {
             robot.globalTracer.closeTraceLog();
         }

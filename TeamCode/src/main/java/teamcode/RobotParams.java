@@ -227,7 +227,7 @@ public class RobotParams
     // Elevator Camera: Logitech C310
     public static final int ELEVATORCAM_IMAGE_WIDTH             = 640;
     public static final int ELEVATORCAM_IMAGE_HEIGHT            = 480;
-    public static final double ELEVATORCAM_VERTICAL_FOV         = 26.0;
+    public static final double ELEVATORCAM_VERTICAL_FOV         = 26.0;     // in degrees
     public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_VERTICAL_FOV/ELEVATORCAM_IMAGE_HEIGHT;
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
