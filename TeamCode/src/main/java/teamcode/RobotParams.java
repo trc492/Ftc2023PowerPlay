@@ -344,6 +344,7 @@ public class RobotParams
     public static final double PPD_FOLLOWING_DISTANCE           = 6.0;
     public static final double PPD_POS_TOLERANCE                = 2.0;
     public static final double PPD_TURN_TOLERANCE               = 1.0;
+    public static final double GRID_CELL_SIZE                   = FULL_TILE_INCHES;
     //
     // Elevator Subsystem
     //

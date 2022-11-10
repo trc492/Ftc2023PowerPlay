@@ -25,6 +25,7 @@ package teamcode;
 import org.opencv.core.Point;
 
 import TrcCommonLib.trclib.TrcDriveBase;
+import TrcCommonLib.trclib.TrcGridDrive;
 import TrcCommonLib.trclib.TrcGyro;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPidDrive;
@@ -67,6 +68,7 @@ public class RobotDrive
     //
     public TrcPidDrive pidDrive;
     public TrcPurePursuitDrive purePursuitDrive;
+    public TrcGridDrive gridDrive;
 
     /**
      * Constructor: Create an instance of the object.

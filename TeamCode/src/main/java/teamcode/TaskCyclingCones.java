@@ -259,14 +259,14 @@ public class TaskCyclingCones
                     {
                         // Vision found the cone, drive to it with incremental pure pursuit.
                         robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), true, targetLocation);
+                            event, null, robot.robotDrive.driveBase.getFieldPosition(), true, targetLocation);
                     }
                     else
                     {
                         // Either we did not use vision or vision did not detect anything. Use the absolute cone
                         // stack location.
                         robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     }
                     sm.waitForSingleEvent(event, State.PICKUP_CONE);
@@ -287,7 +287,7 @@ public class TaskCyclingCones
                 case DRIVE_TO_POLE:
                     // Turn turret to the right side while driving backwards until intake is right above the pole
                     robot.robotDrive.purePursuitDrive.start(
-                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, FtcAuto.autoChoices));
                     robot.turret.setTarget(
                         FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT?

@@ -115,7 +115,7 @@ class CmdVisionTest implements TrcRobot.RobotCommand
                     robot.robotDrive.driveBase.setFieldPosition(RobotParams.STARTPOS_RED_LEFT);
                     // Disable TensorFlow if we are not using it to improve PurePursuitDrive performance.
                     robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.pathPoint(-1.5, -0.5, 0.0));//,
                             //robot.robotDrive.pathPoint(0, 0, -90));                    //
                     //
@@ -133,7 +133,7 @@ class CmdVisionTest implements TrcRobot.RobotCommand
                         }
                     }
                     robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), true,
+                            event, null, robot.robotDrive.driveBase.getFieldPosition(), true,
                             robot.robotDrive.pathPoint(0, 0, angle));
                     break;
 

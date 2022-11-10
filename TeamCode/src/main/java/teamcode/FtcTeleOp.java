@@ -25,6 +25,7 @@ package teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import TrcCommonLib.trclib.TrcGameController;
+import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcFtcLib.ftclib.FtcGamepad;
@@ -100,7 +101,6 @@ public class FtcTeleOp extends FtcOpMode
     private double drivePowerScale = 1.0;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
-    private TaskTileGridDrive gridDriveTask;
 
     //
     // Implements FtcOpMode abstract method.
@@ -127,7 +127,6 @@ public class FtcTeleOp extends FtcOpMode
 
         if (robot.robotDrive != null)
         {
-            gridDriveTask = new TaskTileGridDrive(robot);
             robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
         }
     }   //initRobot
@@ -161,11 +160,13 @@ public class FtcTeleOp extends FtcOpMode
         if (nextMode == TrcRobot.RunMode.TELEOP_MODE)
         {
             robot.globalTracer.traceInfo("TeleOp.startMode", "autoChoices=%s", FtcAuto.autoChoices);
-            robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
+//            robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
 //            if (!robot.restoreCurrentRobotPose())
 //            {
 //                robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
 //            }
+            robot.robotDrive.driveBase.setFieldPosition(
+                new TrcPose2D(RobotParams.FULL_TILE_INCHES/2.0, RobotParams.ROBOT_LENGTH/2.0, 0));
             robot.globalTracer.traceInfo(
                 "TeleOp.startMode", "set RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
         }
@@ -470,30 +471,30 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
-                if (pressed && gridDriveTask != null)
+                if (pressed && robot.robotDrive.gridDrive != null)
                 {
-                    gridDriveTask.setRelativeYTileTarget(1);
+                    robot.robotDrive.gridDrive.setRelativeYGridTarget(1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
-                if (pressed && gridDriveTask != null)
+                if (pressed && robot.robotDrive.gridDrive != null)
                 {
-                    gridDriveTask.setRelativeYTileTarget(-1);
+                    robot.robotDrive.gridDrive.setRelativeYGridTarget(-1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                if (pressed && gridDriveTask != null)
+                if (pressed && robot.robotDrive.gridDrive != null)
                 {
-                    gridDriveTask.setRelativeXTileTarget(-1);
+                    robot.robotDrive.gridDrive.setRelativeXGridTarget(-1);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                if (pressed && gridDriveTask != null)
+                if (pressed && robot.robotDrive.gridDrive != null)
                 {
-                    gridDriveTask.setRelativeXTileTarget(1);
+                    robot.robotDrive.gridDrive.setRelativeXGridTarget(1);
                 }
                 break;
 
