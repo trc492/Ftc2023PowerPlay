@@ -24,11 +24,14 @@ package teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.util.Locale;
+
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcFtcLib.ftclib.FtcGamepad;
+import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcOpMode;
 
 @TeleOp(name="FtcTeleOp", group="Ftc3543")
@@ -117,6 +120,16 @@ public class FtcTeleOp extends FtcOpMode
         // Create and initialize robot object.
         //
         robot = new Robot(TrcRobot.getRunMode());
+        //
+        // Open trace log.
+        //
+        if (RobotParams.Preferences.useTraceLog)
+        {
+            String filePrefix = robot.matchInfo != null?
+                String.format(Locale.US, "%s%02d_TeleOp", robot.matchInfo.matchType, robot.matchInfo.matchNumber):
+                "Unknown_TeleOp";
+            robot.globalTracer.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
+        }
         //
         // Create and initialize Gamepads.
         //

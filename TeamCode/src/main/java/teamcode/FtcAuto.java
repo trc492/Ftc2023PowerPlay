@@ -112,7 +112,6 @@ public class FtcAuto extends FtcOpMode
 
     private static final String moduleName = "FtcAuto";
     private Robot robot;
-    private FtcMatchInfo matchInfo;
     public static final AutoChoices autoChoices = new AutoChoices();
     private TrcRobot.RobotCommand autoCommand;
 
@@ -137,8 +136,9 @@ public class FtcAuto extends FtcOpMode
         //
         if (RobotParams.Preferences.useTraceLog)
         {
-            matchInfo = FtcMatchInfo.getMatchInfo();
-            String filePrefix = String.format(Locale.US, "%s%02d", matchInfo.matchType, matchInfo.matchNumber);
+            robot.matchInfo = FtcMatchInfo.getMatchInfo();
+            String filePrefix = String.format(
+                Locale.US, "%s%02d_Auto", robot.matchInfo.matchType, robot.matchInfo.matchNumber);
             robot.globalTracer.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
         }
         //
@@ -253,9 +253,9 @@ public class FtcAuto extends FtcOpMode
             robot.globalTracer.setTraceLogEnabled(true);
         }
         robot.globalTracer.traceInfo(moduleName, "***** Starting autonomous *****");
-        if (matchInfo != null)
+        if (robot.matchInfo != null)
         {
-            robot.globalTracer.logInfo(moduleName, "MatchInfo", "%s", matchInfo);
+            robot.globalTracer.logInfo(moduleName, "MatchInfo", "%s", robot.matchInfo);
         }
         robot.globalTracer.logInfo(moduleName, "AutoChoices", "%s", autoChoices);
         //
@@ -316,6 +316,11 @@ public class FtcAuto extends FtcOpMode
         }
 
         printPerformanceMetrics(robot.globalTracer);
+
+        if (robot.globalTracer.isTraceLogOpened())
+        {
+            robot.globalTracer.closeTraceLog();
+        }
     }   //stopMode
 
     /**
