@@ -173,9 +173,9 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //corresponding cone stack, facing the cone stack
                     robot.robotDrive.purePursuitDrive.start(
                         event, null, 5.0, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -2.5, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.85, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -90.0, autoChoices));
+                        robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
+                        robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91.5, autoChoices));
                     sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE); //State.PARK);
                     break;
 
@@ -191,10 +191,11 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT,
-                        0.9, event, null, 4, null, null);
+                        0.75, event, null, 5, null, null);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
-
+                //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
+                    //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
                 case SCORE_PRELOAD_WITH_VISION:
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, event);
                     sm.waitForSingleEvent(event, State.DONE);//PARK);
@@ -202,7 +203,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
-                    sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
+                    sm.waitForSingleEvent(event, State.DONE);//PARK);//DO_CYCLE);
                     break;
 
                 //if time >= 26 or no more cones on the conestack, go to park
