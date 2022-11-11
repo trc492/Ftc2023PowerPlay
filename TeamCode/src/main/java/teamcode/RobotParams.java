@@ -336,8 +336,8 @@ public class RobotParams
     // max wheel speed = pi * wheel diameter * wheel gear ratio * motor RPM / 60.0
     // = 3.1415926535897932384626433832795 * 4 in. * 1.0 * 312.0 / 60.0
     // = 65.345127194667699360022982372214 in./sec.
-    public static final double ROBOT_MAX_VELOCITY               = 25.0;     // measured maximum from drive speed test.
-    public static final double ROBOT_MAX_ACCELERATION           = 3380.0;   // measured maximum from drive speed test.
+    public static final double ROBOT_MAX_VELOCITY               = 23.0;     // measured maximum from drive speed test.
+    public static final double ROBOT_MAX_ACCELERATION           = 3000.0;   // measured maximum from drive speed test.
     // KF should be set to the reciprocal of max tangential velocity (time to travel unit distance), units: sec./in.
     public static TrcPidController.PidCoefficients velPidCoeff  =
         new TrcPidController.PidCoefficients(0.0, 0.0, 0.0, 1.0/ROBOT_MAX_VELOCITY);
