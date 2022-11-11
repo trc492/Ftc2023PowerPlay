@@ -99,6 +99,7 @@ public class FtcTeleOp extends FtcOpMode
     protected FtcGamepad operatorGamepad;
     private DriveOrientation driveOrientation = DriveOrientation.ROBOT;
     private double drivePowerScale = 1.0;
+    private boolean turretSlowModeOn = false;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
 
@@ -562,6 +563,16 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_RBUMPER:
+                if(pressed){
+                    turretSlowModeOn = !turretSlowModeOn;
+                    if(turretSlowModeOn){
+                        robot.turret.getPidActuator().getPidController().setOutputLimit(0.5);
+                    }
+                    else{
+                        robot.turret.getPidActuator().getPidController().setOutputLimit(1.0);
+                    }
+
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
