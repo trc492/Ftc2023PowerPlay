@@ -463,6 +463,10 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_B:
+                if (pressed && robot.robotDrive.gridDrive != null)
+                {
+                    robot.robotDrive.gridDrive.resetGridCellCenter();
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
