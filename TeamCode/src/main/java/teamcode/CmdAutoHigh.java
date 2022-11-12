@@ -35,12 +35,10 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
     private enum State
     {
-        TEST_ALIGN_TO_POLE,
         START_DELAY,
         DRIVE_TO_SCORE_POSITION,
         RAISE_ELEVATOR_TO_SCORE,
         TURN_TO_SCORE_PRELOAD,
-        CAP_POLE,
         SCORE_PRELOAD,
         RAISE_ELEVATOR_AFTER_SCORING,
         PREP_FOR_TRAVEL,
