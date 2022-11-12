@@ -40,8 +40,10 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         DRIVE_TO_SCORE_POSITION,
         RAISE_ELEVATOR_TO_SCORE,
         TURN_TO_SCORE_PRELOAD,
-        SCORE_PRELOAD_WITH_VISION,
+        CAP_POLE,
         SCORE_PRELOAD,
+        RAISE_ELEVATOR_AFTER_SCORING,
+        PREP_FOR_TRAVEL,
         DO_CYCLE,
         PARK,
         DONE
@@ -180,33 +182,36 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
-
-                    robot.arm.setTarget(RobotParams.ARM_SCORE_POS);
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event, null, 5.0);
+                    robot.arm.setTarget( 30, false, 1.0, event, null, 0);
+                    robot.elevator.setTarget(32, true, 1.0, null, null, 2.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
-
                 case TURN_TO_SCORE_PRELOAD:
-                    robot.elevator.setTarget(robot.elevator.getPosition());
                     robot.turret.setTarget(
-                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT,
-                        0.75, event, null, 5, null, null);
+                            autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                                    RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT,
+                            0.75, event, null, 2, null, null);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
                 //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
                     //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
-                case SCORE_PRELOAD_WITH_VISION:
-                    robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, event);
-                    sm.waitForSingleEvent(event, State.DONE);//PARK);
-                    break;
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
+                    robot.elevator.setTarget(28, true, 1.0, event, null, 2.0);
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
-                    sm.waitForSingleEvent(event, State.DONE);//PARK);//DO_CYCLE);
+                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_AFTER_SCORING);//PARK);//DO_CYCLE);
                     break;
 
-                //if time >= 26 or no more cones on the conestack, go to park
+                case RAISE_ELEVATOR_AFTER_SCORING:
+                    robot.elevator.setTarget(32, true, 1.0, event, null, 2.0);
+                    sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
+                    break;
+                case PREP_FOR_TRAVEL:
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, 1.0, event, null, 0.0,
+                       RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                    sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    break;
+                    //if time >= 26 or no more cones on the conestack, go to park
                 //otherwise call the doCycle method for each cone on the stack
                 case DO_CYCLE:
                     //if driveOnly, just drive back and forth to simulate it
