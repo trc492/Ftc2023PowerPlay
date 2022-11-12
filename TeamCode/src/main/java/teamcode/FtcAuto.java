@@ -57,8 +57,9 @@ public class FtcAuto extends FtcOpMode
     public enum AutoStrategy
     {
         CYCLE_HIGH,
+        CYCLE_HIGH_PRELOAD_ONLY,
         CYCLE_MID,
-        PARKING,
+        PARKING_ONLY,
         VISION_TEST,
         PID_DRIVE,
         TIMED_DRIVE,
@@ -383,6 +384,8 @@ public class FtcAuto extends FtcOpMode
         startPosMenu.addChoice("Start Position Right", StartPos.RIGHT, false, strategyMenu);
 
         strategyMenu.addChoice("Cycle High", AutoStrategy.CYCLE_HIGH, true, parkingMenu);
+        strategyMenu.addChoice("Cycle High Preload Only", AutoStrategy.CYCLE_HIGH_PRELOAD_ONLY, false, parkingMenu);
+        strategyMenu.addChoice("Park Only", AutoStrategy.PARKING_ONLY, false, parkingMenu);
         strategyMenu.addChoice("Cycle Mid", AutoStrategy.CYCLE_MID, false, parkingMenu);
         strategyMenu.addChoice("Vision Test", AutoStrategy.VISION_TEST, false);
         strategyMenu.addChoice("PID Drive", AutoStrategy.PID_DRIVE, false, xTargetMenu);

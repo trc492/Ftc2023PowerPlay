@@ -173,12 +173,18 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // Todo: add option to do center high poles
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
-                    robot.robotDrive.purePursuitDrive.start(
-                        event, null, 5.0, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91.5, autoChoices));
-                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE); //State.PARK);
+                    if(autoChoices.strategy == FtcAuto.AutoStrategy.PARKING_ONLY){
+                        sm.setState(State.PARK);
+                    }
+                    else{
+                        robot.robotDrive.purePursuitDrive.start(
+                                event, null, 5.0, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91.5, autoChoices));
+                        sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE);
+                    }
+
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
@@ -199,7 +205,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case SCORE_PRELOAD:
                     robot.elevator.setTarget(28, true, 1.0, event, null, 2.0);
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
-                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_AFTER_SCORING);//PARK);//DO_CYCLE);
+                    if(autoChoices.strategy == FtcAuto.AutoStrategy.CYCLE_HIGH_PRELOAD_ONLY){
+                        sm.waitForSingleEvent(event, State.PARK);
+                    }
+                    else{
+                        sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_AFTER_SCORING);
+                    }
                     break;
 
                 case RAISE_ELEVATOR_AFTER_SCORING:
