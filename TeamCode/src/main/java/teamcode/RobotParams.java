@@ -199,7 +199,8 @@ public class RobotParams
         PARKPOS_RED_LEFTP3_FAR
     };
     // In tile units.
-    public static TrcPose2D CONE_STACK_RED_LEFT = new TrcPose2D(-2.95, -0.5, 0.0);
+    public static TrcPose2D CONE_STACK_RED_LEFT                 = new TrcPose2D(-2.3, -0.5, -90.0);
+    public static TrcPose2D LOOK_FOR_CONE_POS_LEFT              = new TrcPose2D(-2.0, -0.5, -90.0);
     // Game element dimensions
     public static final double STACKED_CONE_ADDITION            = 1.5;
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
@@ -311,19 +312,22 @@ public class RobotParams
     //
     public static final double DRIVE_MOTOR_MAX_VELOCITY_PPS     = GOBILDA_5203_312_MAX_VELOCITY_PPS;
 
-    public static TrcPidController.PidCoefficients xPosPidCoeff =
+    public static final TrcPidController.PidCoefficients xPosPidCoeff =
         new TrcPidController.PidCoefficients(0.095, 0.0, 0.001, 0.0);
-    public static double XPOS_TOLERANCE                         = 1.0;
-    public static double XPOS_INCHES_PER_COUNT                  = 0.01924724265461924299065420560748;
+    public static final double XPOS_TOLERANCE                   = 1.0;
+    public static final double XPOS_INCHES_PER_COUNT            = 0.01924724265461924299065420560748;
+    public static final Double X_RAMP_RATE                      = null;//10.0;
 
-    public static TrcPidController.PidCoefficients yPosPidCoeff =
+    public static final TrcPidController.PidCoefficients yPosPidCoeff =
         new TrcPidController.PidCoefficients(0.06, 0.0, 0.002, 0.0);
     public static final double YPOS_TOLERANCE                   = 1.0;
     public static final double YPOS_INCHES_PER_COUNT            = 0.02166184604662450653409090909091;
+    public static final Double Y_RAMP_RATE                      = null;//10.0;
 
-    public static TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.025, 0.0, 0.003, 0.0);
-    public static final double TURN_TOLERANCE                   = 2.0;
+    public static final TrcPidController.PidCoefficients turnPidCoeff =
+        new TrcPidController.PidCoefficients(0.03, 0.02, 0.000, 0.0, 30.0);
+    public static final double TURN_TOLERANCE                   = 1.0;
+    public static final Double TURN_RAMP_RATE                   = null;//10.0;
 
     public static final double X_ODWHEEL_INCHES_PER_COUNT       = 7.6150160901199168116026724971383e-4;
     public static final double Y_ODWHEEL_INCHES_PER_COUNT       = 7.6301149255006038191364659148717e-4;
@@ -348,8 +352,9 @@ public class RobotParams
     // Grid Drive parameters
     //
     public static final double GRIDDRIVE_CELL_SIZE              = FULL_TILE_INCHES;
-    public static final double GRIDDRIVE_TURNSTART_ADJ          = 0.75;
-    public static final double GRIDDRIVE_TURNEND_ADJ            = 0.35;
+    public static final double GRIDDRIVE_TURNSTART_ADJ          = 0.00;
+    public static final double GRIDDRIVE_TURNEND_ADJ            = 0.00;
+    public static final double GRIDDRIVE_FORWARD_ADJ            = 0.00;
     //
     // Elevator Subsystem
     //
@@ -362,7 +367,7 @@ public class RobotParams
     static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
     static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
     static final double ELEVATOR_OFFSET                         = 7.0;              // in inches
-    static final double ELEVATOR_MIN_POS                        = 6.7;
+    static final double ELEVATOR_MIN_POS                        = 7.0;
     static final double ELEVATOR_MAX_POS                        = 36.0;
     static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
     static final double ELEVATOR_POS_FOR_TURRET_TURN            = ELEVATOR_MIN_POS_FOR_TURRET + 2.0;

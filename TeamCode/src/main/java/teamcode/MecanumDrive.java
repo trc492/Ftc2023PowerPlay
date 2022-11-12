@@ -83,10 +83,13 @@ public class MecanumDrive extends RobotDrive
         //
         xPosPidCtrl = new TrcPidController(
             "xPosPidCtrl", RobotParams.xPosPidCoeff, RobotParams.XPOS_TOLERANCE, driveBase::getXPosition);
+        xPosPidCtrl.setRampRate(RobotParams.X_RAMP_RATE);
         yPosPidCtrl = new TrcPidController(
             "yPosPidCtrl", RobotParams.yPosPidCoeff, RobotParams.YPOS_TOLERANCE, driveBase::getYPosition);
+        yPosPidCtrl.setRampRate(RobotParams.Y_RAMP_RATE);
         turnPidCtrl = new TrcPidController(
             "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, driveBase::getHeading);
+        turnPidCtrl.setRampRate(RobotParams.TURN_RAMP_RATE);
         turnPidCtrl.setAbsoluteSetPoint(true);
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.
         // If the robot turns too fast, PID will cause oscillation. By limiting turn power, the robot turns slower.
@@ -106,7 +109,7 @@ public class MecanumDrive extends RobotDrive
         purePursuitDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
         gridDrive = new TrcGridDrive(
             driveBase, purePursuitDrive, RobotParams.GRIDDRIVE_CELL_SIZE, RobotParams.GRIDDRIVE_TURNSTART_ADJ,
-            RobotParams.GRIDDRIVE_TURNEND_ADJ);
+            RobotParams.GRIDDRIVE_TURNEND_ADJ, RobotParams.GRIDDRIVE_FORWARD_ADJ);
         gridDrive.setMsgTracer(robot.globalTracer);
     }   //MecanumDrive
 

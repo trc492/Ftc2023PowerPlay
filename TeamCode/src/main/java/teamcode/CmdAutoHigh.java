@@ -202,7 +202,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case SCORE_PRELOAD:
                     robot.elevator.setTarget(28.0, true, 1.0, null, null, 2.0);
                     robot.intake.autoAssist(1.0, RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
-                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE);
+                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_AFTER_SCORING);
                     break;
 
                 case RAISE_ELEVATOR_AFTER_SCORING:

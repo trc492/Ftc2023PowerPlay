@@ -193,12 +193,11 @@ public class TaskCyclingCones
     //
     private void cycleTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
     {
+        final String funcName = "cycleTask";
         State state = sm.checkReadyAndGetState();
 
         if (state != null)
         {
-//            double matchTime = TrcUtil.getModeElapsedTime();
-
             switch (state)
             {
                 case START: //1. drive forward to the cone and prepare turret to pick it up
@@ -208,9 +207,14 @@ public class TaskCyclingCones
                             FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                                 EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                     }
-                    robot.turret.setTarget(
-                        RobotParams.TURRET_FRONT, 1.0, event, null, 0.0,
-                        RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, RobotParams.ARM_SCORE_POS);
+                    targetLocation = null;
+//                    robot.turret.setTarget(
+//                        RobotParams.TURRET_FRONT, 1.0, null, null, 0.0,
+//                        RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, RobotParams.ARM_HORIZONTAL);
+                    robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
+                    robot.robotDrive.purePursuitDrive.start(
+                        event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
                     // CodeReview: may have to delay elevator until it clears the pole.
                     sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                     break;
@@ -224,7 +228,7 @@ public class TaskCyclingCones
                         if (coneInfo != null)
                         {
                             targetLocation = new TrcPose2D(
-                                coneInfo.distanceFromCamera.x, coneInfo.distanceFromCamera.y,
+                                coneInfo.distanceFromCamera.x - 1.0, coneInfo.distanceFromCamera.y - 6.0,
                                 coneInfo.horizontalAngle);
                         }
                     }
@@ -232,6 +236,7 @@ public class TaskCyclingCones
                     if (targetLocation != null)
                     {
                         // We found the target with vision, go to the next state.
+                        robot.globalTracer.traceInfo(funcName, "ConeLocation=%s", targetLocation);
                         sm.setState(State.DRIVE_TO_CONE);
                     }
                     else if (visionType != VisionType.NO_VISION)
@@ -255,10 +260,10 @@ public class TaskCyclingCones
                     break;
 
                 case DRIVE_TO_CONE:
-                    robot.arm.setTarget(RobotParams.ARM_HORIZONTAL);
                     if (targetLocation != null)
                     {
                         // Vision found the cone, drive to it with incremental pure pursuit.
+                        robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                         robot.robotDrive.purePursuitDrive.start(
                             event, null, robot.robotDrive.driveBase.getFieldPosition(), true, targetLocation);
                     }
@@ -266,11 +271,12 @@ public class TaskCyclingCones
                     {
                         // Either we did not use vision or vision did not detect anything. Use the absolute cone
                         // stack location.
+                        robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                         robot.robotDrive.purePursuitDrive.start(
                             event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     }
-                    sm.waitForSingleEvent(event, State.PICKUP_CONE);
+                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
                     break;
 
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
