@@ -26,6 +26,7 @@ import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcNotifier;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
+import TrcCommonLib.trclib.TrcTimer;
 import TrcFtcLib.ftclib.FtcDigitalInput;
 import TrcFtcLib.ftclib.FtcMotorActuator;
 
@@ -37,10 +38,22 @@ import TrcFtcLib.ftclib.FtcMotorActuator;
  */
 public class Turret
 {
+    private static class ActionParams
+    {
+        double target;
+        double powerLimit;
+        TrcEvent event;
+        TrcNotifier.Receiver callback;
+        double timeout;
+        Double elevatorTarget;
+        Double armTarget;
+    }   //class ActionParams
+
     private static final String moduleName = "Turret";
     private final Robot robot;
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcPidActuator pidTurret;
+    private final TrcTimer delayTimer;
     private double turretTarget = 0.0;
     private double turretPowerLimit = 1.0;
     private TrcEvent turretEvent = null;
@@ -51,6 +64,7 @@ public class Turret
     private boolean armLevelSafe = false;
     private boolean elevatorLevelSafe = false;
     private double prevTurretPower = 0.0;
+    private final ActionParams actionParams = new ActionParams();
 
     public Turret(Robot robot)
     {
@@ -77,6 +91,7 @@ public class Turret
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
         pidTurret.setMsgTracer(robot.globalTracer, true);
+        delayTimer = new TrcTimer(moduleName);
 
         //pidTurret.getPidController().setOutputLimit(0.5);
     }   //Turret
@@ -179,6 +194,52 @@ public class Turret
     }   //presetPositionDown
 
     /**
+     * This method is called after the delay timer has expired to perform the turret action.
+     *
+     * @param context not used.
+     */
+    private void performAction (Object context)
+    {
+        setTarget(actionParams.target, actionParams.powerLimit, actionParams.event, actionParams.callback,
+                  actionParams.timeout, actionParams.elevatorTarget, actionParams.armTarget);
+    }   //performAction
+
+    /**
+     * This method sets the turret target position. It first checks if it's safe for the turret to turn without
+     * hitting anything. If it's not safe, it will first raise the arm above the "safe level" before setting the
+     * target for the turret.
+     *
+     * @param delay specifies the delay in seconds before performing the action.
+     * @param target specifies the target position of the turret in degrees.
+     * @param powerLimit specifies the maximum power the turret will turn.
+     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
+     * @param callback specifies the notify callback to call when the turret is on target, can be null if not provided.
+     * @param timeout specifies timeout in seconds for the operation.
+     * @param elevatorTarget specifies optionally the elevator target, can be null if no additional elevator movement.
+     * @param armTarget specifies optionally the arm target, can be null if no additional arm movement.
+     */
+    public void setTarget(
+        double delay, double target, double powerLimit, TrcEvent event, TrcNotifier.Receiver callback, double timeout,
+        Double elevatorTarget, Double armTarget)
+    {
+        if (delay > 0.0)
+        {
+            actionParams.target = target;
+            actionParams.powerLimit = powerLimit;
+            actionParams.event = event;
+            actionParams.callback = callback;
+            actionParams.timeout = timeout;
+            actionParams.elevatorTarget = elevatorTarget;
+            actionParams.armTarget = armTarget;
+            delayTimer.set(delay, this::performAction);
+        }
+        else
+        {
+            setTarget(target, powerLimit, event, callback, timeout, elevatorTarget, armTarget);
+        }
+    }   //setTarget
+
+    /**
      * This method sets the turret target position. It first checks if it's safe for the turret to turn without
      * hitting anything. If it's not safe, it will first raise the arm above the "safe level" before setting the
      * target for the turret.
@@ -187,6 +248,7 @@ public class Turret
      * @param powerLimit specifies the maximum power the turret will turn.
      * @param event specifies the event to signal when the turret is on target, can be null if not provided.
      * @param callback specifies the notify callback to call when the turret is on target, can be null if not provided.
+     * @param timeout specifies timeout in seconds for the operation.
      * @param elevatorTarget specifies optionally the elevator target, can be null if no additional elevator movement.
      * @param armTarget specifies optionally the arm target, can be null if no additional arm movement.
      */
