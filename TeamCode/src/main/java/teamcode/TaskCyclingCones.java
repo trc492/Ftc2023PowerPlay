@@ -84,6 +84,7 @@ public class TaskCyclingCones
         LOOK_FOR_POLE,
         ALIGN_TO_POLE,
         SCORE,
+        CLEAR_POLE,
         DONE
     }
 
@@ -280,7 +281,7 @@ public class TaskCyclingCones
                     break;
 
                 case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT, true, 1.0, event);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null, 2.0);
                     sm.waitForSingleEvent(event, State.DRIVE_TO_POLE);
                     break;
 
@@ -344,7 +345,13 @@ public class TaskCyclingCones
                     break;
 
                 case SCORE: //7. spin intake backwards
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true);
                     robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, null, 0.5);
+                    sm.waitForSingleEvent(event, State.CLEAR_POLE);
+                    break;
+
+                case CLEAR_POLE:
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null);
                     sm.waitForSingleEvent(event, State.DONE);
                     break;
 

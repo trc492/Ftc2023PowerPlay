@@ -380,6 +380,8 @@ public class RobotParams
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = 18.0;
     static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
+    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 32.0;
+    public static final double CAPPING_OFFSET                   = -4.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
             ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
@@ -425,7 +427,7 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
-    static final double ARM_SCORE_POS                           = 25.0;
+    static final double ARM_SCORE_POS                           = 30.0;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
