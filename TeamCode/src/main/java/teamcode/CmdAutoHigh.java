@@ -173,18 +173,18 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // Todo: add option to do center high poles
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
-                    if(autoChoices.strategy == FtcAuto.AutoStrategy.PARKING_ONLY){
-                        sm.setState(State.PARK);
-                    }
-                    else{
+
                         robot.robotDrive.purePursuitDrive.start(
                                 event, null, 5.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91.5, autoChoices));
+                    if(autoChoices.strategy != FtcAuto.AutoStrategy.PARKING_ONLY){
                         sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_TO_SCORE);
                     }
-
+                    else{
+                        sm.waitForSingleEvent(event, State.PARK);
+                    }
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:

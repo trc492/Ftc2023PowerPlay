@@ -151,13 +151,15 @@ public class FtcAuto extends FtcOpMode
         //
         switch (autoChoices.strategy)
         {
+            //same constructor for cycle high, preload only, and parking only 
             case CYCLE_HIGH:
+            case CYCLE_HIGH_PRELOAD_ONLY:
+            case PARKING_ONLY:
                 if (!RobotParams.Preferences.noRobot)
                 {
                     autoCommand = new CmdAutoHigh(robot, autoChoices);
                 }
                 break;
-
             case CYCLE_MID:
                 if (!RobotParams.Preferences.noRobot)
                 {
