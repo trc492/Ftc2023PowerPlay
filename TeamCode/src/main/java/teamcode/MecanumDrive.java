@@ -107,9 +107,7 @@ public class MecanumDrive extends RobotDrive
             RobotParams.xPosPidCoeff, RobotParams.yPosPidCoeff, RobotParams.turnPidCoeff, RobotParams.velPidCoeff);
         purePursuitDrive.setFastModeEnabled(true);
         purePursuitDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
-        gridDrive = new TrcGridDrive(
-            driveBase, purePursuitDrive, RobotParams.GRIDDRIVE_CELL_SIZE, RobotParams.GRIDDRIVE_TURNSTART_ADJ,
-            RobotParams.GRIDDRIVE_TURNEND_ADJ);
+        gridDrive = new TrcGridDrive(driveBase, purePursuitDrive, RobotParams.GRIDDRIVE_CELL_SIZE);
         gridDrive.setMsgTracer(robot.globalTracer);
     }   //MecanumDrive
 

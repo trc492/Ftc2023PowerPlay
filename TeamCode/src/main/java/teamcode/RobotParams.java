@@ -352,8 +352,6 @@ public class RobotParams
     // Grid Drive parameters
     //
     public static final double GRIDDRIVE_CELL_SIZE              = FULL_TILE_INCHES;
-    public static final double GRIDDRIVE_TURNSTART_ADJ          = 0.00;
-    public static final double GRIDDRIVE_TURNEND_ADJ            = 0.00;
     //
     // Elevator Subsystem
     //
