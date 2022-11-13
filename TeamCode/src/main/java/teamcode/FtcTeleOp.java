@@ -27,9 +27,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.util.Locale;
 
 import TrcCommonLib.trclib.TrcGameController;
+import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcUtil;
+import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcGamepad;
 import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcOpMode;
@@ -626,7 +628,24 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.zeroCalibrate();
                 }
                 break;
+
+            case FtcGamepad.GAMEPAD_LSTICK_BTN:
+                if(robot.turret != null && robot.vision != null)
+                {
+                    if(pressed)
+                    {
+                        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
+                                robot.vision.getBestDetectedPoleInfo();
+                        robot.turret.setTarget(poleInfo.horizontalAngle);
+                    }
+                    else
+                    {
+                        robot.turret.cancel();
+                    }
+                }
+                break;
         }
+
     }   //operatorButtonEvent
 
 }   //class FtcTeleOp
