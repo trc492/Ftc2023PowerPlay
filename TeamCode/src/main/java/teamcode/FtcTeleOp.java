@@ -107,6 +107,7 @@ public class FtcTeleOp extends FtcOpMode
     private boolean turretSlowModeOn = false;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
+    private boolean atScoringLocation = false;
 
     //
     // Implements FtcOpMode abstract method.
@@ -472,6 +473,19 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_X:
+                if (pressed && robot.robotDrive.gridDrive != null) {
+                    if (atScoringLocation)
+                    {
+                        robot.robotDrive.purePursuitDrive.start(
+                                null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
+                    }
+                    else {
+                        robot.robotDrive.purePursuitDrive.start(
+                                null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
+                    }
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_Y:

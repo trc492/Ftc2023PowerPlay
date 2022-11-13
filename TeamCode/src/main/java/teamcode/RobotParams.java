@@ -201,6 +201,8 @@ public class RobotParams
     // In tile units.
     public static TrcPose2D CONE_STACK_RED_LEFT                 = new TrcPose2D(-2.3, -0.5, -90.0);
     public static TrcPose2D LOOK_FOR_CONE_POS_LEFT              = new TrcPose2D(-2.0, -0.5, -90.0);
+    public static TrcPose2D SCORE_LOCATION_RED_LEFT             = new TrcPose2D(-0.5,-1.0,-90);
+    public static TrcPose2D SUBSTATION_RED_LEFT                 = new TrcPose2D(-0.5,-2.0,-135);
     // Game element dimensions
     public static final double STACKED_CONE_ADDITION            = 1.5;
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
