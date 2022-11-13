@@ -88,7 +88,8 @@ public class MecanumDrive extends RobotDrive
             "yPosPidCtrl", RobotParams.yPosPidCoeff, RobotParams.YPOS_TOLERANCE, driveBase::getYPosition);
         yPosPidCtrl.setRampRate(RobotParams.Y_RAMP_RATE);
         turnPidCtrl = new TrcPidController(
-            "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, driveBase::getHeading);
+            "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, RobotParams.TURN_SETTLING,
+            RobotParams.TURN_STEADY_STATE_ERR, RobotParams.TURN_STALL_ERRRATE_THRESHOLD, driveBase::getHeading);
         turnPidCtrl.setRampRate(RobotParams.TURN_RAMP_RATE);
         turnPidCtrl.setAbsoluteSetPoint(true);
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.

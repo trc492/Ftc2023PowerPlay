@@ -325,8 +325,11 @@ public class RobotParams
     public static final Double Y_RAMP_RATE                      = null;//10.0;
 
     public static final TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.03, 0.02, 0.000, 0.0, 30.0);
+        new TrcPidController.PidCoefficients(0.025, 0.02, 0.000, 0.0, 30.0);
+    public static final double TURN_SETTLING                    = TrcPidController.DEF_SETTLING_TIME;
     public static final double TURN_TOLERANCE                   = 1.0;
+    public static final double TURN_STEADY_STATE_ERR            = 2.0;
+    public static final double TURN_STALL_ERRRATE_THRESHOLD     = 1.0;
     public static final Double TURN_RAMP_RATE                   = null;//10.0;
 
     public static final double X_ODWHEEL_INCHES_PER_COUNT       = 7.6150160901199168116026724971383e-4;

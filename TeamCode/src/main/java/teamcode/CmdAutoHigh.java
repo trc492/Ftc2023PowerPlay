@@ -172,7 +172,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                     //corresponding cone stack, facing the cone stack
                     robot.robotDrive.purePursuitDrive.start(
-                        event, null, 5.0, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91.5, autoChoices));
