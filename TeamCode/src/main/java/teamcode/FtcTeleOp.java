@@ -27,9 +27,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.util.Locale;
 
 import TrcCommonLib.trclib.TrcGameController;
+import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcUtil;
+import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcGamepad;
 import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcOpMode;
@@ -105,6 +107,7 @@ public class FtcTeleOp extends FtcOpMode
     private boolean turretSlowModeOn = false;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
+    private boolean atScoringLocation = false;
 
     //
     // Implements FtcOpMode abstract method.
@@ -470,6 +473,19 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_X:
+                if (pressed && robot.robotDrive.gridDrive != null) {
+                    if (atScoringLocation)
+                    {
+                        robot.robotDrive.purePursuitDrive.start(
+                                null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
+                    }
+                    else {
+                        robot.robotDrive.purePursuitDrive.start(
+                                null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
+                    }
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
@@ -626,7 +642,24 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.zeroCalibrate();
                 }
                 break;
+
+            case FtcGamepad.GAMEPAD_LSTICK_BTN:
+                if(robot.turret != null && robot.vision != null)
+                {
+                    if(pressed)
+                    {
+                        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
+                                robot.vision.getBestDetectedPoleInfo();
+                        robot.turret.setTarget(poleInfo.horizontalAngle);
+                    }
+                    else
+                    {
+                        robot.turret.cancel();
+                    }
+                }
+                break;
         }
+
     }   //operatorButtonEvent
 
 }   //class FtcTeleOp

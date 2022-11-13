@@ -532,4 +532,9 @@ public class Turret
         }
     }   //setElevatorAndArmTargets
 
+    public void cancel()
+    {
+        pidTurret.cancel();
+    }
+
 }   //class Turret
