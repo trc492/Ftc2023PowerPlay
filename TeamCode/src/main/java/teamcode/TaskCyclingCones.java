@@ -85,6 +85,7 @@ public class TaskCyclingCones
         ALIGN_TO_POLE,
         SCORE,
         CLEAR_POLE,
+        PREP_FOR_TRAVEL,
         DONE
     }
 
@@ -200,6 +201,7 @@ public class TaskCyclingCones
         {
             switch (state)
             {
+                //robot is facing cone, turret at front, arm at
                 case START: //1. drive forward to the cone and prepare turret to pick it up
                     if (visionType != VisionType.NO_VISION)
                     {
@@ -317,7 +319,10 @@ public class TaskCyclingCones
                             robot.vision.getBestDetectedPoleInfo();
                         if (poleInfo != null)
                         {
+                            TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
                             poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
+                            robot.speak("POLE FOUND");
+                            globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle );
                         }
                         else
                         {
@@ -337,16 +342,14 @@ public class TaskCyclingCones
                         {
                             //times up, reset expireTime, assume it's aligned and score.
                             visionExpireTime = null;
-                            sm.setState(State.SCORE);
+                            //sm.setState(State.SCORE);
                         }
                     }
                     break;
 
                 case ALIGN_TO_POLE:
                     // Call vision to detect the junction pole
-                    TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
-                    globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle );
-                    robot.turret.setTarget(robot.turret.getPosition() + poleAngle, 1.0, event, null, 0.0, null, null);
+                    robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.75, event, null, 0.0, null, null);
                     sm.waitForSingleEvent(event, State.DONE);//SCORE);
                     break;
 
@@ -360,7 +363,11 @@ public class TaskCyclingCones
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null);
                     sm.waitForSingleEvent(event, State.DONE);
                     break;
-
+                case PREP_FOR_TRAVEL:
+                    robot.turret.setTarget(
+                            RobotParams.TURRET_FRONT, 1.0, event, null, 0.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                    sm.waitForSingleEvent(event, State.DONE);
+                    break;
                 default:
                 case DONE:
                     cancel();

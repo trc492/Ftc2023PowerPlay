@@ -128,7 +128,7 @@ public class FtcTest extends FtcTeleOp
     private int posIndex = 0;
     private int wheelIndex = 0;
 
-    private boolean useFrontEocv = true;
+    private boolean useFrontEocv = false;
     //
     // Overrides FtcOpMode abstract method.
     //
@@ -960,15 +960,15 @@ public class FtcTest extends FtcTeleOp
                 int numTargets;
                 TrcVisionTargetInfo<?>[] targetsInfo = useFrontEocv? robot.vision.getDetectedTargetsInfo(null):
                                                                      robot.vision.getDetectedPolesInfo();
-
                 if (targetsInfo != null)
                 {
                     numTargets = Math.min(targetsInfo.length, maxNumLines);
                     for (int i = 0; i < numTargets; i++)
                     {
                         robot.dashboard.displayPrintf(
-                            lineIndex, "[%d] %s (signal=%d)",
-                            i, targetsInfo[i], robot.vision.determineDetectedSignal(targetsInfo[i]));
+                            lineIndex, "[%d] %s (signal=%.3f)",
+                            i, targetsInfo[i],
+                            targetsInfo[i].horizontalAngle);
                         lineIndex++;
                     }
                 }

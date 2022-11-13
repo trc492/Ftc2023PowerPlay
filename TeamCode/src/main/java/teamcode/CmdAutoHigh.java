@@ -36,6 +36,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private enum State
     {
         START_DELAY,
+        DO_POLE_VISION_SETUP,
         DRIVE_TO_SCORE_POSITION,
         RAISE_ELEVATOR_TO_SCORE,
         TURN_TO_SCORE_PRELOAD,
@@ -55,6 +56,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int signalPos = 0;
     // Tells us number cones left on the conestack.
     private int conesRemaining = 5;
+    private boolean debugPoleVision = true;
 
     /**
      * Constructor: Create an instance of the object.
@@ -72,7 +74,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         event = new TrcEvent(moduleName);
         sm = new TrcStateMachine<>(moduleName);
         robot.robotDrive.purePursuitDrive.setFastModeEnabled(true);
-        sm.start(State.START_DELAY);
+        sm.start(debugPoleVision? State.DO_POLE_VISION_SETUP : State.START_DELAY);
     }   //CmdAutoFarCarousel
 
     //
@@ -175,7 +177,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                         robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91.5, autoChoices));
+                        robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
                     sm.waitForSingleEvent(
                         event,
                         autoChoices.strategy != FtcAuto.AutoStrategy.PARKING_ONLY?
@@ -187,7 +189,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.elevator.setTarget(32.0, true, 1.0, event, null, 2.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
-
+                //assumes robot is set up already right next to the pole
+                case DO_POLE_VISION_SETUP:
+                    robot.elevator.setTarget(32, true, 1.0, null, null, 2.0);
+                    robot.arm.setTarget(30);
+                    robot.turret.setTarget(2.0, 93, 0.75, event, null, 2.0, null, null);
+                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
+                    break;
                 case TURN_TO_SCORE_PRELOAD:
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
@@ -200,21 +208,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
-                    robot.elevator.setTarget(28.0, true, 1.0, null, null, 2.0);
-                    robot.intake.autoAssist(1.0, RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
-                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR_AFTER_SCORING);
+                    robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, event);
+//                    robot.elevator.setTarget(28.0, true, 1.0, null, null, 2.0);
+//                    robot.intake.autoAssist(1.0, RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
+                    sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
                     break;
 
-                case RAISE_ELEVATOR_AFTER_SCORING:
-                    robot.elevator.setTarget(32.0, true, 1.0, event, null, 2.0);
-                    sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
-                    break;
-
-                case PREP_FOR_TRAVEL:
-                    robot.turret.setTarget(
-                        RobotParams.TURRET_FRONT, 1.0, event, null, 0.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
-                    sm.waitForSingleEvent(event, State.DO_CYCLE);
-                    break;
 
                 case DO_CYCLE:
                     //if time >= 26 or no more cones on the conestack, go to park
