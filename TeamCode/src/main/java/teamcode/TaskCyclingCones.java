@@ -226,7 +226,7 @@ public class TaskCyclingCones
                     {
                         // Use vision to find the relative location of the cone.
                         TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> coneInfo =
-                            robot.vision.getBestDetectedConeInfo();
+                            robot.vision.getDetectedConeInfo();
                         if (coneInfo != null)
                         {
                             targetLocation = new TrcPose2D(
@@ -315,14 +315,13 @@ public class TaskCyclingCones
                     }
                     else
                     {
-                        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
-                            robot.vision.getBestDetectedPoleInfo();
-                        if (poleInfo != null)
+                        Double poleAngle = robot.vision.getPoleAngle();
+
+                        if (poleAngle != null)
                         {
                             TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
-                            poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
                             robot.speak("POLE FOUND");
-                            globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle );
+                            globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle);
                         }
                         else
                         {

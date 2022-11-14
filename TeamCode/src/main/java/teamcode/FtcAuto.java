@@ -60,7 +60,6 @@ public class FtcAuto extends FtcOpMode
         CYCLE_HIGH_PRELOAD_ONLY,
         CYCLE_MID,
         PARKING_ONLY,
-        VISION_TEST,
         PID_DRIVE,
         TIMED_DRIVE,
         DO_NOTHING
@@ -137,9 +136,9 @@ public class FtcAuto extends FtcOpMode
         //
         if (RobotParams.Preferences.useTraceLog)
         {
-            robot.matchInfo = FtcMatchInfo.getMatchInfo();
+            Robot.matchInfo = FtcMatchInfo.getMatchInfo();
             String filePrefix = String.format(
-                Locale.US, "%s%02d_Auto", robot.matchInfo.matchType, robot.matchInfo.matchNumber);
+                Locale.US, "%s%02d_Auto", Robot.matchInfo.matchType, Robot.matchInfo.matchNumber);
             robot.globalTracer.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
         }
         //
@@ -160,15 +159,11 @@ public class FtcAuto extends FtcOpMode
                     autoCommand = new CmdAutoHigh(robot, autoChoices);
                 }
                 break;
+
             case CYCLE_MID:
                 if (!RobotParams.Preferences.noRobot)
                 {
 
-                }
-                break;
-            case VISION_TEST:
-                if(!RobotParams.Preferences.noRobot){
-                    autoCommand = new CmdVisionTest(robot, autoChoices);
                 }
                 break;
 
@@ -256,9 +251,9 @@ public class FtcAuto extends FtcOpMode
             robot.globalTracer.setTraceLogEnabled(true);
         }
         robot.globalTracer.traceInfo(moduleName, "***** Starting autonomous *****");
-        if (robot.matchInfo != null)
+        if (Robot.matchInfo != null)
         {
-            robot.globalTracer.logInfo(moduleName, "MatchInfo", "%s", robot.matchInfo);
+            robot.globalTracer.logInfo(moduleName, "MatchInfo", "%s", Robot.matchInfo);
         }
         robot.globalTracer.logInfo(moduleName, "AutoChoices", "%s", autoChoices);
         //
@@ -389,7 +384,6 @@ public class FtcAuto extends FtcOpMode
         strategyMenu.addChoice("Cycle High Preload Only", AutoStrategy.CYCLE_HIGH_PRELOAD_ONLY, false, parkingMenu);
         strategyMenu.addChoice("Park Only", AutoStrategy.PARKING_ONLY, false, parkingMenu);
         strategyMenu.addChoice("Cycle Mid", AutoStrategy.CYCLE_MID, false, parkingMenu);
-        strategyMenu.addChoice("Vision Test", AutoStrategy.VISION_TEST, false);
         strategyMenu.addChoice("PID Drive", AutoStrategy.PID_DRIVE, false, xTargetMenu);
         strategyMenu.addChoice("Timed Drive", AutoStrategy.TIMED_DRIVE, false, driveTimeMenu);
         strategyMenu.addChoice("Do nothing", AutoStrategy.DO_NOTHING, false);

@@ -198,7 +198,7 @@ public class Turret
      *
      * @param context not used.
      */
-    private void performAction (Object context)
+    private void performAction(Object context)
     {
         setTarget(actionParams.target, actionParams.powerLimit, actionParams.event, actionParams.callback,
                   actionParams.timeout, actionParams.elevatorTarget, actionParams.armTarget);

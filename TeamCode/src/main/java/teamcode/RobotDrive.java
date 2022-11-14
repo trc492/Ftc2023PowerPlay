@@ -39,13 +39,6 @@ import TrcFtcLib.ftclib.FtcDcMotor;
  */
 public class RobotDrive
 {
-    public enum DriveMode
-    {
-        TANK_MODE,
-        HOLONOMIC_MODE,
-        ARCADE_MODE
-    }   //enum DriveMode
-
     //
     // Sensors.
     //

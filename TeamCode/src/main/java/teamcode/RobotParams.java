@@ -29,6 +29,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import TrcCommonLib.trclib.TrcHomographyMapper;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
+import TrcFtcLib.ftclib.FtcGamepad;
 
 /**
  * This class contains robot and subsystem constants and parameters.
@@ -201,8 +202,8 @@ public class RobotParams
     // In tile units.
     public static TrcPose2D CONE_STACK_RED_LEFT                 = new TrcPose2D(-2.3, -0.5, -90.0);
     public static TrcPose2D LOOK_FOR_CONE_POS_LEFT              = new TrcPose2D(-2.0, -0.5, -90.0);
-    public static TrcPose2D SCORE_LOCATION_RED_LEFT             = new TrcPose2D(-0.5,-1.0,-90);
-    public static TrcPose2D SUBSTATION_RED_LEFT                 = new TrcPose2D(-0.5,-2.0,-135);
+    public static TrcPose2D SCORE_LOCATION_RED_LEFT             = new TrcPose2D(-0.5, -1.0, 180.0);
+    public static TrcPose2D SUBSTATION_RED_LEFT                 = new TrcPose2D(-0.5, -2.0, 135.0);
     // Game element dimensions
     public static final double STACKED_CONE_ADDITION            = 1.5;
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
@@ -308,7 +309,7 @@ public class RobotParams
     public static final double X_ODOMETRY_WHEEL_OFFSET          = ROBOT_LENGTH/2.0 - (3.875 + 9.5); //behind centroid
     public static final double Y_LEFT_ODOMETRY_WHEEL_OFFSET     = -15.25/2.0;
     public static final double Y_RIGHT_ODOMETRY_WHEEL_OFFSET    = 15.25/2.0;
-    public static final RobotDrive.DriveMode ROBOT_DRIVE_MODE   = RobotDrive.DriveMode.ARCADE_MODE;
+    public static final FtcGamepad.DriveMode ROBOT_DRIVE_MODE   = FtcGamepad.DriveMode.ARCADE_MODE;
     //
     // Velocity controlled constants.
     //

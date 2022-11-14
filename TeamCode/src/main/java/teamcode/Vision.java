@@ -187,15 +187,29 @@ public class Vision
     }   //tensorFlowShutdown
 
     /**
-     * This method does not initiate detection. It simply returns the signal detected by the last call to
-     * getDetectedSignal. This is typically used to get the last detected signal during the init period.
+     * This method calls vision to detect the signal and returns the detected info.
      *
-     * @return last detected signal.
+     * @return detected signal info, null if none detected.
      */
-    public int getLastSignal()
+    public TrcVisionTargetInfo<?> getDetectedSignalInfo()
     {
-        return lastSignal;
-    }   //getLastSignal
+        TrcVisionTargetInfo<?>[] targets = null;
+
+        if (tensorFlowVision != null && tensorFlowVision.isEnabled())
+        {
+            targets = tensorFlowVision.getDetectedTargetsInfo(
+                null, null, this::compareConfidence,
+                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+        }
+        else if (frontEocvVision != null && frontEocvVision.isEnabled() &&
+                 frontEocvVision.getDetectObjectType() == EocvVision.ObjectType.APRIL_TAG)
+        {
+            targets = frontEocvVision.getDetectedTargetsInfo(
+                null, null, RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+        }
+
+        return targets != null? targets[0]: null;
+    }   //getDetectedSignalInfo
 
     /**
      * This method determines the signal value from the detected object info.
@@ -274,53 +288,26 @@ public class Vision
      */
     public int getDetectedSignal()
     {
-        return determineDetectedSignal(getBestDetectedTargetInfo(null));
+        return determineDetectedSignal(getDetectedSignalInfo());
     }   //getDetectedSignal
 
     /**
-     * This method returns an array of the detected targets info.
+     * This method does not initiate detection. It simply returns the signal detected by the last call to
+     * getDetectedSignal. This is typically used to get the last detected signal during the init period.
      *
-     * @param label specifies the target label, only valid for TensorFlowVision, null for others.
-     * @return an array of detected targets info.
+     * @return last detected signal.
      */
-    public TrcVisionTargetInfo<?>[] getDetectedTargetsInfo(String label)
+    public int getLastSignal()
     {
-        TrcVisionTargetInfo<?>[] targets = null;
-
-        if (tensorFlowVision != null && tensorFlowVision.isEnabled())
-        {
-            targets = tensorFlowVision.getDetectedTargetsInfo(
-                label, null, this::compareConfidence,
-                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
-        }
-        else if (frontEocvVision != null && frontEocvVision.isEnabled())
-        {
-            targets = frontEocvVision.getDetectedTargetsInfo(
-                null, null, RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
-            if (targets != null && robot.blinkin != null)
-            {
-                EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
-                if (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE)
-                {
-                    robot.blinkin.setPatternState(
-                        detectObjType == EocvVision.ObjectType.RED_CONE ? GOT_RED_CONE : GOT_BLUE_CONE, true, 1.0);
-                }
-            }
-        }
-        else if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
-        {
-            targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
-        }
-
-        return targets;
-    }   //getDetectedTargetsInfo
+        return lastSignal;
+    }   //getLastSignal
 
     /**
-     * This method returns an array of detected cones info.
+     * This method calls vision to detect the cone and returns the detected info.
      *
-     * @return array of detected cones info, null if none detected.
+     * @return detected cone info, null if none detected.
      */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] getDetectedConesInfo()
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedConeInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
         EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
@@ -337,27 +324,15 @@ public class Vision
             }
         }
 
-        //noinspection unchecked
-        return (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[])targets;
-    }   //getDetectedConesInfo
+        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
+    }   //getDetectedConeInfo
 
     /**
-     * This method returns the best detected cone info.
+     * This method calls vision to detect the pole and returns the detected info.
      *
-     * @return best detected cone info, null if none detected.
+     * @return detected pole info, null if none detected.
      */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getBestDetectedConeInfo()
-    {
-        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] targets = getDetectedConesInfo();
-        return targets != null ? targets[0] : null;
-    }   //getBestDetectedConeInfo
-
-    /**
-     * This method returns an array of detected poles info.
-     *
-     * @return an array of detected poles info, null if none detected.
-     */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] getDetectedPolesInfo()
+    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedPoleInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
@@ -371,63 +346,26 @@ public class Vision
             }
         }
 
-        //noinspection unchecked
-        return (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[])targets;
-    }   //getDetectedPolesInfo
+        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
+    }   //getDetectedPoleInfo
 
     /**
-     * This method returns the best detected pole info.
+     * This method returns the angle of the detected pole.
      *
-     * @return best detected pole info, null if none detected.
+     * @return detected pole angle.
      */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getBestDetectedPoleInfo()
+    public Double getPoleAngle()
     {
-        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>[] targets = getDetectedPolesInfo();
-        return targets != null ? targets[0] : null;
-    }   //getBestDetectedPoleInfo
+        Double poleAngle = null;
+        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo = getDetectedPoleInfo();
 
-    /**
-     * This method returns the best detected target info.
-     *
-     * @param label specifies the target label, only valid for TensorFlowVision, null for others.
-     * @return best detected target info.
-     */
-    public TrcVisionTargetInfo<?> getBestDetectedTargetInfo(String label)
-    {
-        TrcVisionTargetInfo<?>[] targets = getDetectedTargetsInfo(label);
-
-        return targets != null? targets[0]: null;
-    }   //getDetectedTargetsInfo
-
-    /**
-     * This method returns info of the closest detected target to image center.
-     *
-     * @param label specifies the target label, only valid for TensorFlowVision, null for others.
-     * @return closest detected target info.
-     */
-    public TrcVisionTargetInfo<?> getClosestTargetInfo(String label)
-    {
-        TrcVisionTargetInfo<?>[] targets = null;
-
-        if (tensorFlowVision != null && tensorFlowVision.isEnabled())
+        if (poleInfo != null)
         {
-            targets = tensorFlowVision.getDetectedTargetsInfo(
-                label, null, this::compareDistanceFromCamera,
-                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
-        }
-        else if (frontEocvVision != null && frontEocvVision.isEnabled())
-        {
-            targets = frontEocvVision.getDetectedTargetsInfo(
-                null, this::compareDistanceFromCamera,
-                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
-        }
-        else if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
-        {
-            targets = elevatorEocvVision.getDetectedTargetsInfo(null, this::compareDistanceFromCamera, 0.0, 0.0);
+            poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
         }
 
-        return targets != null? targets[0]: null;
-    }   //getClosestTargetInfo
+        return poleAngle;
+    }   //getPoleAngle
 
     /**
      * This method is called by the Arrays.sort to sort the target object by decreasing confidence.

@@ -26,14 +26,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.Locale;
 
+import TrcCommonLib.trclib.TrcDriveBase;
 import TrcCommonLib.trclib.TrcGameController;
-import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
-import TrcCommonLib.trclib.TrcUtil;
-import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcGamepad;
-import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcOpMode;
 
 @TeleOp(name="FtcTeleOp", group="Ftc3543")
@@ -69,45 +66,17 @@ import TrcFtcLib.ftclib.FtcOpMode;
 
 public class FtcTeleOp extends FtcOpMode
 {
-    public enum DriveOrientation
-    {
-        ROBOT, FIELD, INVERTED;
-
-        static DriveOrientation nextDriveOrientation(DriveOrientation driveOrientation)
-        {
-            DriveOrientation nextDriveOrientation;
-
-            switch (driveOrientation)
-            {
-                case ROBOT:
-                    nextDriveOrientation = FIELD;
-                    break;
-
-                case FIELD:
-                    nextDriveOrientation = INVERTED;
-                    break;
-
-                default:
-                case INVERTED:
-                    nextDriveOrientation = ROBOT;
-                    break;
-            }
-
-            return nextDriveOrientation;
-        }   //nextDriveOrientation
-
-    }   //enum DriveOrientation
-
     private static final String moduleName = "FtcTeleOp";
     protected Robot robot;
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
-    private DriveOrientation driveOrientation = DriveOrientation.ROBOT;
+    private TrcDriveBase.DriveOrientation driveOrientation = TrcDriveBase.DriveOrientation.ROBOT;
     private double drivePowerScale = 1.0;
     private boolean turretSlowModeOn = false;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
     private boolean atScoringLocation = false;
+    private boolean lockOnPole = false;
 
     //
     // Implements FtcOpMode abstract method.
@@ -129,8 +98,8 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (RobotParams.Preferences.useTraceLog)
         {
-            String filePrefix = robot.matchInfo != null?
-                String.format(Locale.US, "%s%02d_TeleOp", robot.matchInfo.matchType, robot.matchInfo.matchNumber):
+            String filePrefix = Robot.matchInfo != null?
+                String.format(Locale.US, "%s%02d_TeleOp", Robot.matchInfo.matchType, Robot.matchInfo.matchNumber):
                 "Unknown_TeleOp";
             robot.globalTracer.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
         }
@@ -226,7 +195,7 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (robot.robotDrive != null)
         {
-            double[] inputs = getDriveInputs();
+            double[] inputs = driverGamepad.getDriveInputs(RobotParams.ROBOT_DRIVE_MODE, true, drivePowerScale);
             boolean turnOnly = inputs[0] == 0.0 && inputs[1] == 0.0;
 
             if (pivotTurnMode && turnOnly)
@@ -246,7 +215,9 @@ public class FtcTeleOp extends FtcOpMode
             }
             else if (robot.robotDrive.driveBase.supportsHolonomicDrive())
             {
-                robot.robotDrive.driveBase.holonomicDrive(null, inputs[0], inputs[1], inputs[2], getDriveGyroAngle());
+                robot.robotDrive.driveBase.holonomicDrive(
+                    null, inputs[0], inputs[1], inputs[2],
+                    robot.robotDrive.driveBase.getDriveGyroAngle(driveOrientation));
             }
             else
             {
@@ -301,23 +272,35 @@ public class FtcTeleOp extends FtcOpMode
 
         if (robot.turret != null)
         {
-            double turretPower = (operatorGamepad.getLeftTrigger(true) - operatorGamepad.getRightTrigger(true)) *
-                                 RobotParams.TURRET_POWER_SCALE;
-            robot.turret.setPower(turretPower, !manualOverride);
-//            double turretX = operatorGamepad.getLeftStickX();
-//            double turretY = operatorGamepad.getLeftStickY();
-//            double turretPower = operatorGamepad.getMagnitude(turretX, turretY);
-//            double turretDirDegrees = 90.0 - operatorGamepad.getDirectionDegrees(turretX, turretY);
-//            if (turretDirDegrees < 0.0)
-//            {
-//                turretDirDegrees += 360.0;
-//            }
-//            robot.turret.setTarget(turretDirDegrees, turretPower);
+            if (robot.vision != null && lockOnPole)
+            {
+                Double poleAngle = robot.vision.getPoleAngle();
 
-            robot.dashboard.displayPrintf(
-                5, "Turret: power=%.2f, pos=%.1f, LimitSW=%s/%s",
-                turretPower, robot.turret.getPosition(),
-                robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive());
+                if (poleAngle != null && poleAngle != 0.0)
+                {
+                    robot.turret.setTarget(poleAngle);
+                }
+            }
+            else
+            {
+                double turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE;
+                robot.turret.setPower(turretPower, !manualOverride);
+//                double turretX = operatorGamepad.getLeftStickX();
+//                double turretY = operatorGamepad.getLeftStickY();
+//                double turretPower = operatorGamepad.getMagnitude(turretX, turretY);
+//                double turretDirDegrees = 90.0 - operatorGamepad.getDirectionDegrees(turretX, turretY);
+//                if (turretDirDegrees < 0.0)
+//                {
+//                    turretDirDegrees += 360.0;
+//                }
+//                robot.turret.setTarget(turretDirDegrees, turretPower);
+
+                robot.dashboard.displayPrintf(
+                    5, "Turret: power=%.2f, pos=%.1f, LimitSW=%s/%s",
+                    turretPower, robot.turret.getPosition(),
+                    robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive());
+
+            }
         }
 
         if (robot.intake != null)
@@ -326,92 +309,6 @@ public class FtcTeleOp extends FtcOpMode
                 6, "Intake: power=%.2f, sensor=%.2f", robot.intake.getPower(), robot.intake.getSensorValue());
         }
     }   //slowPeriodic
-
-    /**
-     * This method reads various joystick/gamepad control values and returns the drive powers for all three degrees
-     * of robot movement.
-     *
-     * @return an array of 3 values for x, y and rotation power.
-     */
-    public double[] getDriveInputs()
-    {
-        double x = 0.0, y = 0.0, rot = 0.0;
-        double mag;
-        double newMag;
-
-        switch (RobotParams.ROBOT_DRIVE_MODE)
-        {
-            case HOLONOMIC_MODE:
-                x = driverGamepad.getLeftStickX(false);
-                y = driverGamepad.getRightStickY(false);
-                rot = (driverGamepad.getRightTrigger(true) - driverGamepad.getLeftTrigger(true));
-                robot.dashboard.displayPrintf(1, "Holonomic:x=%.1f,y=%.1f,rot=%.1f", x, y, rot);
-                break;
-
-            case ARCADE_MODE:
-                x = driverGamepad.getRightStickX(false);
-                y = driverGamepad.getRightStickY(false);
-                rot = driverGamepad.getLeftStickX(true);
-                robot.dashboard.displayPrintf(1, "Arcade:x=%.1f,y=%.1f,rot=%.1f", x, y, rot);
-                break;
-
-            case TANK_MODE:
-                double leftPower = driverGamepad.getLeftStickY(false);
-                double rightPower = driverGamepad.getRightStickY(false);
-                x = 0.0;
-                y = (leftPower + rightPower)/2.0;
-                rot = (leftPower - rightPower)/2.0;
-                robot.dashboard.displayPrintf(1, "Tank:left=%.1f,right=%.1f", leftPower, rightPower);
-                break;
-        }
-        mag = TrcUtil.magnitude(x, y);
-        if (mag > 1.0)
-        {
-            x /= mag;
-            y /= mag;
-            mag = 1.0;
-        }
-        newMag = Math.pow(mag, 3);
-
-        newMag *= drivePowerScale;
-        rot *= drivePowerScale;
-
-        if (mag != 0.0)
-        {
-            x *= newMag / mag;
-            y *= newMag / mag;
-        }
-
-        return new double[] { x, y, rot };
-    }   //getDriveInput
-
-    /**
-     * This method returns robot heading to be maintained in teleop drive according to drive orientation mode.
-     *
-     * @return robot heading to be maintained.
-     */
-    private double getDriveGyroAngle()
-    {
-        double angle;
-
-        switch (driveOrientation)
-        {
-            case ROBOT:
-                angle = 0.0;
-                break;
-
-            case INVERTED:
-                angle = 180.0;
-                break;
-
-            default:
-            case FIELD:
-                angle = robot.robotDrive.gyro != null? robot.robotDrive.gyro.getZHeading().value: 0.0;
-                break;
-        }
-
-        return angle;
-    }   //getDriveGyroAngle
 
     /**
      * This method updates the blinkin LEDs to show the drive orientation mode.
@@ -466,24 +363,24 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_B:
-                if (pressed && robot.robotDrive.gridDrive != null)
-                {
-                    robot.robotDrive.gridDrive.resetGridCellCenter();
-                }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
-                if (pressed && robot.robotDrive.gridDrive != null) {
+                if (pressed && robot.robotDrive.purePursuitDrive != null)
+                {
+                    atScoringLocation = !atScoringLocation;
                     if (atScoringLocation)
                     {
                         robot.robotDrive.purePursuitDrive.start(
-                                null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.getAutoTargetPoint(RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
+                            null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(
+                                RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
                     }
-                    else {
+                    else
+                    {
                         robot.robotDrive.purePursuitDrive.start(
-                                null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.getAutoTargetPoint(RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
+                            null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
                     }
                 }
                 break;
@@ -498,7 +395,7 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_LBUMPER:
                 if (pressed)
                 {
-                    driveOrientation = DriveOrientation.nextDriveOrientation(driveOrientation);
+                    driveOrientation = TrcDriveBase.DriveOrientation.nextDriveOrientation(driveOrientation);
                     updateDriveModeLeds();
                 }
                 break;
@@ -537,6 +434,10 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_BACK:
+                if (pressed && robot.robotDrive.gridDrive != null)
+                {
+                    robot.robotDrive.gridDrive.resetGridCellCenter();
+                }
                 break;
         }
     }   //driverButtonEvent
@@ -644,19 +545,7 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-                if(robot.turret != null && robot.vision != null)
-                {
-                    if(pressed)
-                    {
-                        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo =
-                                robot.vision.getBestDetectedPoleInfo();
-                        robot.turret.setTarget(poleInfo.horizontalAngle);
-                    }
-                    else
-                    {
-                        robot.turret.cancel();
-                    }
-                }
+                lockOnPole = pressed;
                 break;
         }
 

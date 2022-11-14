@@ -191,11 +191,10 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
                 //assumes robot is set up already right next to the pole
                 case DO_POLE_VISION_SETUP:
-                    robot.elevator.setTarget(32, true, 1.0, null, null, 2.0);
-                    robot.arm.setTarget(30);
-                    robot.turret.setTarget(2.0, 93, 0.75, event, null, 2.0, null, null);
+                    robot.turret.setTarget(2.0, 93, 0.75, event, null, 2.0, 32.0, 30.0);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
+
                 case TURN_TO_SCORE_PRELOAD:
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
