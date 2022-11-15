@@ -133,7 +133,6 @@ public class FtcTeleOp extends FtcOpMode
     @Override
     public void startMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
-        final String funcName = "startMode";
         robot.dashboard.clearDisplay();
         if (robot.globalTracer.isTraceLogEnabled())
         {
@@ -147,13 +146,7 @@ public class FtcTeleOp extends FtcOpMode
 
         if (nextMode == TrcRobot.RunMode.TELEOP_MODE || nextMode == TrcRobot.RunMode.TEST_MODE)
         {
-            if (!robot.restoreCurrentRobotPose())
-            {
-                robot.robotDrive.driveBase.setFieldPosition(
-                    new TrcPose2D(RobotParams.FULL_TILE_INCHES/2.0, RobotParams.ROBOT_LENGTH/2.0, 0));
-            }
-            robot.globalTracer.traceInfo(
-                funcName, "set RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
+            robot.restoreCurrentRobotPose();
         }
     }   //startMode
 

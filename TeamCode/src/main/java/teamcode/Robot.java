@@ -359,24 +359,29 @@ public class Robot
     }   //saveCurrentRobotPose
 
     /**
-     * This method is typically called at the beginning of TeleOp to read the Robot Pose data file saved by the
-     * previous autonomous session. It restore the current robot's field position to this robot pose so that TeleOp
-     * can continue with the same position at the end of autonomous.
-     *
-     * @return true if the data is read successful, false if failed such as file not found.
+     * This method is typically called at the beginning of TeleOp to restore the robot pose saved at the end of
+     * autonomous. If we are running TeleOp without prior autonomous run (e.g. practice driving), there may not
+     * be a saved robot pose. In that case, we will use the start position of the last autonomous run.
      */
-    public boolean restoreCurrentRobotPose()
+    public void restoreCurrentRobotPose()
     {
         final String funcName = "restoreCurrentRobotPose";
 
         if (endOfAutoRobotPose != null)
         {
             robotDrive.driveBase.setFieldPosition(endOfAutoRobotPose);
-            globalTracer.traceInfo(funcName, "Restore RobotPose=%s", endOfAutoRobotPose);
+            globalTracer.traceInfo(funcName, "Restore saved RobotPose=%s", endOfAutoRobotPose);
             endOfAutoRobotPose = null;
         }
-
-        return endOfAutoRobotPose != null;
+        else
+        {
+            // There was no saved robotPose, use previous autonomous start position. In case we didn't even have a
+            // previous autonomous run (e.g. just powering up the robot and go into TeleOp), then we will default
+            // to RED_LEFT starting position.
+            robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
+            globalTracer.traceInfo(
+                funcName, "No saved RobotPose, use autoChoiceStartPos=%s", robotDrive.driveBase.getFieldPosition());
+        }
     }   //restoreCurrentRobotPose
 
     /**
