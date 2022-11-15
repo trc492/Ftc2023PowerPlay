@@ -201,9 +201,9 @@ public class RobotDrive
             {
                 tileX = -tileX;
             }
-            if(autoChoices.startPos == FtcAuto.StartPos.RIGHT){
+            else
+            {
                 heading = -heading;
-
             }
         }
         else if (autoChoices.startPos == FtcAuto.StartPos.RIGHT)
