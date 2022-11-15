@@ -59,6 +59,7 @@ public class Robot
     public FtcDashboard dashboard;
     public TrcDbgTrace globalTracer;
     public static FtcMatchInfo matchInfo = null;
+    public static TrcPose2D endOfAutoRobotPose = null;
     //
     // Vision subsystems.
     //
@@ -353,26 +354,14 @@ public class Robot
     }   //getElevatorPowerCompensation
 
     /**
-     * This method saves the current robot position to a data file. Typically, this is called at the end of autonomous
-     * so that at the beginning of TeleOp, we can restore the robot pose from this file.
+     * This method is typically called at the end of autonomous to save the current robot position to a static variable
+     * so that TeleOp can retrieve and restore the robot pose to the saved location.
      */
     public void saveCurrentRobotPose()
     {
         final String funcName = "saveCurrentRobotPose";
-
-        try (PrintStream out = new PrintStream(new FileOutputStream(
-            RobotParams.TEAM_FOLDER_PATH + "/" + RobotParams.CURRENT_ROBOT_POSE_FILE)))
-        {
-            TrcPose2D currPose = robotDrive.driveBase.getFieldPosition();
-
-            out.println(currPose.x + "," + currPose.y + "," + currPose.angle);
-            out.close();
-            globalTracer.traceInfo(funcName, "Saved robot pose=%s", currPose);
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        endOfAutoRobotPose = robotDrive.driveBase.getFieldPosition();
+        globalTracer.traceInfo(funcName, "Saved robot pose=%s", endOfAutoRobotPose);
     }   //saveCurrentRobotPose
 
     /**
@@ -385,32 +374,15 @@ public class Robot
     public boolean restoreCurrentRobotPose()
     {
         final String funcName = "restoreCurrentRobotPose";
-        boolean success = true;
 
-        try (Scanner in = new Scanner(new FileReader(
-            RobotParams.TEAM_FOLDER_PATH + "/" + RobotParams.CURRENT_ROBOT_POSE_FILE)))
+        if (endOfAutoRobotPose != null)
         {
-            String[] poseData = in.nextLine().split(",", 3);
-            if (poseData.length == 3)
-            {
-                TrcPose2D robotPose = new TrcPose2D(
-                    Double.parseDouble(poseData[0]), Double.parseDouble(poseData[1]), Double.parseDouble(poseData[2]));
-                robotDrive.driveBase.setFieldPosition(robotPose);
-                globalTracer.traceInfo(funcName, "Restore RobotPose=%s", robotPose);
-            }
-            else
-            {
-                success = false;
-                globalTracer.traceWarn(funcName, "Invalid data (len=%d).", poseData.length);
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            success = false;
-            globalTracer.traceWarn(funcName, "Current Robot Pose data file not found.");
+            robotDrive.driveBase.setFieldPosition(endOfAutoRobotPose);
+            globalTracer.traceInfo(funcName, "Restore RobotPose=%s", endOfAutoRobotPose);
+            endOfAutoRobotPose = null;
         }
 
-        return success;
+        return endOfAutoRobotPose != null;
     }   //restoreCurrentRobotPose
 
     /**

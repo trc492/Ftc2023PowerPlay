@@ -183,15 +183,15 @@ public class RobotDrive
     }   //setAutoStartPosition
 
     /**
-     * This method adjusts the target point according to the alliance and startPos in autoChoices.
+     * This method adjusts the target cell according to the alliance and startPos in autoChoices.
      *
      * @param tileX specifies X tile coordinate for RED LEFT.
      * @param tileY specifies Y tile coordinate for RED LEFT.
      * @param heading specifies heading for RED LEFT.
      * @param autoChoices specifies auto choices.
-     * @return adjusted target point as TrcPose2D.
+     * @return adjusted target cell as TrcPose2D.
      */
-    public TrcPose2D getAutoTargetPoint(double tileX, double tileY, double heading, FtcAuto.AutoChoices autoChoices)
+    public TrcPose2D getAutoTargetCell(double tileX, double tileY, double heading, FtcAuto.AutoChoices autoChoices)
     {
         if (autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE)
         {
@@ -212,7 +212,33 @@ public class RobotDrive
             heading = -heading;
         }
 
-        return new TrcPose2D(tileX * RobotParams.FULL_TILE_INCHES, tileY * RobotParams.FULL_TILE_INCHES, heading);
+        return new TrcPose2D(tileX, tileY, heading);
+    }   //getAutoTargetCell
+
+    /**
+     * This method adjusts the target cell according to the alliance and startPos in autoChoices.
+     *
+     * @param targetPos specifies the target position in tile units.
+     * @param autoChoices specifies auto choices.
+     * @return adjusted target cell as TrcPose2D.
+     */
+    public TrcPose2D getAutoTargetCell(TrcPose2D targetPos, FtcAuto.AutoChoices autoChoices)
+    {
+        return getAutoTargetCell(targetPos.x, targetPos.y, targetPos.angle, autoChoices);
+    }   //getAutoTargetCell
+
+    /**
+     * This method adjusts the target point according to the alliance and startPos in autoChoices.
+     *
+     * @param tileX specifies X tile coordinate for RED LEFT.
+     * @param tileY specifies Y tile coordinate for RED LEFT.
+     * @param heading specifies heading for RED LEFT.
+     * @param autoChoices specifies auto choices.
+     * @return adjusted target point as TrcPose2D.
+     */
+    public TrcPose2D getAutoTargetPoint(double tileX, double tileY, double heading, FtcAuto.AutoChoices autoChoices)
+    {
+        return gridDrive.gridCellToPose(getAutoTargetCell(tileX, tileY, heading, autoChoices));
     }   //getAutoTargetPoint
 
     /**

@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import TrcCommonLib.trclib.TrcDriveBase;
 import TrcCommonLib.trclib.TrcGameController;
+import TrcCommonLib.trclib.TrcPathBuilder;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcGamepad;
@@ -132,6 +133,7 @@ public class FtcTeleOp extends FtcOpMode
     @Override
     public void startMode(TrcRobot.RunMode prevMode, TrcRobot.RunMode nextMode)
     {
+        final String funcName = "startMode";
         robot.dashboard.clearDisplay();
         if (robot.globalTracer.isTraceLogEnabled())
         {
@@ -143,18 +145,15 @@ public class FtcTeleOp extends FtcOpMode
         robot.startMode(nextMode);
         updateDriveModeLeds();
 
-        if (nextMode == TrcRobot.RunMode.TELEOP_MODE)
+        if (nextMode == TrcRobot.RunMode.TELEOP_MODE || nextMode == TrcRobot.RunMode.TEST_MODE)
         {
-            robot.globalTracer.traceInfo("TeleOp.startMode", "autoChoices=%s", FtcAuto.autoChoices);
-//            robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
-//            if (!robot.restoreCurrentRobotPose())
-//            {
-//                robot.robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
-//            }
-            robot.robotDrive.driveBase.setFieldPosition(
-                new TrcPose2D(RobotParams.FULL_TILE_INCHES/2.0, RobotParams.ROBOT_LENGTH/2.0, 0));
+            if (!robot.restoreCurrentRobotPose())
+            {
+                robot.robotDrive.driveBase.setFieldPosition(
+                    new TrcPose2D(RobotParams.FULL_TILE_INCHES/2.0, RobotParams.ROBOT_LENGTH/2.0, 0));
+            }
             robot.globalTracer.traceInfo(
-                "TeleOp.startMode", "set RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
+                funcName, "set RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
         }
     }   //startMode
 
@@ -278,7 +277,7 @@ public class FtcTeleOp extends FtcOpMode
 
                 if (poleAngle != null && poleAngle != 0.0)
                 {
-                    robot.turret.setTarget(poleAngle);
+                    robot.turret.setTarget(robot.turret.getPosition() + poleAngle);
                 }
             }
             else
@@ -366,22 +365,29 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_X:
-                if (pressed && robot.robotDrive.purePursuitDrive != null)
+                if (pressed && robot.robotDrive.gridDrive != null)
                 {
                     atScoringLocation = !atScoringLocation;
-                    if (atScoringLocation)
+                    TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
+                    TrcPose2D startGridCell = robot.robotDrive.gridDrive.poseToGridCell(robotPose);
+                    TrcPose2D endGridCell =
+                        atScoringLocation ?
+                            robot.robotDrive.getAutoTargetCell(
+                                RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices) :
+                            robot.robotDrive.getAutoTargetCell(
+                                RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices);
+                    TrcPose2D intermediateGridCell =
+                        robot.robotDrive.gridDrive.getIntermediateGridCell(startGridCell, endGridCell);
+                    TrcPathBuilder pathBuilder = new TrcPathBuilder(robotPose, false)
+                        .append(robot.robotDrive.gridDrive.gridCellToPose(startGridCell));
+
+                    if (intermediateGridCell != null)
                     {
-                        robot.robotDrive.purePursuitDrive.start(
-                            null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(
-                                RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
+                        pathBuilder.append(robot.robotDrive.gridDrive.gridCellToPose(intermediateGridCell));
                     }
-                    else
-                    {
-                        robot.robotDrive.purePursuitDrive.start(
-                            null, null, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
-                    }
+
+                    pathBuilder.append(robot.robotDrive.gridDrive.gridCellToPose(endGridCell));
+                    robot.robotDrive.purePursuitDrive.start(null, pathBuilder.toRelativeStartPath(), null, null, 0.0);
                 }
                 break;
 
