@@ -306,7 +306,6 @@ public class FtcAuto extends FtcOpMode
         // Tell robot object opmode is about to stop so it can do the necessary cleanup for the mode.
         //
         robot.stopMode(prevMode);
-        robot.saveCurrentRobotPose();
 
         if (robot.battery != null)
         {

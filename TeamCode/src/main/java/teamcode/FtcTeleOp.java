@@ -143,11 +143,6 @@ public class FtcTeleOp extends FtcOpMode
         //
         robot.startMode(nextMode);
         updateDriveModeLeds();
-
-        if (nextMode == TrcRobot.RunMode.TELEOP_MODE || nextMode == TrcRobot.RunMode.TEST_MODE)
-        {
-            robot.restoreCurrentRobotPose();
-        }
     }   //startMode
 
     /**

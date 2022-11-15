@@ -53,7 +53,7 @@ public class Robot
     public FtcDashboard dashboard;
     public TrcDbgTrace globalTracer;
     public static FtcMatchInfo matchInfo = null;
-    public static TrcPose2D endOfAutoRobotPose = null;
+    private static TrcPose2D endOfAutoRobotPose = null;
     //
     // Vision subsystems.
     //
@@ -235,6 +235,8 @@ public class Robot
      */
     public void startMode(TrcRobot.RunMode runMode)
     {
+        final String funcName = "startMode";
+
         if (robotDrive != null)
         {
             //
@@ -248,6 +250,25 @@ public class Robot
             // Enable odometry for all opmodes. We need odometry in TeleOp for GridDrive.
             //
             robotDrive.driveBase.setOdometryEnabled(true);
+            if (runMode != TrcRobot.RunMode.AUTO_MODE)
+            {
+                if (endOfAutoRobotPose != null)
+                {
+                    robotDrive.driveBase.setFieldPosition(endOfAutoRobotPose);
+                    globalTracer.traceInfo(funcName, "Restore saved RobotPose=%s", endOfAutoRobotPose);
+                }
+                else
+                {
+                    // There was no saved robotPose, use previous autonomous start position. In case we didn't even
+                    // have a previous autonomous run (e.g. just powering up the robot and go into TeleOp), then we
+                    // will default to RED_LEFT starting position.
+                    robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
+                    globalTracer.traceInfo(
+                        funcName, "No saved RobotPose, use autoChoiceStartPos=%s",
+                        robotDrive.driveBase.getFieldPosition());
+                }
+            }
+            endOfAutoRobotPose = null;
         }
         //
         // The following are performance counters, could be disabled for competition if you want.
@@ -266,7 +287,7 @@ public class Robot
      * This method is call when the robot mode is about to end. It contains code to cleanup robot hardware before
      * exiting the robot mode.
      *
-     * @param runMode specifies the robot mode it is about to start, can be used to cleanup mode specific hardware.
+     * @param runMode specifies the robot mode it is about to stop, can be used to cleanup mode specific hardware.
      */
     public void stopMode(TrcRobot.RunMode runMode)
     {
@@ -321,6 +342,11 @@ public class Robot
 
         if (robotDrive != null)
         {
+            if (runMode == TrcRobot.RunMode.AUTO_MODE)
+            {
+                endOfAutoRobotPose = robotDrive.driveBase.getFieldPosition();
+                globalTracer.traceInfo(funcName, "Saved robot pose=%s", endOfAutoRobotPose);
+            }
             //
             // Disable odometry.
             //
@@ -346,43 +372,6 @@ public class Robot
         return Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
                 0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
     }   //getElevatorPowerCompensation
-
-    /**
-     * This method is typically called at the end of autonomous to save the current robot position to a static variable
-     * so that TeleOp can retrieve and restore the robot pose to the saved location.
-     */
-    public void saveCurrentRobotPose()
-    {
-        final String funcName = "saveCurrentRobotPose";
-        endOfAutoRobotPose = robotDrive.driveBase.getFieldPosition();
-        globalTracer.traceInfo(funcName, "Saved robot pose=%s", endOfAutoRobotPose);
-    }   //saveCurrentRobotPose
-
-    /**
-     * This method is typically called at the beginning of TeleOp to restore the robot pose saved at the end of
-     * autonomous. If we are running TeleOp without prior autonomous run (e.g. practice driving), there may not
-     * be a saved robot pose. In that case, we will use the start position of the last autonomous run.
-     */
-    public void restoreCurrentRobotPose()
-    {
-        final String funcName = "restoreCurrentRobotPose";
-
-        if (endOfAutoRobotPose != null)
-        {
-            robotDrive.driveBase.setFieldPosition(endOfAutoRobotPose);
-            globalTracer.traceInfo(funcName, "Restore saved RobotPose=%s", endOfAutoRobotPose);
-            endOfAutoRobotPose = null;
-        }
-        else
-        {
-            // There was no saved robotPose, use previous autonomous start position. In case we didn't even have a
-            // previous autonomous run (e.g. just powering up the robot and go into TeleOp), then we will default
-            // to RED_LEFT starting position.
-            robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
-            globalTracer.traceInfo(
-                funcName, "No saved RobotPose, use autoChoiceStartPos=%s", robotDrive.driveBase.getFieldPosition());
-        }
-    }   //restoreCurrentRobotPose
 
     /**
      * This method sends the text string to the Driver Station to be spoken using text to speech.
