@@ -143,13 +143,6 @@ public class FtcTeleOp extends FtcOpMode
         //
         robot.startMode(nextMode);
         updateDriveModeLeds();
-        if(robot.vision != null && robot.vision.elevatorEocvVision != null && robot.vision.elevatorEocvVision.isEnabled()){
-            robot.globalTracer.traceInfo("Teleop Start Mode", "Vision is enabled");
-        }
-        else{
-            robot.globalTracer.traceInfo("Teleop Start Mode", "Vision is disabled");
-
-        }
     }   //startMode
 
     /**
@@ -272,8 +265,6 @@ public class FtcTeleOp extends FtcOpMode
 
                 if (poleAngle != null && poleAngle != 0.0)
                 {
-                    robot.globalTracer.traceInfo("Turret position", " Position= %.2f, Pole Angle=%.2f", robot.turret.getPosition()
-                    , poleAngle);
                     robot.turret.setTarget(robot.turret.getPosition() - poleAngle);
                 }
             }
@@ -365,26 +356,13 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
                     atScoringLocation = !atScoringLocation;
-                    TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
-                    TrcPose2D startGridCell = robot.robotDrive.gridDrive.poseToGridCell(robotPose);
-                    TrcPose2D endGridCell =
+                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
                         atScoringLocation ?
                             robot.robotDrive.getAutoTargetCell(
                                 RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices) :
                             robot.robotDrive.getAutoTargetCell(
-                                RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices);
-                    TrcPose2D intermediateGridCell =
-                        robot.robotDrive.gridDrive.getIntermediateGridCell(startGridCell, endGridCell);
-                    TrcPathBuilder pathBuilder = new TrcPathBuilder(robotPose, false)
-                        .append(robot.robotDrive.gridDrive.gridCellToPose(startGridCell));
-
-                    if (intermediateGridCell != null)
-                    {
-                        pathBuilder.append(robot.robotDrive.gridDrive.gridCellToPose(intermediateGridCell));
-                    }
-
-                    pathBuilder.append(robot.robotDrive.gridDrive.gridCellToPose(endGridCell));
-                    robot.robotDrive.purePursuitDrive.start(null, pathBuilder.toRelativeStartPath(), null, null, 0.0);
+                                RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
+                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
                 }
                 break;
 
