@@ -99,10 +99,9 @@ public class Robot
         //
         // Initialize vision subsystems.
         //
-        if ((RobotParams.Preferences.useVuforia ||
-             RobotParams.Preferences.useTensorFlow ||
-             RobotParams.Preferences.useEasyOpenCV)
-            )
+        if (RobotParams.Preferences.useVuforia ||
+            RobotParams.Preferences.useTensorFlow ||
+            RobotParams.Preferences.useEasyOpenCV)
         {
             vision = new Vision(this);
         }
