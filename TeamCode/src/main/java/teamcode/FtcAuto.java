@@ -199,7 +199,6 @@ public class FtcAuto extends FtcOpMode
             {
                 robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect AprilTag.");
                 robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
-                robot.vision.frontEocvVision.setEnabled(true);
             }
             else if (robot.vision.tensorFlowVision != null)
             {
@@ -268,14 +267,6 @@ public class FtcAuto extends FtcOpMode
             {
                 robot.globalTracer.traceInfo(funcName, "Shutting down TensorFlow.");
                 robot.vision.tensorFlowShutdown();
-            }
-
-            // Enabling EOCV vision to detect cones and junction poles.
-            if (robot.vision.frontEocvVision != null)
-            {
-                robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect yellow pole.");
-                robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.YELLOW_POLE);
-                robot.vision.frontEocvVision.setEnabled(true);
             }
         }
 
