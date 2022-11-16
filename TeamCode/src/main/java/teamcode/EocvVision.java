@@ -131,6 +131,7 @@ public class EocvVision extends FtcEocvDetector
                 .setSolidityRange(0.0, 100.0)
                 .setVerticesRange(0.0, 1000.0)
                 .setAspectRatioRange(0.0, 1000.0);
+
         aprilTagPipeline = new FtcEocvAprilTagPipeline(
             AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.APRILTAG_SIZE,
             RobotParams.FRONTCAM_FX, RobotParams.FRONTCAM_FY, RobotParams.FRONTCAM_CX, RobotParams.FRONTCAM_CY,
@@ -140,7 +141,8 @@ public class EocvVision extends FtcEocvDetector
         blueConePipeline = new FtcEocvColorBlobPipeline(
             "blueConePipeline", false, colorThresholdsBlueCone, blueConeFilterContourParams, tracer);
         yellowPolePipeline = new FtcEocvColorBlobPipeline(
-            "yellowPolePipeliine", false, colorThresholdsYellowPole, poleFilterContourParams, tracer);
+            "yellowPolePipeline", false, colorThresholdsYellowPole, poleFilterContourParams, tracer);
+        // Set default pipeline and enable it.
         if (instanceName.equals("frontEocvVision"))
         {
             setDetectObjectType(ObjectType.APRIL_TAG);
