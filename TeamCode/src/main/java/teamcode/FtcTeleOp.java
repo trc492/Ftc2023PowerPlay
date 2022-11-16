@@ -143,6 +143,13 @@ public class FtcTeleOp extends FtcOpMode
         //
         robot.startMode(nextMode);
         updateDriveModeLeds();
+        if(robot.vision != null && robot.vision.elevatorEocvVision != null && robot.vision.elevatorEocvVision.isEnabled()){
+            robot.globalTracer.traceInfo("Teleop Start Mode", "Vision is enabled");
+        }
+        else{
+            robot.globalTracer.traceInfo("Teleop Start Mode", "Vision is disabled");
+
+        }
     }   //startMode
 
     /**
@@ -265,7 +272,9 @@ public class FtcTeleOp extends FtcOpMode
 
                 if (poleAngle != null && poleAngle != 0.0)
                 {
-                    robot.turret.setTarget(robot.turret.getPosition() + poleAngle);
+                    robot.globalTracer.traceInfo("Turret position", " Position= %.2f, Pole Angle=%.2f", robot.turret.getPosition()
+                    , poleAngle);
+                    robot.turret.setTarget(robot.turret.getPosition() - poleAngle);
                 }
             }
             else

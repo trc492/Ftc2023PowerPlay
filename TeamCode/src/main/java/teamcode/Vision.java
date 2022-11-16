@@ -24,6 +24,7 @@ package teamcode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.opencv.core.Rect;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -315,7 +316,7 @@ public class Vision
         if (frontEocvVision != null && frontEocvVision.isEnabled() &&
             (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE))
         {
-            targets = frontEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
+            targets = frontEocvVision.getDetectedTargetsInfo(null, this::compareBottomY, 0.0, 0.0);
 
             if (targets != null && robot.blinkin != null)
             {
@@ -421,5 +422,23 @@ public class Vision
     {
         return (int)((a.detectedObj.getArea() - b.detectedObj.getArea())*1000);
     }   //compareObjectSize
+
+    /**
+     * This method is called by the Arrays.sort to sort the target object by decreasing bottom Y.
+     *
+     * @param a specifies the first target
+     * @param b specifies the second target.
+     * @return negative value if a has smaller bottom Y than b, 0 if a and b have equal bottom Y,
+     *         positive value if a has larger bottom Y than b.
+     */
+    private int compareBottomY(
+            TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> a,
+            TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> b)
+    {
+        Rect aRect = a.detectedObj.getRect();
+        Rect bRect = b.detectedObj.getRect();
+
+        return (bRect.y + bRect.height) - (aRect.y + aRect.height);
+    }   //compareBottomY
 
 }   //class Vision
