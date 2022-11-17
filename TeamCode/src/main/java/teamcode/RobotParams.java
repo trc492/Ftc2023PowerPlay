@@ -236,9 +236,9 @@ public class RobotParams
     public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_VERTICAL_FOV/ELEVATORCAM_IMAGE_HEIGHT;
 
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
-    public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 60.0;
+    public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 120.0;
     public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X     = FRONTCAM_IMAGE_WIDTH - 1;
-    public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_Y     = 60.0;
+    public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_Y     = 120.0;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_X   = 0.0;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMLEFT_Y   = FRONTCAM_IMAGE_HEIGHT - 1;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X  = FRONTCAM_IMAGE_WIDTH - 1;
@@ -246,14 +246,14 @@ public class RobotParams
 
     // These should be in real-world robot coordinates. Needs calibration after camera is actually mounted in position.
     // Measurement unit: inches
-    public static final double HOMOGRAPHY_WORLD_TOPLEFT_X       = -32.25;
-    public static final double HOMOGRAPHY_WORLD_TOPLEFT_Y       = 101.25;
-    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_X      = 27.75;
-    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_Y      = 89.25;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_X    = -2.50;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_Y    = 20.75 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_X   = 2.25;
-    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y   = 20.5 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
+    public static final double HOMOGRAPHY_WORLD_TOPLEFT_X       = -12.5625;
+    public static final double HOMOGRAPHY_WORLD_TOPLEFT_Y       = 48.0 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
+    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_X      = 11.4375;
+    public static final double HOMOGRAPHY_WORLD_TOPRIGHT_Y      = 44.75 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_X    = -2.5625;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMLEFT_Y    = 21.0 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_X   = 2.5626;
+    public static final double HOMOGRAPHY_WORLD_BOTTOMRIGHT_Y   = 21.0 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
 
     public static final TrcHomographyMapper.Rectangle cameraRect = new TrcHomographyMapper.Rectangle(
         RobotParams.HOMOGRAPHY_CAMERA_TOPLEFT_X, RobotParams.HOMOGRAPHY_CAMERA_TOPLEFT_Y,
