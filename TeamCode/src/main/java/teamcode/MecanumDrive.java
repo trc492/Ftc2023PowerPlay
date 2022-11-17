@@ -36,7 +36,7 @@ import TrcCommonLib.trclib.TrcPurePursuitDrive;
 public class MecanumDrive extends RobotDrive
 {
     private static final boolean logPoseEvents = true;
-    private static final boolean tracePidInfo = true;
+    private static final boolean tracePidInfo = false;
 
     /**
      * Constructor: Create an instance of the object.
