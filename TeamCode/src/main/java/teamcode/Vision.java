@@ -367,7 +367,23 @@ public class Vision
 
         return poleAngle;
     }   //getPoleAngle
+    /**
+     * This method returns the angle of the detected pole.
+     *
+     * @return detected pole angle.
+     */
+    public Double getConeAngle()
+    {
+        Double coneAngle = null;
+        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> coneInfo = getDetectedPoleInfo();
 
+        if (coneInfo != null)
+        {
+            coneAngle = coneInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
+        }
+
+        return coneAngle;
+    }   //getPoleAngle
     /**
      * This method is called by the Arrays.sort to sort the target object by decreasing confidence.
      *

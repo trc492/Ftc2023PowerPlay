@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import TrcCommonLib.trclib.TrcDriveBase;
 import TrcCommonLib.trclib.TrcGameController;
+import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcGamepad;
@@ -77,6 +78,8 @@ public class FtcTeleOp extends FtcOpMode
     private boolean manualOverride = false;
     private boolean atScoringLocation = false;
     private boolean lockOnPole = false;
+    private boolean lockOnCone = false;
+    private TrcPidController coneAlignPidCtrl;
 
     //
     // Implements FtcOpMode abstract method.
@@ -115,6 +118,15 @@ public class FtcTeleOp extends FtcOpMode
         {
             robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
         }
+        if(robot.vision != null){
+            robot.vision.frontEocvVision.setDetectObjectType(
+                    FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
+                            EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
+        }
+        coneAlignPidCtrl = new TrcPidController(
+                "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, RobotParams.TURN_SETTLING,
+                RobotParams.TURN_STEADY_STATE_ERR, RobotParams.TURN_STALL_ERRRATE_THRESHOLD, this::findConeAlignAngle);
+
     }   //initRobot
 
     //
@@ -207,7 +219,19 @@ public class FtcTeleOp extends FtcOpMode
             }
             else
             {
-                robot.robotDrive.driveBase.arcadeDrive(inputs[1], inputs[2]);
+                double turnPower = inputs[2];
+                //if we see the cone and lockOnCone is enabled, turn based on coneAlign pid controller, otherwise turn clockwise
+                if (robot.vision != null && lockOnCone)
+                {
+                    //findConeAlignAngle() is a Double so it returns null if no cone found
+                    if(findConeAlignAngle() != null){
+                        turnPower = coneAlignPidCtrl.getOutput();
+                    }
+                    else{
+                        turnPower = -0.25;
+                    }
+                }
+                robot.robotDrive.driveBase.arcadeDrive(inputs[1], turnPower);
             }
 
             robot.dashboard.displayPrintf(2, "Pose:%s", robot.robotDrive.driveBase.getFieldPosition());
@@ -262,7 +286,7 @@ public class FtcTeleOp extends FtcOpMode
             {
                 Double poleAngle = robot.vision.getPoleAngle();
 
-                if (poleAngle != null && poleAngle != 0.0)
+                if (poleAngle != null && Math.abs(poleAngle) >= 1.0)
                 {
                     robot.turret.setTarget(robot.turret.getPosition() - poleAngle);
                 }
@@ -349,6 +373,10 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_B:
+                if(pressed){
+                    robot.cyclingTask.doPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
+                    //robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
+                }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
@@ -419,6 +447,10 @@ public class FtcTeleOp extends FtcOpMode
                     robot.robotDrive.gridDrive.resetGridCellCenter();
                 }
                 break;
+            case FtcGamepad.GAMEPAD_LSTICK_BTN:
+                lockOnCone = pressed;
+                break;
+
         }
     }   //driverButtonEvent
 
@@ -443,20 +475,31 @@ public class FtcTeleOp extends FtcOpMode
                 break;
             // Prepare Pickup: Extend arm, turn turret to face front, lower elevator after half a second
             case FtcGamepad.GAMEPAD_B:
-                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null)
+                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null && robot.robotDrive.gridDrive!= null)
                 {
+//                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
+//                                    robot.robotDrive.getAutoTargetCell(
+//                                            RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
+//                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
                     robot.arm.setTarget(RobotParams.ARM_MAX_POS);
                     robot.turret.setTarget(RobotParams.TURRET_FRONT);
                     robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, true, 1.0, null, null, 0.0);
+
                 }
+
                 break;
             //Prepares high pole scoring: raise elevator, turn turret to the left, set arm to parallel
             case FtcGamepad.GAMEPAD_X:
-                if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null)
+                if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null && robot.robotDrive.gridDrive != null)
                 {
-                   robot.turret.setTarget(
+//                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
+//                            robot.robotDrive.getAutoTargetCell(
+//                                    RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
+//                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
+                    robot.turret.setTarget(
                        RobotParams.TURRET_LEFT, 1.0, null, null, 0.0,
                        RobotParams.ELEVATOR_SCORING_HEIGHT, 33.0);
+
                 }
                 break;
 
@@ -526,9 +569,13 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
                 lockOnPole = pressed;
-                break;
+            break;
+
         }
 
     }   //operatorButtonEvent
+    private Double findConeAlignAngle(){
+        return robot.vision.getConeAngle();
+    }
 
 }   //class FtcTeleOp
