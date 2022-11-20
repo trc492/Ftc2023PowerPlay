@@ -199,6 +199,16 @@ public class RobotParams
         PARKPOS_RED_LEFTP2_FAR,
         PARKPOS_RED_LEFTP3_FAR
     };
+    public static TrcPose2D TELEOP_CONE_STACK_RED_LEFT          = new TrcPose2D(-1.5, -0.5, -90);
+    public static TrcPose2D TELEOP_CONE_STACK_RED_RIGHT         = new TrcPose2D(1.5,-0.5,90);
+    public static TrcPose2D TELEOP_CONE_STACK_BLUE_LEFT         = new TrcPose2D(1.5,0.5,90);
+    public static TrcPose2D TELEOP_CONE_STACK_BLUE_RIGHT        = new TrcPose2D(-1.5,0.5,-90);
+
+    public static TrcPose2D TELEOP_SUBSTATION_RED_LEFT          = new TrcPose2D(-0.5, -1.5, 180);
+    public static TrcPose2D TELEOP_SUBSTATION_RED_RIGHT         = new TrcPose2D(0.5,-1.5,180);
+    public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5,1.5,0);
+    public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5,1.5,0);
+
     // In tile units.
     public static TrcPose2D CONE_STACK_RED_LEFT                 = new TrcPose2D(-2.3, -0.5, -90.0);
     public static TrcPose2D LOOK_FOR_CONE_POS_LEFT              = new TrcPose2D(-2.0, -0.5, -90.0);
