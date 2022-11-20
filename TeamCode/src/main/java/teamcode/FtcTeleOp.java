@@ -578,4 +578,32 @@ public class FtcTeleOp extends FtcOpMode
         return robot.vision.getConeAngle();
     }
 
+    /*buttonIndex:
+    0: left substation
+    1: right substation
+    2: left cone stack
+    3: right cone stack
+    */
+    private TrcPose2D autoNavigate(FtcAuto.Alliance alliance, int buttonIndex) {
+        TrcPose2D point = null;
+        boolean hasCone = robot.intake.hasObject();
+        if (hasCone) { //scoring the cone bc we already have it
+            if (alliance == FtcAuto.Alliance.RED_ALLIANCE) {
+                point = RobotParams.SCORING_POINTS_RED[buttonIndex];
+            }
+            else {
+                point = RobotParams.SCORING_POINTS_BLUE[buttonIndex];
+            }
+        }
+        else { //picking up cone because we dont have cone
+            if (alliance == FtcAuto.Alliance.RED_ALLIANCE) {
+                point = RobotParams.PICKUP_POINTS_RED[buttonIndex];
+            }
+            else {
+                point = RobotParams.PICKUP_POINTS_BLUE[buttonIndex];
+            }
+        }
+        return point;
+    }
+
 }   //class FtcTeleOp

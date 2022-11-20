@@ -209,6 +209,36 @@ public class RobotParams
     public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5,1.5,0);
     public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5,1.5,0);
 
+    public static TrcPose2D SCORING_SUBSTATION_RED              = new TrcPose2D (0, -1.0, 0);
+    public static TrcPose2D SCORING_SUBSTATION_BLUE             = new TrcPose2D (0, 1.0, 0);
+    public static TrcPose2D SCORING_AUDIENCE_POLE               = new TrcPose2D (-1.0, 0, 0);
+    public static TrcPose2D SCORING_REFEREE_POLE                = new TrcPose2D (1.0, 0, 0);
+
+    public static TrcPose2D[] PICKUP_POINTS_RED                 = {
+            TELEOP_SUBSTATION_RED_LEFT,
+            TELEOP_SUBSTATION_RED_RIGHT,
+            TELEOP_CONE_STACK_RED_LEFT,
+            TELEOP_CONE_STACK_RED_RIGHT
+    };
+    public static TrcPose2D[] PICKUP_POINTS_BLUE                 = {
+            TELEOP_SUBSTATION_BLUE_LEFT,
+            TELEOP_SUBSTATION_BLUE_RIGHT,
+            TELEOP_CONE_STACK_BLUE_LEFT,
+            TELEOP_CONE_STACK_BLUE_RIGHT
+    };
+    public static TrcPose2D[] SCORING_POINTS_RED                = {
+            SCORING_SUBSTATION_RED,
+            SCORING_SUBSTATION_RED,
+            SCORING_AUDIENCE_POLE,
+            SCORING_REFEREE_POLE
+    };
+    public static TrcPose2D[] SCORING_POINTS_BLUE                = {
+            SCORING_SUBSTATION_BLUE,
+            SCORING_SUBSTATION_BLUE,
+            SCORING_REFEREE_POLE,
+            SCORING_AUDIENCE_POLE
+    };
+
     // In tile units.
     public static TrcPose2D CONE_STACK_RED_LEFT                 = new TrcPose2D(-2.3, -0.5, -90.0);
     public static TrcPose2D LOOK_FOR_CONE_POS_LEFT              = new TrcPose2D(-2.0, -0.5, -90.0);
