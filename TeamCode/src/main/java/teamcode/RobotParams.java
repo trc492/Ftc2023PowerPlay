@@ -226,17 +226,11 @@ public class RobotParams
             TELEOP_CONE_STACK_BLUE_LEFT,
             TELEOP_CONE_STACK_BLUE_RIGHT
     };
-    public static TrcPose2D[] SCORING_POINTS_RED                = {
+    public static TrcPose2D[] SCORING_POINTS                    = {
             SCORING_SUBSTATION_RED,
-            SCORING_SUBSTATION_RED,
+            SCORING_SUBSTATION_BLUE,
             SCORING_AUDIENCE_POLE,
             SCORING_REFEREE_POLE
-    };
-    public static TrcPose2D[] SCORING_POINTS_BLUE                = {
-            SCORING_SUBSTATION_BLUE,
-            SCORING_SUBSTATION_BLUE,
-            SCORING_REFEREE_POLE,
-            SCORING_AUDIENCE_POLE
     };
 
     // In tile units.

@@ -74,6 +74,7 @@ public class FtcTeleOp extends FtcOpMode
     private TrcDriveBase.DriveOrientation driveOrientation = TrcDriveBase.DriveOrientation.ROBOT;
     private double drivePowerScale = 1.0;
     private boolean turretSlowModeOn = false;
+    private boolean autoMovement = false;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
     private boolean atScoringLocation = false;
@@ -411,6 +412,7 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_RBUMPER:
                 // Press and hold for slow drive.
                 drivePowerScale = pressed? RobotParams.SLOW_DRIVE_POWER_SCALE: 1.0;
+                autoMovement = pressed;
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_UP:
@@ -428,9 +430,18 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                if (pressed && robot.robotDrive.gridDrive != null)
-                {
-                    robot.robotDrive.gridDrive.setRelativeXGridTarget(-1);
+                if(pressed && robot.robotDrive.gridDrive != null) {
+                    if (autoMovement) {
+                        TrcPose2D endPoint = null;
+                        if (robot.intake.hasObject()) {
+                            endPoint = getNearestHighPole();
+                        } else {
+                            endPoint = autoPickupPoint(FtcAuto.autoChoices.alliance, 0);
+                        }
+                        robot.robotDrive.gridDrive.driveToEndPoint(robot.robotDrive.gridDrive.gridCellToPose(endPoint));
+                    } else {
+                        robot.robotDrive.gridDrive.setRelativeXGridTarget(-1);
+                    }
                 }
                 break;
 
@@ -528,7 +539,6 @@ public class FtcTeleOp extends FtcOpMode
                     else{
                         robot.turret.getPidActuator().getPidController().setOutputLimit(1.0);
                     }
-
                 }
                 break;
 
@@ -584,26 +594,32 @@ public class FtcTeleOp extends FtcOpMode
     2: left cone stack
     3: right cone stack
     */
-    private TrcPose2D autoNavigate(FtcAuto.Alliance alliance, int buttonIndex) {
+    private TrcPose2D autoPickupPoint(FtcAuto.Alliance alliance, int buttonIndex) {
         TrcPose2D point = null;
-        boolean hasCone = robot.intake.hasObject();
-        if (hasCone) { //scoring the cone bc we already have it
-            if (alliance == FtcAuto.Alliance.RED_ALLIANCE) {
-                point = RobotParams.SCORING_POINTS_RED[buttonIndex];
-            }
-            else {
-                point = RobotParams.SCORING_POINTS_BLUE[buttonIndex];
-            }
+        if (alliance == FtcAuto.Alliance.RED_ALLIANCE) {
+            point = RobotParams.PICKUP_POINTS_RED[buttonIndex];
         }
-        else { //picking up cone because we dont have cone
-            if (alliance == FtcAuto.Alliance.RED_ALLIANCE) {
-                point = RobotParams.PICKUP_POINTS_RED[buttonIndex];
-            }
-            else {
-                point = RobotParams.PICKUP_POINTS_BLUE[buttonIndex];
-            }
+        else {
+            point = RobotParams.PICKUP_POINTS_BLUE[buttonIndex];
         }
         return point;
+    }
+
+    private TrcPose2D getNearestHighPole() {
+        TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
+        TrcPose2D robotGridCell = robot.robotDrive.gridDrive.poseToGridCell(robotPose);
+        robotGridCell = robot.robotDrive.gridDrive.adjustGridCellCenter(robotGridCell);
+        double minDistance = Double.MAX_VALUE;
+        TrcPose2D closest = null;
+        for(TrcPose2D pole : RobotParams.SCORING_POINTS) {
+            double distance = Math.pow(robotGridCell.x - pole.x, 2) + Math.pow(robotGridCell.y - pole.y, 2);
+            if(distance < minDistance) {
+                closest = pole;
+                minDistance = distance;
+            }
+        }
+        //TODO: Calculate offset to scoring position
+        return closest;
     }
 
 }   //class FtcTeleOp
