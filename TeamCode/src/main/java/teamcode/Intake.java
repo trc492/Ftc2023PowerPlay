@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import TrcFtcLib.ftclib.FtcDistanceSensor;
 class Intake
 {
     private final TrcIntake.Parameters params;
-    private final TrcIntake trcIntake;
+    private final TrcIntake motorIntake;
 
     /**
      * Constructor: Creates an instance of the object.
@@ -44,7 +44,7 @@ class Intake
         FtcDcMotor motor = new FtcDcMotor(instanceName + ".motor");
         TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger = null;
 
-        if (RobotParams.Preferences.hasIntakeSensor)
+        if (RobotParams.Preferences.hasGrabberSensor)
         {
             FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcAnalogSensorTrigger<>(
@@ -52,7 +52,7 @@ class Intake
                     new double[]{params.analogThreshold}, this::analogTriggerEvent, false);
         }
 
-        trcIntake = new TrcIntake(instanceName, motor, params, analogTrigger);
+        motorIntake = new TrcIntake(instanceName, motor, params, analogTrigger);
     }   //Intake
 
     /**
@@ -60,10 +60,10 @@ class Intake
      *
      * @return TrcIntake object.
      */
-    public TrcIntake getTrcIntake()
+    public TrcIntake getMotorIntake()
     {
-        return trcIntake;
-    }   //getTrcIntake
+        return motorIntake;
+    }   //getMotorIntake
 
     /**
      * This method is called when an analog sensor threshold has been crossed.
@@ -81,14 +81,14 @@ class Intake
             params.msgTracer.traceInfo(funcName, "Zone=%d->%d, value=%.3f", prevZone, currZone, value);
         }
 
-        if (trcIntake.isAutoAssistActive() && prevZone != -1)
+        if (motorIntake.isAutoAssistActive() && prevZone != -1)
         {
             if (params.msgTracer != null)
             {
-                params.msgTracer.traceInfo(funcName, "Trigger: hasObject=%s", trcIntake.hasObject());
+                params.msgTracer.traceInfo(funcName, "Trigger: hasObject=%s", motorIntake.hasObject());
             }
 
-            trcIntake.finishAutoAssist(null);
+            motorIntake.finishAutoAssist(null);
         }
     }   //analogTriggerEvent
 

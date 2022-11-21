@@ -33,6 +33,7 @@ import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
+import TrcCommonLib.trclib.TrcServoGrabber;
 import TrcFtcLib.ftclib.FtcAndroidTone;
 import TrcFtcLib.ftclib.FtcDashboard;
 import TrcFtcLib.ftclib.FtcMatchInfo;
@@ -72,9 +73,8 @@ public class Robot
     public TrcPidActuator arm = null;
     public Turret turret;
     public TrcIntake intake = null;
+    public TrcServoGrabber grabber = null;
     public TaskCyclingCones cyclingTask;
-
-    //zero intake
 
     /**
      * Constructor: Create an instance of the object.
@@ -202,7 +202,21 @@ public class Robot
                         .setTriggerInverted(true)
                         .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
                         .setMsgTracer(globalTracer);
-                    intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getTrcIntake();
+                    intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getMotorIntake();
+                }
+
+                if (RobotParams.Preferences.useGrabber)
+                {
+                    TrcServoGrabber.Parameters grabberParams = new TrcServoGrabber.Parameters()
+                        .setStepParams(
+                            RobotParams.GRABBER_MAX_STEPRATE, RobotParams.GRABBER_MIN_POS, RobotParams.GRABBER_MAX_POS)
+                        .setServoInverted(RobotParams.GRABBER_LSERVO_INVERTED, RobotParams.GRABBER_RSERVO_INVERTED)
+                        .setTriggerInverted(RobotParams.GRABBER_TRIGGER_INVERTED)
+                        .setAnalogThreshold(RobotParams.GRABBER_SENSOR_THRESHOLD)
+                        .setOpenParams(RobotParams.GRABBER_OPEN_POS, RobotParams.GRABBER_OPEN_TIME)
+                        .setCloseParams(RobotParams.GRABBER_CLOSE_POS, RobotParams.GRABBER_CLOSE_TIME)
+                        .setMsgTracer(globalTracer);
+                    grabber = new Grabber(RobotParams.HWNAME_GRABBER, grabberParams).getServoGrabber();
                 }
                 //
                 // Create and initialize auto-assist tasks.

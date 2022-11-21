@@ -65,9 +65,9 @@ public class RobotParams
         public static boolean useTurret = true;
         public static boolean useElevator = true;
         public static boolean useArm = true;
-        public static boolean useIntake = true;
+        public static boolean useIntake = false;
         public static boolean hasIntakeSensor = true;
-        public static boolean useGrabber = false;
+        public static boolean useGrabber = true;
         public static boolean hasGrabberSensor = true;
     }   //class Preferences
 
@@ -103,6 +103,7 @@ public class RobotParams
     public static final String HWNAME_ELEVATOR                  = "elevator";
     public static final String HWNAME_ARM                       = "arm";
     public static final String HWNAME_INTAKE                    = "intake";
+    public static final String HWNAME_GRABBER                   = "grabber";
     //
     // Field dimensions.
     //
@@ -556,5 +557,19 @@ public class RobotParams
     static final double INTAKE_POWER_DUMP                       = -1.0;
     static final double INTAKE_DUMP_TIME                        = 1.0;
     static final double INTAKE_SENSOR_THRESHOLD                 = 5.0;      //in cm
+    //
+    // Grabber subsystem.
+    //
+    static final double GRABBER_MAX_STEPRATE                    = 1.0;
+    static final double GRABBER_MIN_POS                         = 0.0;
+    static final double GRABBER_MAX_POS                         = 0.25;
+    static final boolean GRABBER_LSERVO_INVERTED                = false;
+    static final boolean GRABBER_RSERVO_INVERTED                = true;
+    static final boolean GRABBER_TRIGGER_INVERTED               = false;
+    static final double GRABBER_SENSOR_THRESHOLD                = 5.0;
+    static final double GRABBER_OPEN_POS                        = GRABBER_MAX_POS;
+    static final double GRABBER_OPEN_TIME                       = 0.5;
+    static final double GRABBER_CLOSE_POS                       = GRABBER_MIN_POS;
+    static final double GRABBER_CLOSE_TIME                      = 0.5;
 
 }   //class RobotParams

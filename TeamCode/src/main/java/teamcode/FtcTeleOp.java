@@ -330,6 +330,11 @@ public class FtcTeleOp extends FtcOpMode
             robot.dashboard.displayPrintf(
                 6, "Intake: power=%.2f, sensor=%.2f", robot.intake.getPower(), robot.intake.getSensorValue());
         }
+        else if (robot.grabber != null)
+        {
+            robot.dashboard.displayPrintf(
+                6, "Grabber: pos=%.2f, sensor=%.2f", robot.grabber.getPosition(), robot.grabber.getSensorValue());
+        }
     }   //slowPeriodic
 
     /**
@@ -498,9 +503,17 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
-                if (pressed && robot.intake != null)
+                if (pressed)
                 {
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
+                    if (robot.intake != null)
+                    {
+                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
+                    }
+                    else if (robot.grabber != null)
+                    {
+//                        robot.grabber.autoAssist(null, 0.0, null, 0.0);
+                        robot.grabber.open();
+                    }
                 }
                 break;
             // Prepare Pickup: Extend arm, turn turret to face front, lower elevator after half a second
@@ -534,15 +547,21 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
-                if (pressed && robot.intake != null)
+                if (pressed)
                 {
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
+                    if (robot.intake != null)
+                    {
+                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
+                    }
+                    else if (robot.grabber != null)
+                    {
+                        robot.grabber.close();
+                    }
                 }
-
-                if (pressed && robot.elevator != null)
-                {
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
-                }
+//                if (pressed && robot.elevator != null)
+//                {
+//                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
+//                }
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
