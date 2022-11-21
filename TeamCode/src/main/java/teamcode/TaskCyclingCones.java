@@ -50,7 +50,7 @@ public class TaskCyclingCones
     {
         AUTO_FULL_CYCLE, //does a full cycle(pickup and scoring), used for auto
         SCORING_ONLY,//assumes robot already has a cone, scores it onto the pole
-        PICKUP_ONLY,//picks up a cone from the stack
+        PICKUP_ONLY_TELEOP,//picks up a cone from the stack
 
         SCORE_WITH_VISION
     }
@@ -141,23 +141,46 @@ public class TaskCyclingCones
     }   //cancel
 
     //doFullAutoCycle pickups and scores 1 cone
-    /* Preconditions(AUTO_FULL_CYCLE)
-     * robot facing the cone stack with high and mid junction on either side turret position 90 degrees
-     * turret position 90 degrees means intake is right on top of the high pole or mid pole (because we just scored a cone)
-     * elevator is height of the high pole
-     * arm position extended, intake stopped
+    /* Preconditions & Postconditions (AUTO_FULL_CYCLE)
+         * robot facing the cone stack with high and mid junction on either side
+         * turret is facing the front (ready for pickup)
+         * elevator is lowered for pickup
+         * arm is extended
      */
     public void doFullAutoCycle(VisionType visionType, int conesRemaining, TrcEvent event)
     {
         startCycling(CycleType.AUTO_FULL_CYCLE, visionType, conesRemaining, event, null);
     }
 
-    //teleop call to do pickupOnly
-    public void doPickup(VisionType visionType, int conesRemaining, TrcEvent event)
+    //doTeleopPickup - pickup cone in the triangle during teleop
+    /* Preconditions
+         * robot facing the cone stack with high and mid junction on either side
+         * turret is facing the front (ready for pickup)
+         * elevator is lowered for pickup
+         * arm is extended
+     * Postconditions
+         * Robot located around triangle
+         * Turret facing front
+         * elevator lowered at pickup height
+         * arm extended
+     */
+    public void doTeleopPickup(VisionType visionType, int conesRemaining, TrcEvent event)
     {
-        startCycling(CycleType.PICKUP_ONLY, visionType, conesRemaining, event, null);
+        robot.robotDrive.driveBase.acquireExclusiveAccess("CycleTask");
+        startCycling(CycleType.PICKUP_ONLY_TELEOP, visionType, conesRemaining, event, null);
     }
-    //teleop call to do scoring, only the cone it currently has
+
+    //scorePreload - scores the preload cone onto the high pole in auto
+    /* Preconditions
+        * robot turret facing right, such that cone is above the pole
+        * elevator extended to high pole scoring height
+        * arm retracted to scoring position
+     * Postconditions
+        * Robot located around triangle
+        * Turret facing front
+        * elevator lowered at pickup height
+        * arm extended
+     */
     public void scoreCone(VisionType visionType, TrcEvent event)
     {
         startCycling(CycleType.SCORING_ONLY, visionType, 1, event, null);
@@ -172,6 +195,18 @@ public class TaskCyclingCones
         this.onFinishEvent = event;
         this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
+        switch(cycleType){
+            case AUTO_FULL_CYCLE:
+                sm.start(State.START);
+                break;
+            case SCORING_ONLY:
+                sm.start(State.LOOK_FOR_POLE);
+                break;
+            case PICKUP_ONLY_TELEOP:
+                sm.start(State.LOOK_FOR_CONE);
+                break;
+
+        }
         sm.start(cycleType == CycleType.SCORING_ONLY? State.LOOK_FOR_POLE: State.START);
     }   //startCycling
 
@@ -220,7 +255,8 @@ public class TaskCyclingCones
                     // CodeReview: may have to delay elevator until it clears the pole.
                     sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                     break;
-
+                //if using vision, finds the cone
+                    //if teleop, rotate counterclockwise until it sees the cone
                 case LOOK_FOR_CONE:
                     if (visionType != VisionType.NO_VISION)
                     {
@@ -229,12 +265,12 @@ public class TaskCyclingCones
                             robot.vision.getDetectedConeInfo();
                         if (coneInfo != null)
                         {
+                            robot.robotDrive.driveBase.stop();
                             targetLocation = new TrcPose2D(
                                 coneInfo.distanceFromCamera.x - 1.0, coneInfo.distanceFromCamera.y - 6.0,
                                 coneInfo.horizontalAngle);
                         }
                     }
-
                     if (targetLocation != null)
                     {
                         // We found the target with vision, go to the next state.
@@ -247,12 +283,23 @@ public class TaskCyclingCones
                         if (visionExpireTime == null)
                         {
                             visionExpireTime = TrcUtil.getCurrentTime() + 0.5;
+                            //if we don't see the cone in teleop, rotate counterclockwise
+                            if(cycleType == CycleType.PICKUP_ONLY_TELEOP){
+                                visionExpireTime = TrcUtil.getCurrentTime() + 1.0;
+                                robot.robotDrive.driveBase.holonomicDrive(0, 0, -0.25);
+                            }
                         }
                         else if (TrcUtil.getCurrentTime() >= visionExpireTime)
                         {
                             // Times up, reset expireTime, go to next state.
                             visionExpireTime = null;
-                            sm.setState(State.DRIVE_TO_CONE);
+                            if(cycleType == CycleType.AUTO_FULL_CYCLE){
+                                sm.setState(State.DRIVE_TO_CONE);
+                            }
+                            //if cycletype is Teleop Pickup, just go to done
+                            else{
+                                sm.setState(State.DONE);
+                            }
                         }
                     }
                     else

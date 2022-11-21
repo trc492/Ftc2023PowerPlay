@@ -30,6 +30,7 @@ import TrcCommonLib.trclib.TrcHomographyMapper;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcFtcLib.ftclib.FtcGamepad;
+import java.util.HashMap;
 
 /**
  * This class contains robot and subsystem constants and parameters.
@@ -67,6 +68,8 @@ public class RobotParams
         public static boolean useIntake = true;
         public static boolean hasIntakeSensor = true;
     }   //class Preferences
+
+
 
     public static final String ROBOT_NAME                       = "Robot3543";
     public static final String TEAM_FOLDER_PATH                 =
@@ -204,10 +207,10 @@ public class RobotParams
     public static TrcPose2D TELEOP_CONE_STACK_BLUE_LEFT         = new TrcPose2D(1.5,0.5,90);
     public static TrcPose2D TELEOP_CONE_STACK_BLUE_RIGHT        = new TrcPose2D(-1.5,0.5,-90);
 
-    public static TrcPose2D TELEOP_SUBSTATION_RED_LEFT          = new TrcPose2D(-0.5, -1.5, 180);
-    public static TrcPose2D TELEOP_SUBSTATION_RED_RIGHT         = new TrcPose2D(0.5,-1.5,180);
-    public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5,1.5,0);
-    public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5,1.5,0);
+    public static TrcPose2D TELEOP_SUBSTATION_RED_LEFT          = new TrcPose2D(-0.5, -2.2, 180);
+    public static TrcPose2D TELEOP_SUBSTATION_RED_RIGHT         = new TrcPose2D(0.5,-2.2,180);
+    public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5,2.2,0);
+    public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5,2.2,0);
 
     public static TrcPose2D SCORING_SUBSTATION_RED              = new TrcPose2D (0, -1.0, 0);
     public static TrcPose2D SCORING_SUBSTATION_BLUE             = new TrcPose2D (0, 1.0, 0);
@@ -428,14 +431,24 @@ public class RobotParams
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
             ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
-//            STACKED_CONE_ADDITION + CONE_GRAB_HEIGHT,           // Slot 2
-//            STACKED_CONE_ADDITION * 2 + CONE_GRAB_HEIGHT,       // Slot 3
-//            STACKED_CONE_ADDITION * 3 + CONE_GRAB_HEIGHT,       // Slot 4
-//            STACKED_CONE_ADDITION * 4 + CONE_GRAB_HEIGHT,       // Slot 5
+//            STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,           // Slot 2
+//            STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 3
+//            STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 4
+//            STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 5
 //            LOW_JUNCTION_HEIGHT,                                // Slot 6
 //            MID_JUNCTION_HEIGHT,                                // Slot 7
             HIGH_JUNCTION_HEIGHT,                               // Slot 8
             ELEVATOR_MAX_POS                                    // Slot 9
+    };
+    //0.0 for placeholder so 1 additional cone per index
+    static final double[] ELEVATOR_PICKUP_PRESETS                    = new double[] {
+            0.0,
+            ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
+            STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,           // Slot 2
+            STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 3
+            STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 4
+            STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 5
+
     };
     static final double ELEVATOR_DOWN_POWER_SCALE               = 0.1001;
     //
@@ -471,6 +484,11 @@ public class RobotParams
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
     static final double ARM_SCORE_POS                           = 30.0;
+    static final double ARM_SINGLE_CONE_POS                     = ARM_MAX_POS;
+    static final double ARM_STACK_2_POS                         = ARM_MAX_POS;
+    static final double ARM_STACK_3_CONES_POS                   = ARM_MAX_POS;
+    static final double ARM_STACK_4_CONES_POS                   = ARM_MAX_POS;
+    static final double ARM_STACK_5_CONES_POS                   = ARM_MAX_POS;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
@@ -478,6 +496,16 @@ public class RobotParams
         ARM_SCORE_POS,                                          // Slot 1
         ARM_HORIZONTAL,                                         // Slot 2
         ARM_MAX_POS                                             // Slot 2: Down position
+    };
+    //0 is a placeholder so index 1 is 1 cone, 2 is 2 cones, etc.
+    static final double[] ARM_PICKUP_PRESETS                    = new double[] {
+        0.0,
+        ARM_SINGLE_CONE_POS,
+        ARM_STACK_2_POS,
+        ARM_STACK_3_CONES_POS,
+        ARM_STACK_4_CONES_POS,
+        ARM_STACK_5_CONES_POS
+
     };
     //
     // Turret subsystem.

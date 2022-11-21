@@ -38,9 +38,15 @@ import TrcFtcLib.ftclib.FtcOpMode;
 
 /*
 
-    //TODOS:
-    // - OPERATOR BUTTON: after dropping cone buttons to retract everyting: bring turret to the front while lowering elevator(add a delay to elevator), extend armvds
-    // --
+
+    Autoassisted Teleop sequence
+        *Driver drives to the substation
+        *Driver holds B, initiating pickup Sequence
+            *if driver releases B, automated pickup sequence quits -> control manually
+        *Driver clicks left button -> robot drives to the nearest high pole, raises its elevator
+        *Driver holds B, initiating the scoring sequence
+            *if driver releases B, automated scoring sequence stops -> manual control
+
     Driver Controls:
     - LeftStickX (Rotation)
     - RightStickX (Strafe Left/Right), RightStickY (Forward/Backward)
@@ -81,6 +87,7 @@ public class FtcTeleOp extends FtcOpMode
     private boolean lockOnPole = false;
     private boolean lockOnCone = false;
     private TrcPidController coneAlignPidCtrl;
+    private Double coneAngle;
 
     //
     // Implements FtcOpMode abstract method.
@@ -222,16 +229,20 @@ public class FtcTeleOp extends FtcOpMode
             {
                 double turnPower = inputs[2];
                 //if we see the cone and lockOnCone is enabled, turn based on coneAlign pid controller, otherwise turn clockwise
-                if (robot.vision != null && lockOnCone)
-                {
-                    //findConeAlignAngle() is a Double so it returns null if no cone found
-                    if(findConeAlignAngle() != null){
-                        turnPower = coneAlignPidCtrl.getOutput();
-                    }
-                    else{
-                        turnPower = -0.25;
-                    }
-                }
+//                if (robot.vision != null && lockOnCone)
+//                {
+//                    findConeAlignAngle() is a Double so it returns null if no cone found
+//                    coneAngle = robot.vision.getConeAngle();
+//                    if(coneAngle != null && Math.abs(coneAngle) > 1.0){
+//                        turnPower = coneAlignPidCtrl.getOutput();
+//                    }
+//                    else if(coneAngle != null){
+//                        turnPower = 0;
+//                    }
+//                    else{
+//                        turnPower = -0.25;
+//                    }
+//                }
                 robot.robotDrive.driveBase.arcadeDrive(inputs[1], turnPower);
             }
 
@@ -375,8 +386,15 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_B:
                 if(pressed){
-                    robot.cyclingTask.doPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
-                    //robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
+                    if(!robot.intake.hasObject()){
+                        robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
+                    }
+                    else{
+                        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
+                    }
+                }
+                else{
+                    robot.cyclingTask.cancel();
                 }
                 break;
 
@@ -429,6 +447,7 @@ public class FtcTeleOp extends FtcOpMode
                 }
                 break;
 
+            //drives to the nearest high pole if it has a cone, or the nearest triangle substation to pick up a cone
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
                 if(pressed && robot.robotDrive.gridDrive != null) {
                     if (autoMovement) {
@@ -584,8 +603,9 @@ public class FtcTeleOp extends FtcOpMode
         }
 
     }   //operatorButtonEvent
+
     private Double findConeAlignAngle(){
-        return robot.vision.getConeAngle();
+        return coneAngle != null? coneAngle : 0.0;
     }
 
     /*buttonIndex:
