@@ -205,38 +205,39 @@ public class RobotParams
         PARKPOS_RED_LEFTP2_FAR,
         PARKPOS_RED_LEFTP3_FAR
     };
-    public static TrcPose2D TELEOP_CONE_STACK_RED_LEFT          = new TrcPose2D(-1.5, -0.5, -90);
-    public static TrcPose2D TELEOP_CONE_STACK_RED_RIGHT         = new TrcPose2D(1.5,-0.5,90);
-    public static TrcPose2D TELEOP_CONE_STACK_BLUE_LEFT         = new TrcPose2D(1.5,0.5,90);
-    public static TrcPose2D TELEOP_CONE_STACK_BLUE_RIGHT        = new TrcPose2D(-1.5,0.5,-90);
+    // Auto-Assist TeleOp drive locations.
+    public static TrcPose2D TELEOP_CONE_STACK_RED_LEFT          = new TrcPose2D(-1.5, -0.5, -90.0);
+    public static TrcPose2D TELEOP_CONE_STACK_RED_RIGHT         = new TrcPose2D(1.5, -0.5, 90.0);
+    public static TrcPose2D TELEOP_CONE_STACK_BLUE_LEFT         = new TrcPose2D(1.5, 0.5, 90.0);
+    public static TrcPose2D TELEOP_CONE_STACK_BLUE_RIGHT        = new TrcPose2D(-1.5, 0.5, -90.0);
 
-    public static TrcPose2D TELEOP_SUBSTATION_RED_LEFT          = new TrcPose2D(-0.5, -2.2, 180);
-    public static TrcPose2D TELEOP_SUBSTATION_RED_RIGHT         = new TrcPose2D(0.5,-2.2,180);
-    public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5,2.2,0);
-    public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5,2.2,0);
+    public static TrcPose2D TELEOP_SUBSTATION_RED_LEFT          = new TrcPose2D(-0.5, -2.2, 180.0);
+    public static TrcPose2D TELEOP_SUBSTATION_RED_RIGHT         = new TrcPose2D(0.5, -2.2, 180.0);
+    public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5, 2.2, 0.0);
+    public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5, 2.2, 0.0);
 
-    public static TrcPose2D SCORING_SUBSTATION_RED              = new TrcPose2D (0, -1.0, 0);
-    public static TrcPose2D SCORING_SUBSTATION_BLUE             = new TrcPose2D (0, 1.0, 0);
-    public static TrcPose2D SCORING_AUDIENCE_POLE               = new TrcPose2D (-1.0, 0, 0);
-    public static TrcPose2D SCORING_REFEREE_POLE                = new TrcPose2D (1.0, 0, 0);
+    public static TrcPose2D SCORING_SUBSTATION_RED              = new TrcPose2D (0.0, -1.0, 0.0);
+    public static TrcPose2D SCORING_SUBSTATION_BLUE             = new TrcPose2D (0.0, 1.0, 0.0);
+    public static TrcPose2D SCORING_AUDIENCE_POLE               = new TrcPose2D (-1.0, 0.0, 0.0);
+    public static TrcPose2D SCORING_REFEREE_POLE                = new TrcPose2D (1.0, 0.0, 0.0);
 
     public static TrcPose2D[] PICKUP_POINTS_RED                 = {
-            TELEOP_SUBSTATION_RED_LEFT,
-            TELEOP_SUBSTATION_RED_RIGHT,
-            TELEOP_CONE_STACK_RED_LEFT,
-            TELEOP_CONE_STACK_RED_RIGHT
+        TELEOP_SUBSTATION_RED_LEFT,
+        TELEOP_SUBSTATION_RED_RIGHT,
+        TELEOP_CONE_STACK_RED_LEFT,
+        TELEOP_CONE_STACK_RED_RIGHT
     };
-    public static TrcPose2D[] PICKUP_POINTS_BLUE                 = {
-            TELEOP_SUBSTATION_BLUE_LEFT,
-            TELEOP_SUBSTATION_BLUE_RIGHT,
-            TELEOP_CONE_STACK_BLUE_LEFT,
-            TELEOP_CONE_STACK_BLUE_RIGHT
+    public static TrcPose2D[] PICKUP_POINTS_BLUE                = {
+        TELEOP_SUBSTATION_BLUE_LEFT,
+        TELEOP_SUBSTATION_BLUE_RIGHT,
+        TELEOP_CONE_STACK_BLUE_LEFT,
+        TELEOP_CONE_STACK_BLUE_RIGHT
     };
     public static TrcPose2D[] SCORING_POINTS                    = {
-            SCORING_SUBSTATION_RED,
-            SCORING_SUBSTATION_BLUE,
-            SCORING_AUDIENCE_POLE,
-            SCORING_REFEREE_POLE
+        SCORING_SUBSTATION_RED,
+        SCORING_SUBSTATION_BLUE,
+        SCORING_AUDIENCE_POLE,
+        SCORING_REFEREE_POLE
     };
 
     // In tile units.
