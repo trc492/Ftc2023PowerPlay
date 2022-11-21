@@ -44,7 +44,7 @@ class Intake
         FtcDcMotor motor = new FtcDcMotor(instanceName + ".motor");
         TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger = null;
 
-        if (RobotParams.Preferences.hasGrabberSensor)
+        if (RobotParams.Preferences.hasIntakeSensor)
         {
             FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcAnalogSensorTrigger<>(
