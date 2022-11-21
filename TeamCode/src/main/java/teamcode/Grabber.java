@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Titan Robotics Club (http://www.titanrobotics.com)
+ * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,14 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcAnalogSensorTrigger;
-import TrcCommonLib.trclib.TrcIntake;
-import TrcFtcLib.ftclib.FtcDcMotor;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
+import TrcCommonLib.trclib.TrcServoGrabber;
+import TrcFtcLib.ftclib.FtcServo;
 
-class Intake
+public class Grabber
 {
-    private final TrcIntake.Parameters params;
-    private final TrcIntake trcIntake;
+    private final TrcServoGrabber.Parameters params;
+    private final TrcServoGrabber grabber;
 
     /**
      * Constructor: Creates an instance of the object.
@@ -38,32 +38,34 @@ class Intake
      * @param instanceName specifies the hardware name.
      * @param params specifies the parameters for the Intake subsystem.
      */
-    public Intake(String instanceName, TrcIntake.Parameters params)
+    public Grabber(String instanceName, TrcServoGrabber.Parameters params)
     {
         this.params = params;
-        FtcDcMotor motor = new FtcDcMotor(instanceName + ".motor");
+        FtcServo leftServo = new FtcServo(instanceName + ".left");
+        FtcServo rightServo = new FtcServo(instanceName + ".right");
         TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger = null;
 
-        if (RobotParams.Preferences.hasIntakeSensor)
+        if (RobotParams.Preferences.hasGrabberSensor)
         {
             FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcAnalogSensorTrigger<>(
-                    instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
-                    new double[]{params.analogThreshold}, this::analogTriggerEvent, false);
+                instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
+                new double[]{params.analogThreshold}, this::analogTriggerEvent, false);
         }
 
-        trcIntake = new TrcIntake(instanceName, motor, params, analogTrigger);
-    }   //Intake
+        grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, params, analogTrigger);
+        grabber.close();
+    }   //Grabber
 
     /**
-     * This method returns the TrcIntake object.
+     * This method returns the TrcServoGrabber object.
      *
-     * @return TrcIntake object.
+     * @return TrcServoGrabber object.
      */
-    public TrcIntake getTrcIntake()
+    public TrcServoGrabber getServoGrabber()
     {
-        return trcIntake;
-    }   //getTrcIntake
+        return grabber;
+    }   //getServoGrabber
 
     /**
      * This method is called when an analog sensor threshold has been crossed.
@@ -81,15 +83,15 @@ class Intake
             params.msgTracer.traceInfo(funcName, "Zone=%d->%d, value=%.3f", prevZone, currZone, value);
         }
 
-        if (trcIntake.isAutoAssistActive() && prevZone != -1)
+        if (grabber.isAutoAssistActive() && prevZone != -1)
         {
             if (params.msgTracer != null)
             {
-                params.msgTracer.traceInfo(funcName, "Trigger: hasObject=%s", trcIntake.hasObject());
+                params.msgTracer.traceInfo(funcName, "Trigger: hasObject=%s", grabber.objectInProximity());
             }
 
-            trcIntake.finishAutoAssist(null);
+            grabber.finishAutoAssist(null);
         }
     }   //analogTriggerEvent
 
-}   //class Intake
+}   //class Grabber

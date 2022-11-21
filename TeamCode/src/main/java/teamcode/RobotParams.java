@@ -67,6 +67,8 @@ public class RobotParams
         public static boolean useArm = true;
         public static boolean useIntake = true;
         public static boolean hasIntakeSensor = true;
+        public static boolean useGrabber = false;
+        public static boolean hasGrabberSensor = true;
     }   //class Preferences
 
 
