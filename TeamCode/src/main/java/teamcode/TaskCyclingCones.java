@@ -328,7 +328,7 @@ public class TaskCyclingCones
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
                     robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[conesRemaining]);
                     // CodeReview: give it a timeout to prevent hanging.
-                    robot.grabber.autoAssist(null, 0, event, 2.0);
+                    robot.grabber.enableAutoAssist(null, 0, event, 2.0);
                     sm.waitForSingleEvent(event, State.RAISE_ELEVATOR);
                     break;
 
@@ -398,7 +398,7 @@ public class TaskCyclingCones
 
                 case SCORE: //7. spin intake backwards
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true);
-                    robot.grabber.autoAssist(null, 0, event, 2.0);
+                    robot.grabber.enableAutoAssist(null, 0, event, 2.0);
                     sm.waitForSingleEvent(event, State.CLEAR_POLE);
                     break;
 

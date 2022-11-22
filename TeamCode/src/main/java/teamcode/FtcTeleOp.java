@@ -392,11 +392,13 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_B:
                 if(pressed){
                     //if robot does not have a cone, initiate pickup
-                    if(!robot.grabber.objectInProximity()){
+                    if (!robot.grabber.hasObject())
+                    {
                         robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
                     }
                     //otherwise robot has a cone, turn turret to the left, raise arm, elevator
-                    else{
+                    else
+                    {
                         robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
                                 0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
                     }
@@ -506,16 +508,22 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
-                if (pressed)
+                if (robot.intake != null)
                 {
-                    if (robot.intake != null)
+                    if (pressed)
                     {
                         robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
                     }
-                    else if (robot.grabber != null)
+                }
+                else if (robot.grabber != null)
+                {
+                    if (pressed)
                     {
-//                        robot.grabber.autoAssist(null, 0.0, null, 0.0);
-                        robot.grabber.open();
+                        robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
+                    }
+                    else
+                    {
+                        robot.grabber.cancelAutoAssist();
                     }
                 }
                 break;

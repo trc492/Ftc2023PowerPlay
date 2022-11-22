@@ -85,12 +85,17 @@ public class Grabber
 
         if (grabber.isAutoAssistActive() && prevZone != -1)
         {
+            boolean inProximity = grabber.objectInProximity();
+
             if (params.msgTracer != null)
             {
-                params.msgTracer.traceInfo(funcName, "Trigger: hasObject=%s", grabber.objectInProximity());
+                params.msgTracer.traceInfo(funcName, "Trigger: inProximity=%s", inProximity);
             }
 
-            grabber.finishAutoAssist(null);
+            if (inProximity)
+            {
+                grabber.close();
+            }
         }
     }   //analogTriggerEvent
 
