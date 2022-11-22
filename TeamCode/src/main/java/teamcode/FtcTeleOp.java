@@ -39,12 +39,12 @@ import TrcFtcLib.ftclib.FtcOpMode;
 /*
 
 
-    Autoassisted Teleop sequence
+    Autoassisted Teleop sequence (currently only on driver gamepad for easier tuning)
         *Driver drives to the substation
         *Driver holds B, initiating pickup Sequence
             *if driver releases B, automated pickup sequence quits -> control manually
-        *Driver clicks left button -> robot drives to the nearest high pole, raises its elevator
-        *Driver holds B, initiating the scoring sequence
+        *Driver clicks left button -> robot drives to the nearest high pole
+        *Driver holds B, turning turret, raising elevator, extending arm, then initiating the scoring sequence
             *if driver releases B, automated scoring sequence stops -> manual control
 
     Driver Controls:
@@ -391,11 +391,14 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_B:
                 if(pressed){
-                    if(!robot.intake.hasObject()){
+                    //if robot does not have a cone, initiate pickup
+                    if(!robot.grabber.objectInProximity()){
                         robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
                     }
+                    //otherwise robot has a cone, turn turret to the left, raise arm, elevator
                     else{
-                        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
+                        robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
+                                0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
                     }
                 }
                 else{
@@ -659,6 +662,9 @@ public class FtcTeleOp extends FtcOpMode
         }
         //TODO: Calculate offset to scoring position
         return closest;
+    }
+    private void scoreCone(Object context){
+        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
     }
 
 }   //class FtcTeleOp

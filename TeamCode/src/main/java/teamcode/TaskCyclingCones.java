@@ -236,7 +236,8 @@ public class TaskCyclingCones
         {
             switch (state)
             {
-                //robot is facing cone, turret at front, arm at
+                //only called by autoFullCycle()
+                //assumes turret facing front, robot next to the high pole
                 case START: //1. drive forward to the cone and prepare turret to pick it up
                     if (visionType != VisionType.NO_VISION)
                     {
@@ -245,14 +246,10 @@ public class TaskCyclingCones
                                 EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                     }
                     targetLocation = null;
-//                    robot.turret.setTarget(
-//                        RobotParams.TURRET_FRONT, 1.0, null, null, 0.0,
-//                        RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, RobotParams.ARM_HORIZONTAL);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                     robot.robotDrive.purePursuitDrive.start(
                         event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
-                    // CodeReview: may have to delay elevator until it clears the pole.
                     sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                     break;
                 //if using vision, finds the cone
@@ -329,9 +326,9 @@ public class TaskCyclingCones
                     break;
 
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
-                    robot.elevator.setPresetPosition(conesRemaining);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[conesRemaining]);
                     // CodeReview: give it a timeout to prevent hanging.
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP, event, 0.0);
+                    robot.grabber.autoAssist(null, 0, event, 2.0);
                     sm.waitForSingleEvent(event, State.RAISE_ELEVATOR);
                     break;
 
@@ -401,7 +398,7 @@ public class TaskCyclingCones
 
                 case SCORE: //7. spin intake backwards
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true);
-                    robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP, event, 0.5);
+                    robot.grabber.autoAssist(null, 0, event, 2.0);
                     sm.waitForSingleEvent(event, State.CLEAR_POLE);
                     break;
 

@@ -207,9 +207,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
+
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, event);
-//                    robot.elevator.setTarget(28.0, true, 1.0, null, null, 2.0);
-//                    robot.intake.autoAssist(1.0, RobotParams.INTAKE_POWER_DUMP, event, null, 0.0);
                     sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
                     break;
 
