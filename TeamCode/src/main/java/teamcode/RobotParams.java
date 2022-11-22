@@ -554,6 +554,8 @@ public class RobotParams
     //
     // Intake subsystem.
     //
+    static final boolean INTAKE_MOTOR_INVERTED                  = true;
+    static final boolean INTAKE_TRIGGER_INVERTED                = true;
     static final double INTAKE_POWER_PICKUP                     = 1.0;
     static final double INTAKE_POWER_DUMP                       = -1.0;
     static final double INTAKE_DUMP_TIME                        = 1.0;
@@ -566,8 +568,8 @@ public class RobotParams
     static final double GRABBER_MAX_POS                         = 0.25;
     static final boolean GRABBER_LSERVO_INVERTED                = false;
     static final boolean GRABBER_RSERVO_INVERTED                = true;
-    static final boolean GRABBER_TRIGGER_INVERTED               = false;
-    static final double GRABBER_SENSOR_THRESHOLD                = 5.0;
+    static final boolean GRABBER_TRIGGER_INVERTED               = true;
+    static final double GRABBER_SENSOR_THRESHOLD                = 3.0;
     static final double GRABBER_OPEN_POS                        = GRABBER_MAX_POS;
     static final double GRABBER_OPEN_TIME                       = 0.5;
     static final double GRABBER_CLOSE_POS                       = GRABBER_MIN_POS;

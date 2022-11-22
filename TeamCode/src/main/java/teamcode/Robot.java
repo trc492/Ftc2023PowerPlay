@@ -198,8 +198,8 @@ public class Robot
                 if (RobotParams.Preferences.useIntake)
                 {
                     TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
-                        .setMotorInverted(true)
-                        .setTriggerInverted(true)
+                        .setMotorInverted(RobotParams.INTAKE_MOTOR_INVERTED)
+                        .setTriggerInverted(RobotParams.INTAKE_TRIGGER_INVERTED)
                         .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
                         .setMsgTracer(globalTracer);
                     intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getMotorIntake();
