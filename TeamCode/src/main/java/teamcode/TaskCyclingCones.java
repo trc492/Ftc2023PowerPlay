@@ -397,10 +397,8 @@ public class TaskCyclingCones
                     break;
 
                 case SCORE: //7. spin intake backwards
-                    robot.grabber.cancelAutoAssist();
-                    robot.grabber.open(event);
+                    robot.grabber.cancelAutoAssist(event);
                     sm.waitForSingleEvent(event, State.CLEAR_POLE);
-
                     break;
 
                 case CLEAR_POLE:
