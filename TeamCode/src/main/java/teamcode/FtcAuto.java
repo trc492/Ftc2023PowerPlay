@@ -206,12 +206,15 @@ public class FtcAuto extends FtcOpMode
                 robot.vision.tensorFlowVision.setEnabled(true);
             }
         }
+
         if (robot.elevator != null && robot.arm != null && robot.turret != null)
         {
             robot.turret.zeroCalibrate();
         }
-        if(robot.grabber != null){
-            robot.grabber.enableAutoAssist(null, 0, null, 0);
+
+        if (robot.grabber != null)
+        {
+            robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
         }
     }   //initRobot
 

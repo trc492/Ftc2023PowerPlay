@@ -52,8 +52,8 @@ public class RobotParams
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
-        public static boolean useEasyOpenCV = false;
-        public static boolean showEasyOpenCvView = false;
+        public static boolean useEasyOpenCV = true;
+        public static boolean showEasyOpenCvView = true;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
