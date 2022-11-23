@@ -512,7 +512,11 @@ public class FtcTeleOp extends FtcOpMode
                 {
                     if (pressed)
                     {
-                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
+                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
+                    }
+                    else
+                    {
+                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP)
                     }
                 }
                 else if (robot.grabber != null)
@@ -540,7 +544,8 @@ public class FtcTeleOp extends FtcOpMode
                 break;
             // Prepare Pickup: Extend arm, turn turret to face front, lower elevator after half a second
             case FtcGamepad.GAMEPAD_B:
-                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null && robot.robotDrive.gridDrive!= null)
+                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null &&
+                    robot.robotDrive.gridDrive!= null)
                 {
 //                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
 //                                    robot.robotDrive.getAutoTargetCell(
@@ -569,21 +574,6 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_Y:
-                if (pressed)
-                {
-                    if (robot.intake != null)
-                    {
-                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_PICKUP);
-                    }
-                    else if (robot.grabber != null)
-                    {
-                        robot.grabber.close();
-                    }
-                }
-//                if (pressed && robot.elevator != null)
-//                {
-//                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
-//                }
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
@@ -640,7 +630,6 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
                 lockOnPole = pressed;
             break;
-
         }
 
     }   //operatorButtonEvent
