@@ -634,44 +634,64 @@ public class FtcTeleOp extends FtcOpMode
 
     }   //operatorButtonEvent
 
-    private Double findConeAlignAngle(){
-        return coneAngle != null? coneAngle : 0.0;
-    }
-
     /*buttonIndex:
     0: left substation
     1: right substation
     2: left cone stack
     3: right cone stack
     */
-    private TrcPose2D autoPickupPoint(FtcAuto.Alliance alliance, int buttonIndex) {
+    private TrcPose2D autoPickupPoint(FtcAuto.Alliance alliance, int buttonIndex)
+    {
         TrcPose2D point = null;
-        if (alliance == FtcAuto.Alliance.RED_ALLIANCE) {
+
+        if (alliance == FtcAuto.Alliance.RED_ALLIANCE)
+        {
             point = RobotParams.PICKUP_POINTS_RED[buttonIndex];
         }
-        else {
+        else
+        {
             point = RobotParams.PICKUP_POINTS_BLUE[buttonIndex];
         }
+
         return point;
     }
 
-    private TrcPose2D getNearestHighPole() {
+    private TrcPose2D getNearestHighPole()
+    {
         TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
         TrcPose2D robotGridCell = robot.robotDrive.gridDrive.poseToGridCell(robotPose);
         robotGridCell = robot.robotDrive.gridDrive.adjustGridCellCenter(robotGridCell);
         double minDistance = Double.MAX_VALUE;
         TrcPose2D closest = null;
-        for(TrcPose2D pole : RobotParams.SCORING_POINTS) {
+
+        for(TrcPose2D pole : RobotParams.SCORING_POINTS)
+        {
             double distance = Math.pow(robotGridCell.x - pole.x, 2) + Math.pow(robotGridCell.y - pole.y, 2);
-            if(distance < minDistance) {
+            if(distance < minDistance)
+            {
                 closest = pole;
                 minDistance = distance;
             }
         }
-        //TODO: Calculate offset to scoring position
+
+        double northDeltaDistance = closest.y - robotGridCell.y;
+        double eastDeltaDistance = closest.x - robotGridCell.x;
+        boolean poleIsNorthOfRobot = northDeltaDistance > 0.0;
+        boolean poleIsEastOfRobot = eastDeltaDistance > 0.0;
+        boolean sameRow = Math.abs(northDeltaDistance) < 1.0;
+        boolean sameColumn = Math.abs(eastDeltaDistance) < 1.0;
+
+
         return closest;
     }
-    private void scoreCone(Object context){
+
+    private Double findConeAlignAngle()
+    {
+        return coneAngle != null? coneAngle : 0.0;
+    }
+
+    private void scoreCone(Object context)
+    {
         robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
     }
 
