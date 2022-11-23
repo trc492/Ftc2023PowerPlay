@@ -517,7 +517,18 @@ public class FtcTeleOp extends FtcOpMode
                 }
                 else if (robot.grabber != null)
                 {
-                    if (pressed)
+                    if (manualOverride)
+                    {
+                        if (pressed)
+                        {
+                            robot.grabber.close();
+                        }
+                        else
+                        {
+                            robot.grabber.open();
+                        }
+                    }
+                    else if (pressed)
                     {
                         robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
                     }
