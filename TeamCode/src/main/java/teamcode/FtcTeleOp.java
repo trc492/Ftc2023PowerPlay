@@ -516,7 +516,7 @@ public class FtcTeleOp extends FtcOpMode
                     }
                     else
                     {
-                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP)
+                        robot.intake.autoAssist(RobotParams.INTAKE_POWER_DUMP);
                     }
                 }
                 else if (robot.grabber != null)
