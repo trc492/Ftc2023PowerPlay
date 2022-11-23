@@ -52,8 +52,8 @@ public class RobotParams
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
-        public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = true;
+        public static boolean useEasyOpenCV = false;
+        public static boolean showEasyOpenCvView = false;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -431,7 +431,7 @@ public class RobotParams
     static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 32.0;
-    public static final double CAPPING_OFFSET                   = -4.0;
+    public static final double CAPPING_OFFSET                   = -8.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
             ELEVATOR_MIN_POS,                                   // Slot 0
             ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
@@ -487,7 +487,7 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
-    static final double ARM_SCORE_POS                           = 30.0;
+    static final double ARM_SCORE_POS                           = 20;
     static final double ARM_SINGLE_CONE_POS                     = ARM_MAX_POS;
     static final double ARM_STACK_2_POS                         = ARM_MAX_POS;
     static final double ARM_STACK_3_CONES_POS                   = ARM_MAX_POS;
@@ -532,7 +532,7 @@ public class RobotParams
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = 0.5;
+    static final double TURRET_CAL_POWER                        = 0.3;
     static final double TURRET_POWER_SCALE                      = 1.0;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;

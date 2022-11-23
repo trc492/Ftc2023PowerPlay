@@ -163,7 +163,7 @@ public class Robot
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     elevator.getPidController().setOutputRange(-RobotParams.ELEVATOR_DOWN_POWER_SCALE, 1.0);
-                    elevator.setMsgTracer(globalTracer);
+                    elevator.setMsgTracer(globalTracer, true);
                     elevator.setBeep(androidTone);
                 }
 

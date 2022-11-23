@@ -40,6 +40,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         DRIVE_TO_SCORE_POSITION,
         RAISE_ELEVATOR_TO_SCORE,
         TURN_TO_SCORE_PRELOAD,
+        LOWER_ELEVATOR,
         SCORE_PRELOAD,
         RAISE_ELEVATOR_AFTER_SCORING,
         PREP_FOR_TRAVEL,
@@ -56,7 +57,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int signalPos = 0;
     // Tells us number cones left on the conestack.
     private int conesRemaining = 5;
-    private boolean debugPoleVision = true;
+    private boolean debugPoleVision = false;
 
     /**
      * Constructor: Create an instance of the object.
@@ -185,8 +186,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
-                    robot.arm.setTarget(30.0);
-                    robot.elevator.setTarget(32.0, true, 1.0, event, null, 2.0);
+                    robot.arm.setTarget(25.0);
+                    robot.elevator.setTarget(32, true, 1.0, event, null, 0.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -200,15 +201,18 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
                         0.75, event, null, 2.0, null, null);
+                    sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
+                    break;
+                case LOWER_ELEVATOR:
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true, 1.0, event);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
-
                 //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
 
-                    robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, event);
+                    robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
                     sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
                     break;
 

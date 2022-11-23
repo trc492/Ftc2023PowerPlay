@@ -397,9 +397,10 @@ public class TaskCyclingCones
                     break;
 
                 case SCORE: //7. spin intake backwards
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true);
-                    robot.grabber.enableAutoAssist(null, 0, event, 2.0);
+                    robot.grabber.cancelAutoAssist();
+                    robot.grabber.open(event);
                     sm.waitForSingleEvent(event, State.CLEAR_POLE);
+
                     break;
 
                 case CLEAR_POLE:

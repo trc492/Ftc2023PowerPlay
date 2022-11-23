@@ -205,11 +205,13 @@ public class FtcAuto extends FtcOpMode
                 robot.globalTracer.traceInfo(funcName, "Enabling TensorFlowVision to detect Signal.");
                 robot.vision.tensorFlowVision.setEnabled(true);
             }
-
-            if (robot.elevator != null && robot.arm != null && robot.turret != null)
-            {
-                robot.turret.zeroCalibrate();
-            }
+        }
+        if (robot.elevator != null && robot.arm != null && robot.turret != null)
+        {
+            robot.turret.zeroCalibrate();
+        }
+        if(robot.grabber != null){
+            robot.grabber.enableAutoAssist(null, 0, null, 0);
         }
     }   //initRobot
 
