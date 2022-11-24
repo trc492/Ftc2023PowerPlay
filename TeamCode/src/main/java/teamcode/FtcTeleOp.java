@@ -380,12 +380,6 @@ public class FtcTeleOp extends FtcOpMode
         robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad, button, pressed? "Pressed": "Released");
         robot.dashboard.displayPrintf(8, "Drive Mode:%s", driveOrientation.toString());
 
-        /* buttonIndex:
-            0: left substation
-            1: right substation
-            2: left cone stack
-            3: right cone stack
-        */
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
@@ -395,12 +389,12 @@ public class FtcTeleOp extends FtcOpMode
                 }
                 break;
 
-            //drives to the nearest high pole if has cone otherwise left cone stack
             case FtcGamepad.GAMEPAD_B:
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
                     if (autoNavigate)
                     {
+                        // Navigate to right cone stack and the corresponding high pole.
                         startAutoNavigate(3);
                     }
 //                        //Cycling code, move elsewhere
@@ -419,11 +413,11 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_X:
-                //drives to the nearest high pole if has cone otherwise left cone stack
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
                     if (autoNavigate)
                     {
+                        // Navigate to left cone stack and the corresponding high pole.
                         startAutoNavigate(2);
                     }
                 }
@@ -465,11 +459,11 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
-                //drives to the nearest high pole if it has a cone, otherwise left triangle substation to pick up a cone
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
                     if (autoNavigate)
                     {
+                        // Navigate to left substation and the corresponding high pole.
                         startAutoNavigate(0);
                     }
                     else
@@ -480,11 +474,11 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
-                //drives to the nearest high pole if has cone otherwise right substation
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
                     if (autoNavigate)
                     {
+                        // Navigate to right substation and the corresponding high pole.
                         startAutoNavigate(1);
                     }
                     else
