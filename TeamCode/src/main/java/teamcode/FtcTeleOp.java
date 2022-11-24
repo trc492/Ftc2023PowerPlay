@@ -389,36 +389,36 @@ public class FtcTeleOp extends FtcOpMode
                 }
                 break;
 
+            //drives to the nearest high pole if has cone otherwise left cone stack
             case FtcGamepad.GAMEPAD_B:
                 if(pressed){
-                    //if robot does not have a cone, initiate pickup
-                    if (!robot.grabber.hasObject())
-                    {
-                        robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
+                    if (robot.robotDrive.gridDrive != null) {
+                        if (autoMovement) {
+                            startAutoMovement(2);
+                        }
                     }
-                    //otherwise robot has a cone, turn turret to the left, raise arm, elevator
-                    else
-                    {
-                        robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
-                                0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
-                    }
-                }
-                else{
-                    robot.cyclingTask.cancel();
-                }
-                break;
+//                        //Cycling code, move elsewhere
+//                        if robot does not have a cone, initiate pickup
+//                        if (!robot.grabber.hasObject())
+//                        {
+//                            robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
+//                        }
+//                        //otherwise robot has a cone, turn turret to the left, raise arm, elevator
+//                        else
+//                        {
+//                            robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
+//                                    0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
+//                        }
 
+                }
+
+                break;
+            //drives to the nearest high pole if has cone otherwise left cone stack
             case FtcGamepad.GAMEPAD_X:
-                if (pressed && robot.robotDrive.gridDrive != null)
-                {
-                    atScoringLocation = !atScoringLocation;
-                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
-                        atScoringLocation ?
-                            robot.robotDrive.getAutoTargetCell(
-                                RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices) :
-                            robot.robotDrive.getAutoTargetCell(
-                                RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
-                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
+                if (pressed && robot.robotDrive.gridDrive != null) {
+                    if (autoMovement) {
+                        startAutoMovement(2);
+                    }
                 }
                 break;
 
@@ -453,31 +453,40 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
-                    robot.robotDrive.gridDrive.setRelativeYGridTarget(-1);
+                    if (autoMovement) {
+                        startAutoMovement(0);
+                    }
+                    else {
+                        robot.robotDrive.gridDrive.setRelativeYGridTarget(-1);
+                    }
                 }
                 break;
-
-            //drives to the nearest high pole if it has a cone, or the nearest triangle substation to pick up a cone
+            /*buttonIndex:
+            0: left substation
+            1: right substation
+            2: left cone stack
+            3: right cone stack
+            */
+            //drives to the nearest high pole if it has a cone, otherwise left triangle substation to pick up a cone
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
                 if(pressed && robot.robotDrive.gridDrive != null) {
                     if (autoMovement) {
-                        TrcPose2D endPoint = null;
-                        if (robot.intake.hasObject()) {
-                            endPoint = getNearestHighPole();
-                        } else {
-                            endPoint = autoPickupPoint(FtcAuto.autoChoices.alliance, 0);
-                        }
-                        robot.robotDrive.gridDrive.driveToEndPoint(robot.robotDrive.gridDrive.gridCellToPose(endPoint));
+                        startAutoMovement(0);
                     } else {
                         robot.robotDrive.gridDrive.setRelativeXGridTarget(-1);
                     }
                 }
                 break;
-
+            //drives to the nearest high pole if has cone otherwise right substation
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
                 if (pressed && robot.robotDrive.gridDrive != null)
                 {
-                    robot.robotDrive.gridDrive.setRelativeXGridTarget(1);
+                    if (autoMovement) {
+                        startAutoMovement(1);
+                    }
+                    else {
+                        robot.robotDrive.gridDrive.setRelativeXGridTarget(1);
+                    }
                 }
                 break;
 
@@ -634,12 +643,7 @@ public class FtcTeleOp extends FtcOpMode
 
     }   //operatorButtonEvent
 
-    /*buttonIndex:
-    0: left substation
-    1: right substation
-    2: left cone stack
-    3: right cone stack
-    */
+
     private TrcPose2D autoPickupPoint(FtcAuto.Alliance alliance, int buttonIndex)
     {
         TrcPose2D point = null;
@@ -659,30 +663,81 @@ public class FtcTeleOp extends FtcOpMode
     private TrcPose2D getNearestHighPole()
     {
         TrcPose2D robotPose = robot.robotDrive.driveBase.getFieldPosition();
+        //this is the position the robot snaps to in the center
         TrcPose2D robotGridCell = robot.robotDrive.gridDrive.poseToGridCell(robotPose);
         robotGridCell = robot.robotDrive.gridDrive.adjustGridCellCenter(robotGridCell);
         double minDistance = Double.MAX_VALUE;
-        TrcPose2D closest = null;
+        TrcPose2D closestPole = null;
+
+        TrcPose2D finalRobotPos = new TrcPose2D();
 
         for(TrcPose2D pole : RobotParams.SCORING_POINTS)
         {
             double distance = Math.pow(robotGridCell.x - pole.x, 2) + Math.pow(robotGridCell.y - pole.y, 2);
             if(distance < minDistance)
             {
-                closest = pole;
+                closestPole = pole;
                 minDistance = distance;
             }
         }
 
-        double northDeltaDistance = closest.y - robotGridCell.y;
-        double eastDeltaDistance = closest.x - robotGridCell.x;
+        double northDeltaDistance = closestPole.y - robotGridCell.y;
+        double eastDeltaDistance = closestPole.x - robotGridCell.x;
         boolean poleIsNorthOfRobot = northDeltaDistance > 0.0;
         boolean poleIsEastOfRobot = eastDeltaDistance > 0.0;
         boolean sameRow = Math.abs(northDeltaDistance) < 1.0;
         boolean sameColumn = Math.abs(eastDeltaDistance) < 1.0;
+        if(!sameRow && !sameColumn){
+
+            if(robotGridCell.angle == 0 || robotGridCell.angle == 180){
+                //first move is along the column, second move is along the row (so x is the same)
+                finalRobotPos.y = closestPole.y + ((poleIsNorthOfRobot)? -0.5 : 0.5);
+                finalRobotPos.x = closestPole.x;
+                finalRobotPos.angle = poleIsEastOfRobot? 90: 270;
+            }
+            else{
+                //first move is along the row, second move is along the column
+                finalRobotPos.x = closestPole.x + ((poleIsEastOfRobot)? -0.5 : 0.5);
+                finalRobotPos.y = closestPole.y;
+                finalRobotPos.angle = poleIsNorthOfRobot? 0 : 180;
+            }
+        }
+        else if(sameRow){
+            //if robot heading east west, don't have ot turn it
+            //robotGridCell - location the robot snaps to in the center of tile
+            //if the closestPole is South of the robot, the final point's y does not need to be the same
+            finalRobotPos.y = robotGridCell.y;
+            finalRobotPos.x = closestPole.x;
+            if(robotGridCell.angle == 0 || robotGridCell.angle == 180){
+                finalRobotPos.angle = poleIsEastOfRobot? 90: 270;
+            }
+            else{
+                finalRobotPos.angle = robotGridCell.angle;
+            }
+
+        }
+        else if(sameColumn){
+            finalRobotPos.y = closestPole.y;
+            finalRobotPos.x = robotGridCell.x;
+            if(robotGridCell.angle == 90 || robotGridCell.angle == 270){
+                finalRobotPos.angle = poleIsNorthOfRobot? 0: 180;
+            }
+            else{
+                finalRobotPos.angle = robotGridCell.angle;
+            }
+        }
 
 
-        return closest;
+        return finalRobotPos;
+    }
+    private void startAutoMovement(int buttonIndex){
+            TrcPose2D endPoint = null;
+            if (robot.intake.hasObject()) {
+                endPoint = getNearestHighPole();
+            } else {
+                endPoint = autoPickupPoint(FtcAuto.autoChoices.alliance, buttonIndex);
+            }
+            robot.robotDrive.gridDrive.driveToEndPoint(robot.robotDrive.gridDrive.gridCellToPose(endPoint));
     }
 
     private Double findConeAlignAngle()
