@@ -659,7 +659,8 @@ public class FtcTeleOp extends FtcOpMode
         TrcPose2D robotGridCell = robot.robotDrive.gridDrive.poseToGridCell(robotPose);
         robotGridCell = robot.robotDrive.gridDrive.adjustGridCellCenter(robotGridCell);
         double minDistance = Double.MAX_VALUE;
-        TrcPose2D closestPole = null;
+        // Initialize closestPole to something so the compiler won't complain about NullPointerException.
+        TrcPose2D closestPole = RobotParams.SCORING_POINTS[0];
         TrcPose2D finalRobotGridCell = new TrcPose2D();
 
         for(TrcPose2D pole : RobotParams.SCORING_POINTS)
