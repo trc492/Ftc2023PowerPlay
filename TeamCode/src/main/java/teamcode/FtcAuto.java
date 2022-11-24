@@ -58,7 +58,6 @@ public class FtcAuto extends FtcOpMode
     {
         CYCLE_HIGH,
         CYCLE_HIGH_PRELOAD_ONLY,
-        CYCLE_MID,
         PARKING_ONLY,
         PID_DRIVE,
         TIMED_DRIVE,
@@ -157,13 +156,6 @@ public class FtcAuto extends FtcOpMode
                 if (!RobotParams.Preferences.noRobot)
                 {
                     autoCommand = new CmdAutoHigh(robot, autoChoices);
-                }
-                break;
-
-            case CYCLE_MID:
-                if (!RobotParams.Preferences.noRobot)
-                {
-
                 }
                 break;
 
@@ -378,7 +370,6 @@ public class FtcAuto extends FtcOpMode
         strategyMenu.addChoice("Cycle High", AutoStrategy.CYCLE_HIGH, true, parkingMenu);
         strategyMenu.addChoice("Cycle High Preload Only", AutoStrategy.CYCLE_HIGH_PRELOAD_ONLY, false, parkingMenu);
         strategyMenu.addChoice("Park Only", AutoStrategy.PARKING_ONLY, false, parkingMenu);
-        strategyMenu.addChoice("Cycle Mid", AutoStrategy.CYCLE_MID, false, parkingMenu);
         strategyMenu.addChoice("PID Drive", AutoStrategy.PID_DRIVE, false, xTargetMenu);
         strategyMenu.addChoice("Timed Drive", AutoStrategy.TIMED_DRIVE, false, driveTimeMenu);
         strategyMenu.addChoice("Do nothing", AutoStrategy.DO_NOTHING, false);

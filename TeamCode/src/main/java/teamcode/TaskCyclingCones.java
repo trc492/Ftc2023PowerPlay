@@ -367,10 +367,6 @@ public class TaskCyclingCones
                             robot.speak("POLE FOUND");
                             globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle);
                         }
-                        else
-                        {
-                            poleAngle = null;
-                        }
 
                         if (poleAngle != null)
                         {

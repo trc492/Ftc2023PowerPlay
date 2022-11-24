@@ -163,7 +163,7 @@ public class Robot
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     elevator.getPidController().setOutputRange(-RobotParams.ELEVATOR_DOWN_POWER_SCALE, 1.0);
-                    elevator.setMsgTracer(globalTracer, true);
+                    elevator.setMsgTracer(globalTracer);
                     elevator.setBeep(androidTone);
                 }
 
@@ -192,17 +192,6 @@ public class Robot
                 if(RobotParams.Preferences.useTurret)
                 {
                     turret = new Turret(this);
-//                    turret.zeroCalibrate();
-                }
-
-                if (RobotParams.Preferences.useIntake)
-                {
-                    TrcIntake.Parameters intakeParams = new TrcIntake.Parameters()
-                        .setMotorInverted(RobotParams.INTAKE_MOTOR_INVERTED)
-                        .setTriggerInverted(RobotParams.INTAKE_TRIGGER_INVERTED)
-                        .setAnalogThreshold(RobotParams.INTAKE_SENSOR_THRESHOLD)
-                        .setMsgTracer(globalTracer);
-                    intake = new Intake(RobotParams.HWNAME_INTAKE, intakeParams).getMotorIntake();
                 }
 
                 if (RobotParams.Preferences.useGrabber)
@@ -385,6 +374,21 @@ public class Robot
         return Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
                 0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
     }   //getElevatorPowerCompensation
+
+    /**
+     * This method starts auto-assist navigation to the pickup/scoring position according to the caller's selection.
+     *
+     * @param buttonIndex specifies the caller selection.
+     */
+    public void startAutoNavigate(int buttonIndex)
+    {
+        TrcPose2D endPoint =
+            grabber.hasObject() ?
+                robotDrive.getNearestHighPoleGridCell() :
+                robotDrive.autoPickupGridCell(FtcAuto.autoChoices.alliance, buttonIndex);
+
+        robotDrive.gridDrive.driveToEndPoint(robotDrive.gridDrive.gridCellToPose(endPoint));
+    }   //startAutoNavigate
 
     /**
      * This method sends the text string to the Driver Station to be spoken using text to speech.

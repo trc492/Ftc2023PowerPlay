@@ -30,7 +30,6 @@ import TrcCommonLib.trclib.TrcHomographyMapper;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcFtcLib.ftclib.FtcGamepad;
-import java.util.HashMap;
 
 /**
  * This class contains robot and subsystem constants and parameters.
@@ -52,8 +51,8 @@ public class RobotParams
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
-        public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = true;
+        public static boolean useEasyOpenCV = false;
+        public static boolean showEasyOpenCvView = false;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -65,19 +64,14 @@ public class RobotParams
         public static boolean useTurret = true;
         public static boolean useElevator = true;
         public static boolean useArm = true;
-        public static boolean useIntake = false;
-        public static boolean hasIntakeSensor = true;
         public static boolean useGrabber = true;
         public static boolean hasGrabberSensor = true;
     }   //class Preferences
-
-
 
     public static final String ROBOT_NAME                       = "Robot3543";
     public static final String TEAM_FOLDER_PATH                 =
         Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftc3543";
     public static final String LOG_FOLDER_PATH                  = TEAM_FOLDER_PATH + "/logs";
-    public static final String CURRENT_ROBOT_POSE_FILE          = "CurrentRobotPose.txt";
     public static final String STEERING_CALIBRATION_DATA_FILE   = "SteerCalibration.txt";
     //
     // Hardware names.
@@ -102,7 +96,6 @@ public class RobotParams
     public static final String HWNAME_TURRET_DIR_SWITCH         = "turretDirSwitch";
     public static final String HWNAME_ELEVATOR                  = "elevator";
     public static final String HWNAME_ARM                       = "arm";
-    public static final String HWNAME_INTAKE                    = "intake";
     public static final String HWNAME_GRABBER                   = "grabber";
     //
     // Field dimensions.
@@ -123,129 +116,93 @@ public class RobotParams
     public static final double STARTPOS_FROM_FIELDCENTER_X      = 1.5 * FULL_TILE_INCHES;
     public static final double STARTPOS_FROM_FIELDCENTER_Y      = HALF_FIELD_INCHES - ROBOT_LENGTH/2.0;
 
-    public static TrcPose2D STARTPOS_RED_LEFT = new TrcPose2D(
-            -STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D STARTPOS_RED_RIGHT = new TrcPose2D(
-            STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D STARTPOS_BLUE_LEFT = new TrcPose2D(
-            STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
-    public static TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
-            -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
+    // Robot start positions in inches.
+    public static final TrcPose2D STARTPOS_RED_LEFT = new TrcPose2D(
+        -STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
+    public static final TrcPose2D STARTPOS_RED_RIGHT = new TrcPose2D(
+        STARTPOS_FROM_FIELDCENTER_X, -STARTPOS_FROM_FIELDCENTER_Y, 0.0);
+    public static final TrcPose2D STARTPOS_BLUE_LEFT = new TrcPose2D(
+        STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
+    public static final TrcPose2D STARTPOS_BLUE_RIGHT = new TrcPose2D(
+        -STARTPOS_FROM_FIELDCENTER_X, STARTPOS_FROM_FIELDCENTER_Y, 180.0);
 
-    // Park positions are in tile units.
-    public static final double PARKPOS_LEFTP1_FROM_FIELDCENTER_X    = 2.5;
-    public static final double PARKPOS_LEFTP2_FROM_FIELDCENTER_X    = 1.5;
-    public static final double PARKPOS_LEFTP3_FROM_FIELDCENTER_X    = 0.5;
-//    public static final double PARKPOS_RIGHTP1_FROM_FIELDCENTER_X   = 0.5;
-//    public static final double PARKPOS_RIGHTP2_FROM_FIELDCENTER_X   = 1.5;
-//    public static final double PARKPOS_RIGHTP3_FROM_FIELDCENTER_X   = 2.5;
-    public static final double PARKPOS_FAR_FROM_FIELDCENTER_Y       = 0.5;
-    public static final double PARKPOS_NEAR_FROM_FIELDCENTER_Y      = 1.5;
+    // Robot park positions in tile units.
+    public static final double PARKPOS_LEFTP1_FROM_FIELDCENTER_X= 2.5;
+    public static final double PARKPOS_LEFTP2_FROM_FIELDCENTER_X= 1.5;
+    public static final double PARKPOS_LEFTP3_FROM_FIELDCENTER_X= 0.5;
+    public static final double PARKPOS_FAR_FROM_FIELDCENTER_Y   = 0.5;
+    public static final double PARKPOS_NEAR_FROM_FIELDCENTER_Y  = 1.5;
 
-    public static TrcPose2D PARKPOS_RED_LEFTP1_FAR = new TrcPose2D(
+    public static final TrcPose2D PARKPOS_RED_LEFTP1_FAR = new TrcPose2D(
         -PARKPOS_LEFTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_LEFTP1_NEAR = new TrcPose2D(
+    public static final TrcPose2D PARKPOS_RED_LEFTP1_NEAR = new TrcPose2D(
         -PARKPOS_LEFTP1_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_LEFTP2_FAR = new TrcPose2D(
+    public static final TrcPose2D PARKPOS_RED_LEFTP2_FAR = new TrcPose2D(
         -PARKPOS_LEFTP2_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_LEFTP2_NEAR = new TrcPose2D(
+    public static final TrcPose2D PARKPOS_RED_LEFTP2_NEAR = new TrcPose2D(
         -PARKPOS_LEFTP2_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_LEFTP3_FAR = new TrcPose2D(
+    public static final TrcPose2D PARKPOS_RED_LEFTP3_FAR = new TrcPose2D(
         -PARKPOS_LEFTP3_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-    public static TrcPose2D PARKPOS_RED_LEFTP3_NEAR = new TrcPose2D(
+    public static final TrcPose2D PARKPOS_RED_LEFTP3_NEAR = new TrcPose2D(
         -PARKPOS_LEFTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
 
-//    public static TrcPose2D PARKPOS_RED_RIGHTP1_FAR = new TrcPose2D(
-//        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_RED_RIGHTP1_NEAR = new TrcPose2D(
-//        PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_RED_RIGHTP2_FAR = new TrcPose2D(
-//        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_RED_RIGHTP2_NEAR = new TrcPose2D(
-//        PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_RED_RIGHTP3_FAR = new TrcPose2D(
-//        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_RED_RIGHTP3_NEAR = new TrcPose2D(
-//        PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, -PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//
-//    public static TrcPose2D PARKPOS_BLUE_LEFTP1_FAR = new TrcPose2D(
-//        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_LEFTP1_NEAR = new TrcPose2D(
-//        PARKPOS_LEFTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_LEFTP2_FAR = new TrcPose2D(
-//        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_LEFTP2_NEAR = new TrcPose2D(
-//        PARKPOS_LEFTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_LEFTP3_FAR = new TrcPose2D(
-//        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_LEFTP3_NEAR = new TrcPose2D(
-//        PARKPOS_LEFTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//
-//    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_FAR = new TrcPose2D(
-//        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_RIGHTP1_NEAR = new TrcPose2D(
-//        -PARKPOS_RIGHTP1_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_FAR = new TrcPose2D(
-//        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_RIGHTP2_NEAR = new TrcPose2D(
-//        -PARKPOS_RIGHTP2_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_FAR = new TrcPose2D(
-//        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_FAR_FROM_FIELDCENTER_Y, 0.0);
-//    public static TrcPose2D PARKPOS_BLUE_RIGHTP3_NEAR = new TrcPose2D(
-//        -PARKPOS_RIGHTP3_FROM_FIELDCENTER_X, PARKPOS_NEAR_FROM_FIELDCENTER_Y, 0.0);
-
-    //both arays use TILE_COORDINATES
-    public static TrcPose2D[] PARKPOS_RED_LEFT_NEAR = {
+    public static final TrcPose2D[] PARKPOS_RED_LEFT_NEAR = {
         PARKPOS_RED_LEFTP1_NEAR,
         PARKPOS_RED_LEFTP2_NEAR,
         PARKPOS_RED_LEFTP3_NEAR
     };
-    public static TrcPose2D[] PARKPOS_RED_LEFT_FAR = {
+    public static final TrcPose2D[] PARKPOS_RED_LEFT_FAR = {
         PARKPOS_RED_LEFTP1_FAR,
         PARKPOS_RED_LEFTP2_FAR,
         PARKPOS_RED_LEFTP3_FAR
     };
-    // Auto-Assist TeleOp drive locations.
-    public static TrcPose2D TELEOP_CONE_STACK_RED_LEFT          = new TrcPose2D(-1.5, -0.5, -90.0);
-    public static TrcPose2D TELEOP_CONE_STACK_RED_RIGHT         = new TrcPose2D(1.5, -0.5, 90.0);
-    public static TrcPose2D TELEOP_CONE_STACK_BLUE_LEFT         = new TrcPose2D(1.5, 0.5, 90.0);
-    public static TrcPose2D TELEOP_CONE_STACK_BLUE_RIGHT        = new TrcPose2D(-1.5, 0.5, -90.0);
 
-    public static TrcPose2D TELEOP_SUBSTATION_RED_LEFT          = new TrcPose2D(-0.5, -2.2, 180.0);
-    public static TrcPose2D TELEOP_SUBSTATION_RED_RIGHT         = new TrcPose2D(0.5, -2.2, 180.0);
-    public static TrcPose2D TELEOP_SUBSTATION_BLUE_LEFT         = new TrcPose2D(0.5, 2.2, 0.0);
-    public static TrcPose2D TELEOP_SUBSTATION_BLUE_RIGHT        = new TrcPose2D(-0.5, 2.2, 0.0);
+    // Auto-Assist navigation locations in tile units.
+    public static final TrcPose2D AUTONAV_CONESTACK_RED_LEFT    = new TrcPose2D(-1.5, -0.5, -90.0);
+    public static final TrcPose2D AUTONAV_CONESTACK_RED_RIGHT   = new TrcPose2D(1.5, -0.5, 90.0);
+    public static final TrcPose2D AUTONAV_CONESTACK_BLUE_LEFT   = new TrcPose2D(1.5, 0.5, 90.0);
+    public static final TrcPose2D AUTONAV_CONESTACK_BLUE_RIGHT  = new TrcPose2D(-1.5, 0.5, -90.0);
 
-    public static TrcPose2D SCORING_SUBSTATION_RED              = new TrcPose2D (0.0, -1.0, 0.0);
-    public static TrcPose2D SCORING_SUBSTATION_BLUE             = new TrcPose2D (0.0, 1.0, 0.0);
-    public static TrcPose2D SCORING_AUDIENCE_POLE               = new TrcPose2D (-1.0, 0.0, 0.0);
-    public static TrcPose2D SCORING_REFEREE_POLE                = new TrcPose2D (1.0, 0.0, 0.0);
+    public static final TrcPose2D AUTONAV_SUBSTATION_RED_LEFT   = new TrcPose2D(-0.5, -2.2, 180.0);
+    public static final TrcPose2D AUTONAV_SUBSTATION_RED_RIGHT  = new TrcPose2D(0.5, -2.2, 180.0);
+    public static final TrcPose2D AUTONAV_SUBSTATION_BLUE_LEFT  = new TrcPose2D(0.5, 2.2, 0.0);
+    public static final TrcPose2D AUTONAV_SUBSTATION_BLUE_RIGHT = new TrcPose2D(-0.5, 2.2, 0.0);
 
-    public static TrcPose2D[] PICKUP_POINTS_RED                 = {
-        TELEOP_SUBSTATION_RED_LEFT,
-        TELEOP_SUBSTATION_RED_RIGHT,
-        TELEOP_CONE_STACK_RED_LEFT,
-        TELEOP_CONE_STACK_RED_RIGHT
+    public static final TrcPose2D HIGHPOLE_SUBSTATION_RED       = new TrcPose2D (0.0, -1.0, 0.0);
+    public static final TrcPose2D HIGHPOLE_SUBSTATION_BLUE      = new TrcPose2D (0.0, 1.0, 0.0);
+    public static final TrcPose2D HIGHPOLE_AUDIENCE             = new TrcPose2D (-1.0, 0.0, 0.0);
+    public static final TrcPose2D HIGHPOLE_REFEREE              = new TrcPose2D (1.0, 0.0, 0.0);
+
+    public static final TrcPose2D[] AUTONAV_PICKUP_RED = {
+        AUTONAV_SUBSTATION_RED_LEFT,
+        AUTONAV_SUBSTATION_RED_RIGHT,
+        AUTONAV_CONESTACK_RED_LEFT,
+        AUTONAV_CONESTACK_RED_RIGHT
     };
-    public static TrcPose2D[] PICKUP_POINTS_BLUE                = {
-        TELEOP_SUBSTATION_BLUE_LEFT,
-        TELEOP_SUBSTATION_BLUE_RIGHT,
-        TELEOP_CONE_STACK_BLUE_LEFT,
-        TELEOP_CONE_STACK_BLUE_RIGHT
+    public static final TrcPose2D[] AUTONAV_PICKUP_BLUE = {
+        AUTONAV_SUBSTATION_BLUE_LEFT,
+        AUTONAV_SUBSTATION_BLUE_RIGHT,
+        AUTONAV_CONESTACK_BLUE_LEFT,
+        AUTONAV_CONESTACK_BLUE_RIGHT
     };
-    public static TrcPose2D[] SCORING_POINTS                    = {
-        SCORING_SUBSTATION_RED,
-        SCORING_SUBSTATION_BLUE,
-        SCORING_AUDIENCE_POLE,
-        SCORING_REFEREE_POLE
+    public static final int AUTONAV_LEFT_SUBSTATION_INDEX       = 0;
+    public static final int AUTONAV_RIGHT_SUBSTATION_INDEX      = 1;
+    public static final int AUTONAV_LEFT_CONESTACK_INDEX        = 2;
+    public static final int AUTONAV_RIGHT_CONESTACK_INDEX       = 3;
+
+    public static final TrcPose2D[] AUTONAV_HIGHPOLE = {
+        HIGHPOLE_SUBSTATION_RED,
+        HIGHPOLE_SUBSTATION_BLUE,
+        HIGHPOLE_AUDIENCE,
+        HIGHPOLE_REFEREE
     };
 
     // In tile units.
-    public static TrcPose2D CONE_STACK_RED_LEFT                 = new TrcPose2D(-2.3, -0.5, -90.0);
-    public static TrcPose2D LOOK_FOR_CONE_POS_LEFT              = new TrcPose2D(-2.0, -0.5, -90.0);
+    public static final TrcPose2D CONE_STACK_RED_LEFT           = new TrcPose2D(-2.3, -0.5, -90.0);
+    public static final TrcPose2D LOOK_FOR_CONE_POS_LEFT        = new TrcPose2D(-2.0, -0.5, -90.0);
 
-    public static TrcPose2D SCORE_LOCATION_RED_LEFT             = new TrcPose2D(-0.5, -1.0, 180.0);
-    public static TrcPose2D SUBSTATION_RED_LEFT                 = new TrcPose2D(-0.55, -1.95, 150.0);
+    public static final TrcPose2D SCORE_LOCATION_RED_LEFT       = new TrcPose2D(-0.5, -1.0, 180.0);
+    public static final TrcPose2D SUBSTATION_RED_LEFT           = new TrcPose2D(-0.55, -1.95, 150.0);
     // Game element dimensions
     public static final double STACKED_CONE_ADDITION            = 1.5;
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
@@ -261,8 +218,7 @@ public class RobotParams
     public static final double FRONTCAM_FRONT_OFFSET            = 2.000;//Camera offset from front of robot in inches
     public static final double FRONTCAM_LEFT_OFFSET             = 7.125;//Camera offset from left of robot in inches
     public static final double FRONTCAM_HEIGHT_OFFSET           = 3.750;//Camera offset from floor in inches
-    public static final double FRONTCAM_TILT_DOWN               = 15.00;//Camera tilt down angle from horizontal in
-    // deg
+    public static final double FRONTCAM_TILT_DOWN               = 15.00;//Camera tilt down angle from horizontal in deg
     // Front Camera: Logitech C310
     public static final int FRONTCAM_IMAGE_WIDTH                = 640;
     public static final int FRONTCAM_IMAGE_HEIGHT               = 480;
@@ -276,6 +232,7 @@ public class RobotParams
     public static final double ELEVATORCAM_VERTICAL_FOV         = 26.0;     // in degrees
     public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_VERTICAL_FOV/ELEVATORCAM_IMAGE_HEIGHT;
 
+    // Measurement unit: pixels
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_Y      = 120.0;
     public static final double HOMOGRAPHY_CAMERA_TOPRIGHT_X     = FRONTCAM_IMAGE_WIDTH - 1;
@@ -285,7 +242,6 @@ public class RobotParams
     public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_X  = FRONTCAM_IMAGE_WIDTH - 1;
     public static final double HOMOGRAPHY_CAMERA_BOTTOMRIGHT_Y  = FRONTCAM_IMAGE_HEIGHT - 1;
 
-    // These should be in real-world robot coordinates. Needs calibration after camera is actually mounted in position.
     // Measurement unit: inches
     public static final double HOMOGRAPHY_WORLD_TOPLEFT_X       = -12.5625;
     public static final double HOMOGRAPHY_WORLD_TOPLEFT_Y       = 48.0 - ROBOT_LENGTH + FRONTCAM_FRONT_OFFSET;
@@ -433,26 +389,25 @@ public class RobotParams
     public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 32.0;
     public static final double CAPPING_OFFSET                   = -8.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
-            ELEVATOR_MIN_POS,                                   // Slot 0
-            ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
-//            STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,           // Slot 2
-//            STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 3
-//            STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 4
-//            STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 5
-//            LOW_JUNCTION_HEIGHT,                                // Slot 6
-//            MID_JUNCTION_HEIGHT,                                // Slot 7
-            HIGH_JUNCTION_HEIGHT,                               // Slot 8
-            ELEVATOR_MAX_POS                                    // Slot 9
+        ELEVATOR_MIN_POS,                                       // Slot 0
+        ELEVATOR_CONE_GRAB_HEIGHT,                              // Slot 1
+//        STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,      // Slot 2
+//        STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 3
+//        STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
+//        STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
+//        LOW_JUNCTION_HEIGHT,                                  // Slot 6
+//        MID_JUNCTION_HEIGHT,                                  // Slot 7
+        HIGH_JUNCTION_HEIGHT,                                   // Slot 8
+        ELEVATOR_MAX_POS                                        // Slot 9
     };
-    //0.0 for placeholder so 1 additional cone per index
-    static final double[] ELEVATOR_PICKUP_PRESETS                    = new double[] {
-            0.0,
-            ELEVATOR_CONE_GRAB_HEIGHT,                                   // Slot 1
-            STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,           // Slot 2
-            STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 3
-            STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 4
-            STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,       // Slot 5
-
+    // 0.0 for placeholder so 1 additional cone per index
+    static final double[] ELEVATOR_PICKUP_PRESETS               = new double[] {
+        0.0,
+        ELEVATOR_CONE_GRAB_HEIGHT,                              // Slot 1
+        STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,      // Slot 2
+        STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 3
+        STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
+        STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
     };
     static final double ELEVATOR_DOWN_POWER_SCALE               = 0.2;
     //
@@ -509,7 +464,6 @@ public class RobotParams
         ARM_STACK_3_CONES_POS,
         ARM_STACK_4_CONES_POS,
         ARM_STACK_5_CONES_POS
-
     };
     //
     // Turret subsystem.
@@ -551,15 +505,6 @@ public class RobotParams
     };
     //In tile coordinates---how far from the cone the robot should be before trying to pick it up
     static final double TURRET_PICKUP_OFFSET                    = 0.3; //todo: tune this
-    //
-    // Intake subsystem.
-    //
-    static final boolean INTAKE_MOTOR_INVERTED                  = true;
-    static final boolean INTAKE_TRIGGER_INVERTED                = true;
-    static final double INTAKE_POWER_PICKUP                     = 1.0;
-    static final double INTAKE_POWER_DUMP                       = -1.0;
-    static final double INTAKE_DUMP_TIME                        = 1.0;
-    static final double INTAKE_SENSOR_THRESHOLD                 = 5.0;      //in cm
     //
     // Grabber subsystem.
     //

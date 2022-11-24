@@ -35,13 +35,11 @@ SOFTWARE.
             <RevRoboticsCoreHexMotor name="turret.motor" port="0" />
             <goBILDA5202SeriesMotor name="elevator.motor" port="1" />
             <goBILDA5202SeriesMotor name="arm.motor" port="2" />
-            <RevRoboticsCoreHexMotor name="intake.motor" port="3" />
             <DigitalDevice name="elevator.lowerLimit" port="0" />
             <DigitalDevice name="arm.lowerLimit" port="1" />
             <Servo name="grabber.left" port="0" />
             <Servo name="grabber.right" port="1" />
             <RevBlinkinLedDriver name="blinkin" port="5" />
-            <!--<RevColorSensorV3 name="intake.sensor" port="0" bus="1"/>-->
             <RevColorSensorV3 name="grabber.sensor" port="0" bus="1"/>
             <!--<LynxEmbeddedIMU name="imu 1" port="0" bus="0" />-->
         </LynxModule>

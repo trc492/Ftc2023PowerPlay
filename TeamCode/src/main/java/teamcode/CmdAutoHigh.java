@@ -57,7 +57,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int signalPos = 0;
     // Tells us number cones left on the conestack.
     private int conesRemaining = 5;
-    private boolean debugPoleVision = false;
+    private final boolean debugPoleVision = false;
 
     /**
      * Constructor: Create an instance of the object.

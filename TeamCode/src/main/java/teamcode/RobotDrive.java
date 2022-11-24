@@ -253,4 +253,112 @@ public class RobotDrive
         return getAutoTargetPoint(targetPos.x, targetPos.y, targetPos.angle, autoChoices);
     }   //getAutoTargetPoint
 
+    /**
+     * This method returns the grid cell position of the pickup point according to the alliance color and the caller's
+     * selection.
+     * <p>
+     * Button Index:
+     *  0 - Left substation
+     *  1 - Right substation
+     *  2 - Left cone stack
+     *  3 - Right cone stack
+     * </p>
+     * @param alliance specifies the alliance color.
+     * @param buttonIndex speicifes the caller's selection.
+     * @return pickup grid cell position.
+     */
+    public TrcPose2D autoPickupGridCell(FtcAuto.Alliance alliance, int buttonIndex)
+    {
+        return alliance == FtcAuto.Alliance.RED_ALLIANCE ?
+            RobotParams.AUTONAV_PICKUP_RED[buttonIndex] : RobotParams.AUTONAV_PICKUP_BLUE[buttonIndex];
+    }   //autoPickupGridCell
+
+    /**
+     * This method returns the grid cell position of the nearest high pole from the robot.
+     *
+     * @return grid cell position of the nearest high pole.
+     */
+    public TrcPose2D getNearestHighPoleGridCell()
+    {
+        TrcPose2D robotPose = driveBase.getFieldPosition();
+        // robotGridCell is the cell position the robot snaps to the center of the cell.
+        TrcPose2D robotGridCell = gridDrive.poseToGridCell(robotPose);
+        robotGridCell = gridDrive.adjustGridCellCenter(robotGridCell);
+        double minDistance = Double.MAX_VALUE;
+        // Initialize closestPole to something so the compiler won't complain about NullPointerException.
+        TrcPose2D closestPole = RobotParams.AUTONAV_HIGHPOLE[0];
+        TrcPose2D finalRobotGridCell = new TrcPose2D();
+
+        for(TrcPose2D pole : RobotParams.AUTONAV_HIGHPOLE)
+        {
+            double distance = Math.pow(robotGridCell.x - pole.x, 2) + Math.pow(robotGridCell.y - pole.y, 2);
+            if(distance < minDistance)
+            {
+                closestPole = pole;
+                minDistance = distance;
+            }
+        }
+
+        double northDeltaDistance = closestPole.y - robotGridCell.y;
+        double eastDeltaDistance = closestPole.x - robotGridCell.x;
+        boolean poleIsNorthOfRobot = northDeltaDistance > 0.0;
+        boolean poleIsEastOfRobot = eastDeltaDistance > 0.0;
+        boolean sameRow = Math.abs(northDeltaDistance) < 1.0;
+        boolean sameColumn = Math.abs(eastDeltaDistance) < 1.0;
+
+        if (!sameRow && !sameColumn)
+        {
+            if (robotGridCell.angle == 0.0 || robotGridCell.angle == 180.0)
+            {
+                // First move is along the column, second move is along the row (so final x is the same as the pole).
+                finalRobotGridCell.x = closestPole.x;
+                finalRobotGridCell.y = closestPole.y + (poleIsNorthOfRobot ? -0.5 : 0.5);
+                finalRobotGridCell.angle = poleIsEastOfRobot ? 90.0: 270.0;
+            }
+            else
+            {
+                // First move is along the row, second move is along the column (so final y is the same as the pole).
+                finalRobotGridCell.x = closestPole.x + (poleIsEastOfRobot ? -0.5 : 0.5);
+                finalRobotGridCell.y = closestPole.y;
+                finalRobotGridCell.angle = poleIsNorthOfRobot ? 0.0 : 180.0;
+            }
+        }
+        else if (sameRow)
+        {
+            // Robot is on the same row as the pole.
+            // Final x is the same as the pole and final y is the same as the robot.
+            finalRobotGridCell.x = closestPole.x;
+            finalRobotGridCell.y = robotGridCell.y;
+            if (robotGridCell.angle == 0.0 || robotGridCell.angle == 180.0)
+            {
+                // Robot heading is north/south, need to turn it to east/west.
+                finalRobotGridCell.angle = poleIsEastOfRobot ? 90.0: 270.0;
+            }
+            else
+            {
+                // Robot heading is east/west, don't have ot turn it.
+                finalRobotGridCell.angle = robotGridCell.angle;
+            }
+        }
+        else
+        {
+            // Robot is on the same column.
+            // Final x is the same as the robot and final y is the same as the pole.
+            finalRobotGridCell.x = robotGridCell.x;
+            finalRobotGridCell.y = closestPole.y;
+            if (robotGridCell.angle == 90.0 || robotGridCell.angle == 270.0)
+            {
+                // Robot heading is east/west, need to turn it to north/south.
+                finalRobotGridCell.angle = poleIsNorthOfRobot ? 0.0 : 180.0;
+            }
+            else
+            {
+                // Robot heading is north/south, don't have to turn it.
+                finalRobotGridCell.angle = robotGridCell.angle;
+            }
+        }
+
+        return finalRobotGridCell;
+    }   //getNearestHighPoleGridCell
+
 }   //class RobotDrive
