@@ -249,7 +249,7 @@ public class TaskCyclingCones
                     targetLocation = null;
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                     robot.robotDrive.purePursuitDrive.start(
-                        event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
                     sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                     break;
@@ -312,7 +312,7 @@ public class TaskCyclingCones
                         // Vision found the cone, drive to it with incremental pure pursuit.
                         robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                         robot.robotDrive.purePursuitDrive.start(
-                            event, null, robot.robotDrive.driveBase.getFieldPosition(), true,
+                            event, robot.robotDrive.driveBase.getFieldPosition(), true,
                                 new TrcPose2D(targetLocation.x, targetLocation.y, 270 - robot.robotDrive.driveBase.getHeading()));
                     }
                     else
@@ -321,7 +321,7 @@ public class TaskCyclingCones
                         // stack location.
                         robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                         robot.robotDrive.purePursuitDrive.start(
-                            event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     }
                     sm.waitForSingleEvent(event, State.PREPARE_PICKUP);//PICKUP_CONE);
@@ -337,7 +337,7 @@ public class TaskCyclingCones
                     TrcEvent event2 = new TrcEvent("event2");
                     event2.setCallback(this::grabberCancelPurePursuit, null);
                     robot.robotDrive.purePursuitDrive.start(
-                            event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     // CodeReview: give it a timeout to prevent hanging.
                     robot.grabber.enableAutoAssist(null, 0, event2, 0);
@@ -355,7 +355,7 @@ public class TaskCyclingCones
                 case DRIVE_TO_POLE:
                     // Turn turret to the right side while driving backwards until intake is right above the pole
                     robot.robotDrive.purePursuitDrive.start(
-                        event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-1, -0.5, -90, FtcAuto.autoChoices));
                     robot.turret.setTarget(
                         FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT?

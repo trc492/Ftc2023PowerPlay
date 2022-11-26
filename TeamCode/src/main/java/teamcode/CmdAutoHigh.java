@@ -189,7 +189,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                         //corresponding cone stack, facing the cone stack
                         robot.robotDrive.purePursuitDrive.start(
-                                event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
@@ -267,7 +267,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                                 RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
                                 RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
                         robot.robotDrive.purePursuitDrive.start(
-                            event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90.0, autoChoices));
                         sm.waitForSingleEvent(event, State.DONE);
                     }
