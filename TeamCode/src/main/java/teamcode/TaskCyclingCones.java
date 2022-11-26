@@ -78,6 +78,7 @@ public class TaskCyclingCones
         START,
         LOOK_FOR_CONE,
         DRIVE_TO_CONE,
+        PREPARE_PICKUP,
         PICKUP_CONE,
         RAISE_ELEVATOR,
         DRIVE_TO_POLE,
@@ -126,7 +127,7 @@ public class TaskCyclingCones
     {
         sm.stop();
         cycleTaskObj.unregisterTask();
-
+        robot.robotDrive.driveBase.releaseExclusiveAccess(moduleName);
         if (onFinishEvent != null)
         {
             onFinishEvent.cancel();
@@ -265,7 +266,7 @@ public class TaskCyclingCones
                             robot.robotDrive.driveBase.stop();
                             targetLocation = new TrcPose2D(
                                 coneInfo.distanceFromCamera.x - 1.0, coneInfo.distanceFromCamera.y - 6.0,
-                                coneInfo.horizontalAngle);
+                                0);//coneInfo.horizontalAngle);
                         }
                     }
                     if (targetLocation != null)
@@ -311,7 +312,8 @@ public class TaskCyclingCones
                         // Vision found the cone, drive to it with incremental pure pursuit.
                         robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                         robot.robotDrive.purePursuitDrive.start(
-                            event, null, robot.robotDrive.driveBase.getFieldPosition(), true, targetLocation);
+                            event, null, robot.robotDrive.driveBase.getFieldPosition(), true,
+                                new TrcPose2D(targetLocation.x, targetLocation.y, 270 - robot.robotDrive.driveBase.getHeading()));
                     }
                     else
                     {
@@ -322,19 +324,32 @@ public class TaskCyclingCones
                             event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     }
-                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
+                    sm.waitForSingleEvent(event, State.PREPARE_PICKUP);//PICKUP_CONE);
                     break;
 
+                case PREPARE_PICKUP:
+                    robot.grabber.open();
+                    robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, null, 0, 9.5, RobotParams.ARM_PICKUP_POS);
+                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
+
+                    break;
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[conesRemaining]);
+                    TrcEvent event2 = new TrcEvent("event2");
+                    event2.setCallback(this::grabberCancelPurePursuit, null);
+                    robot.robotDrive.purePursuitDrive.start(
+                            event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     // CodeReview: give it a timeout to prevent hanging.
-                    robot.grabber.enableAutoAssist(null, 0, event, 2.0);
+                    robot.grabber.enableAutoAssist(null, 0, event2, 0);
                     sm.waitForSingleEvent(event, State.RAISE_ELEVATOR);
                     break;
 
+
+
                 case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
+                    robot.robotDrive.driveBase.stop();
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null, 2.0);
-                    sm.waitForSingleEvent(event, State.DRIVE_TO_POLE);
+                    sm.waitForSingleEvent(event, State.DONE); //DRIVE_TO_POLE);
                     break;
 
                 case DRIVE_TO_POLE:
@@ -420,5 +435,9 @@ public class TaskCyclingCones
             }
         }
     }   //cycleTask
+    //cancels pure pursuit when grabber sees object
+    private void grabberCancelPurePursuit(Object context){
+        robot.robotDrive.purePursuitDrive.cancel();
+    }
 
 }   //class TaskCyclingCones

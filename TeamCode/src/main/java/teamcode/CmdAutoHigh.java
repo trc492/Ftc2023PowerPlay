@@ -58,6 +58,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     // Tells us number cones left on the conestack.
     private int conesRemaining = 5;
     private final boolean debugPoleVision = false;
+    private final boolean debugCycleTask = true;
+
 
     /**
      * Constructor: Create an instance of the object.
@@ -75,7 +77,10 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         event = new TrcEvent(moduleName);
         sm = new TrcStateMachine<>(moduleName);
         robot.robotDrive.purePursuitDrive.setFastModeEnabled(true);
+
         sm.start(debugPoleVision? State.DO_POLE_VISION_SETUP : State.START_DELAY);
+
+
     }   //CmdAutoFarCarousel
 
     //
@@ -129,7 +134,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //
                     // Set robot starting position in the field.
                     //
-                    robot.robotDrive.setAutoStartPosition(autoChoices);
+                    if(debugCycleTask){
+                        robot.robotDrive.driveBase.setFieldPosition(new TrcPose2D(-1 * RobotParams.FULL_TILE_INCHES, -0.5 * RobotParams.FULL_TILE_INCHES, 270));
+                    }
+                    else{
+                        robot.robotDrive.setAutoStartPosition(autoChoices);
+                    }
                     // Call vision at the beginning to figure out the signal position.
                     if (robot.vision != null)
                     {
@@ -167,27 +177,32 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
 
                 case DRIVE_TO_SCORE_POSITION:
-                    //drive to score position
-                    //raise elevator to scoring height
-                    //turn turret to score position
-                    //wait for pure pursuit to finish
-                    // Todo: add option to do center high poles
-                    //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
-                    //corresponding cone stack, facing the cone stack
-                    robot.robotDrive.purePursuitDrive.start(
-                        event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                        robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
-                    sm.waitForSingleEvent(
-                        event,
-                        autoChoices.strategy != FtcAuto.AutoStrategy.PARKING_ONLY?
-                            State.RAISE_ELEVATOR_TO_SCORE: State.PARK);
+                    if(debugCycleTask){
+                        sm.setState(State.DO_CYCLE);
+                    }
+                    else {
+                        //drive to score position
+                        //raise elevator to scoring height
+                        //turn turret to score position
+                        //wait for pure pursuit to finish
+                        // Todo: add option to do center high poles
+                        //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
+                        //corresponding cone stack, facing the cone stack
+                        robot.robotDrive.purePursuitDrive.start(
+                                event, null, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
+                        sm.waitForSingleEvent(
+                                event,
+                                autoChoices.strategy != FtcAuto.AutoStrategy.PARKING_ONLY ?
+                                        State.RAISE_ELEVATOR_TO_SCORE : State.PARK);
+                    }
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
                     robot.arm.setTarget(25.0);
-                    robot.elevator.setTarget(32, true, 1.0, event, null, 0.0);
+                    robot.elevator.setTarget(33, true, 1.0, event, null, 0.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -218,6 +233,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
 
                 case DO_CYCLE:
+
                     //if time >= 26 or no more cones on the conestack, go to park
                     //otherwise call the doCycle method for each cone on the stack
                     //if driveOnly, just drive back and forth to simulate it

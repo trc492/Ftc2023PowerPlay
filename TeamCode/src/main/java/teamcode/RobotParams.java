@@ -51,8 +51,8 @@ public class RobotParams
         public static boolean showVuforiaView = false;
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
-        public static boolean useEasyOpenCV = false;
-        public static boolean showEasyOpenCvView = false;
+        public static boolean useEasyOpenCV = true;
+        public static boolean showEasyOpenCvView = true;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -383,7 +383,7 @@ public class RobotParams
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double ELEVATOR_CONE_GRAB_HEIGHT               = 18.0;
+    static final double ELEVATOR_CONE_GRAB_HEIGHT               = 3;//18.0;
     static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 32.0;
@@ -457,6 +457,7 @@ public class RobotParams
         ARM_MAX_POS                                             // Slot 2: Down position
     };
     //0 is a placeholder so index 1 is 1 cone, 2 is 2 cones, etc.
+    static final double ARM_PICKUP_POS                          = 101.7;
     static final double[] ARM_PICKUP_PRESETS                    = new double[] {
         0.0,
         ARM_SINGLE_CONE_POS,

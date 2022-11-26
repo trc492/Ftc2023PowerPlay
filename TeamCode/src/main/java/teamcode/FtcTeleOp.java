@@ -391,18 +391,6 @@ public class FtcTeleOp extends FtcOpMode
                         // Navigate to right cone stack and the corresponding high pole.
                         robot.startAutoNavigate(RobotParams.AUTONAV_RIGHT_CONESTACK_INDEX);
                     }
-//                        //Cycling code, move elsewhere
-//                        if robot does not have a cone, initiate pickup
-//                        if (!robot.grabber.hasObject())
-//                        {
-//                            robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
-//                        }
-//                        //otherwise robot has a cone, turn turret to the left, raise arm, elevator
-//                        else
-//                        {
-//                            robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
-//                                    0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
-//                        }
                 }
                 break;
 
@@ -490,7 +478,20 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-//                lockOnCone = pressed;
+            //Cycling code
+            //if robot does not have a cone, initiate pickup
+            if (!robot.grabber.hasObject())
+            {
+                robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
+                robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
+            }
+            //otherwise robot has a cone, turn turret to the left, raise arm, elevator, then score cone when that is done
+            else
+            {
+                robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
+                        0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
+            }
+
                 break;
 
         }
@@ -556,10 +557,6 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null &&
                     robot.robotDrive.gridDrive != null)
                 {
-//                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
-//                            robot.robotDrive.getAutoTargetCell(
-//                                    RobotParams.SUBSTATION_RED_LEFT, FtcAuto.autoChoices));
-//                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
                     robot.turret.setTarget(
                        RobotParams.TURRET_LEFT, 1.0, null, null, 0.0,
                        RobotParams.ELEVATOR_SCORING_HEIGHT, 33.0);
@@ -634,9 +631,10 @@ public class FtcTeleOp extends FtcOpMode
 //        return coneAngle != null? coneAngle : 0.0;
 //    }
 //
-//    private void scoreCone(Object context)
-//    {
-//        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
-//    }
+    private void scoreCone(Object context)
+    {
+        robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
+        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
+    }
 
 }   //class FtcTeleOp
