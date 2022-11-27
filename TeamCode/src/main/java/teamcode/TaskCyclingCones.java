@@ -313,7 +313,7 @@ public class TaskCyclingCones
                         robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                         robot.robotDrive.purePursuitDrive.start(
                             event, robot.robotDrive.driveBase.getFieldPosition(), true,
-                                new TrcPose2D(targetLocation.x, targetLocation.y, 270 - robot.robotDrive.driveBase.getHeading()));
+                                new TrcPose2D(targetLocation.x, Math.max(5, targetLocation.y-5), 270 - robot.robotDrive.driveBase.getHeading()));
                     }
                     else
                     {
@@ -329,27 +329,28 @@ public class TaskCyclingCones
 
                 case PREPARE_PICKUP:
                     robot.grabber.open();
-                    robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, null, 0, 9.5, RobotParams.ARM_PICKUP_POS);
-                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
+                    robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, null, 0, 9.0, RobotParams.ARM_PICKUP_POS);
+                    sm.waitForSingleEvent(event, State.PICKUP_CONE);
 
                     break;
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
                     TrcEvent event2 = new TrcEvent("event2");
                     event2.setCallback(this::grabberCancelPurePursuit, null);
+                    robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.2);
+                    robot.grabber.cancelAutoAssist();
                     robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            null, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     // CodeReview: give it a timeout to prevent hanging.
                     robot.grabber.enableAutoAssist(null, 0, event2, 0);
-                    sm.waitForSingleEvent(event, State.RAISE_ELEVATOR);
+                    sm.waitForSingleEvent(event2, State.RAISE_ELEVATOR);
                     break;
 
-
-
                 case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
+                    robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     robot.robotDrive.driveBase.stop();
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null, 2.0);
-                    sm.waitForSingleEvent(event, State.DONE); //DRIVE_TO_POLE);
+                    sm.waitForSingleEvent(event, State.DRIVE_TO_POLE);
                     break;
 
                 case DRIVE_TO_POLE:
