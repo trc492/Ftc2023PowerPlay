@@ -22,6 +22,7 @@
 
 package teamcode;
 
+import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -137,11 +138,11 @@ public class EocvVision extends FtcEocvDetector
             RobotParams.FRONTCAM_FX, RobotParams.FRONTCAM_FY, RobotParams.FRONTCAM_CX, RobotParams.FRONTCAM_CY,
             tracer);
         redConePipeline = new FtcEocvColorBlobPipeline(
-            "redConePipeline", false, colorThresholdsRedCone, redConeFilterContourParams, tracer);
+            "redConePipeline", Imgproc.COLOR_RGBA2RGB, colorThresholdsRedCone, redConeFilterContourParams, tracer);
         blueConePipeline = new FtcEocvColorBlobPipeline(
-            "blueConePipeline", false, colorThresholdsBlueCone, blueConeFilterContourParams, tracer);
+            "blueConePipeline", Imgproc.COLOR_RGBA2RGB, colorThresholdsBlueCone, blueConeFilterContourParams, tracer);
         yellowPolePipeline = new FtcEocvColorBlobPipeline(
-            "yellowPolePipeline", false, colorThresholdsYellowPole, poleFilterContourParams, tracer);
+            "yellowPolePipeline", Imgproc.COLOR_RGBA2RGB, colorThresholdsYellowPole, poleFilterContourParams, tracer);
         // Set default pipeline and enable it.
         if (instanceName.equals("frontEocvVision"))
         {
