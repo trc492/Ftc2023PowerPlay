@@ -457,7 +457,7 @@ public class RobotParams
         ARM_MAX_POS                                             // Slot 2: Down position
     };
     //0 is a placeholder so index 1 is 1 cone, 2 is 2 cones, etc.
-    static final double ARM_PICKUP_POS                          = 101.7;
+    static final double ARM_PICKUP_POS                          = 100;
     static final double[] ARM_PICKUP_PRESETS                    = new double[] {
         0.0,
         ARM_SINGLE_CONE_POS,

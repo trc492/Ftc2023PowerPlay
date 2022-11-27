@@ -23,6 +23,7 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcAnalogSensorTrigger;
+import TrcCommonLib.trclib.TrcEvent;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcCommonLib.trclib.TrcServoGrabber;
 import TrcFtcLib.ftclib.FtcServo;
@@ -94,7 +95,7 @@ public class Grabber
 
             if (inProximity)
             {
-                grabber.close();
+                grabber.closeOnTrigger();
             }
         }
     }   //analogTriggerEvent
