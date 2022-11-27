@@ -24,7 +24,6 @@ package teamcode;
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
-import TrcCommonLib.trclib.TrcNotifier;
 import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
@@ -98,7 +97,6 @@ public class TaskCyclingCones
     private CycleType cycleType = CycleType.AUTO_FULL_CYCLE;
     private VisionType visionType = VisionType.CONE_VISION;
     private TrcEvent onFinishEvent = null;
-    private TrcNotifier.Receiver onFinishCallback = null;
     private int conesRemaining;
     private Double visionExpireTime = null;
     //location of the cone or pole relative to the robot
@@ -128,16 +126,11 @@ public class TaskCyclingCones
         sm.stop();
         cycleTaskObj.unregisterTask();
         robot.robotDrive.driveBase.releaseExclusiveAccess(moduleName);
+
         if (onFinishEvent != null)
         {
             onFinishEvent.cancel();
             onFinishEvent = null;
-        }
-
-        if (onFinishCallback != null)
-        {
-            onFinishCallback.notify(null);
-            onFinishCallback = null;
         }
     }   //cancel
 
@@ -150,7 +143,7 @@ public class TaskCyclingCones
      */
     public void doFullAutoCycle(VisionType visionType, int conesRemaining, TrcEvent event)
     {
-        startCycling(CycleType.AUTO_FULL_CYCLE, visionType, conesRemaining, event, null);
+        startCycling(CycleType.AUTO_FULL_CYCLE, visionType, conesRemaining, event);
     }
 
     //doTeleopPickup - pickup cone in the triangle during teleop
@@ -168,7 +161,7 @@ public class TaskCyclingCones
     public void doTeleopPickup(VisionType visionType, int conesRemaining, TrcEvent event)
     {
         robot.robotDrive.driveBase.acquireExclusiveAccess("CycleTask");
-        startCycling(CycleType.PICKUP_ONLY_TELEOP, visionType, conesRemaining, event, null);
+        startCycling(CycleType.PICKUP_ONLY_TELEOP, visionType, conesRemaining, event);
     }
 
     //scorePreload - scores the preload cone onto the high pole in auto
@@ -184,17 +177,16 @@ public class TaskCyclingCones
      */
     public void scoreCone(VisionType visionType, TrcEvent event)
     {
-        startCycling(CycleType.SCORING_ONLY, visionType, 1, event, null);
+        startCycling(CycleType.SCORING_ONLY, visionType, 1, event);
     }
     //prepare for cycling, start sm
     public void startCycling(
-        CycleType cycleType, VisionType visionType, int conesRemaining, TrcEvent event, TrcNotifier.Receiver callback)
+        CycleType cycleType, VisionType visionType, int conesRemaining, TrcEvent event)
     {
         this.cycleType = cycleType;
         this.visionType = visionType;
         this.conesRemaining = conesRemaining;
         this.onFinishEvent = event;
-        this.onFinishCallback = callback;
         cycleTaskObj.registerTask(TrcTaskMgr.TaskType.SLOW_POSTPERIODIC_TASK);
         switch(cycleType){
             case AUTO_FULL_CYCLE:
@@ -329,10 +321,10 @@ public class TaskCyclingCones
 
                 case PREPARE_PICKUP:
                     robot.grabber.open();
-                    robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, null, 0, 9.0, RobotParams.ARM_PICKUP_POS);
-                    sm.waitForSingleEvent(event, State.PICKUP_CONE);
-
+                    robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, 0, 9.5, RobotParams.ARM_PICKUP_POS);
+                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
                     break;
+
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
                     TrcEvent event2 = new TrcEvent("event2");
                     event2.setCallback(this::grabberCancelPurePursuit, null);
@@ -349,8 +341,8 @@ public class TaskCyclingCones
                 case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     robot.robotDrive.driveBase.stop();
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null, 2.0);
-                    sm.waitForSingleEvent(event, State.DRIVE_TO_POLE);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, 2.0);
+                    sm.waitForSingleEvent(event, State.DONE); //DRIVE_TO_POLE);
                     break;
 
                 case DRIVE_TO_POLE:
@@ -404,7 +396,7 @@ public class TaskCyclingCones
 
                 case ALIGN_TO_POLE:
                     // Call vision to detect the junction pole
-                    robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.75, event, null, 0.0, null, null);
+                    robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.75, event, 0.0, null, null);
                     sm.waitForSingleEvent(event, State.DONE);//SCORE);
                     break;
 
@@ -414,12 +406,12 @@ public class TaskCyclingCones
                     break;
 
                 case CLEAR_POLE:
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, null);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event);
                     sm.waitForSingleEvent(event, State.DONE);
                     break;
                 case PREP_FOR_TRAVEL:
                     robot.turret.setTarget(
-                            RobotParams.TURRET_FRONT, 1.0, event, null, 0.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                            RobotParams.TURRET_FRONT, 1.0, event, 0.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
                     sm.waitForSingleEvent(event, State.DONE);
                     break;
                 default:

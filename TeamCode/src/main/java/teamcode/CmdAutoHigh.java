@@ -202,12 +202,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case RAISE_ELEVATOR_TO_SCORE:
                     robot.arm.setTarget(25.0);
-                    robot.elevator.setTarget(33, true, 1.0, event, null, 0.0);
+                    robot.elevator.setTarget(33, true, 1.0, event, 0.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
                 case DO_POLE_VISION_SETUP:
-                    robot.turret.setTarget(2.0, 93, 0.75, event, null, 2.0, 32.0, 30.0);
+                    robot.turret.setTarget(2.0, 93, 0.75, event, 2.0, 32.0, 30.0);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
 
@@ -215,7 +215,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
-                        0.75, event, null, 2.0, null, null);
+                        0.75, event, 2.0, null, null);
                     sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
                     break;
                 case LOWER_ELEVATOR:
@@ -259,7 +259,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     else
                     {
                         robot.turret.setTarget(
-                            RobotParams.TURRET_BACK, 1.0, null, null, 0.0,
+                            RobotParams.TURRET_BACK, 1.0, null, 0.0,
                             RobotParams.ELEVATOR_MIN_POS, RobotParams.ARM_MIN_POS);
                         // CodeReview: check if there are any obstacles in the path.
                         TrcPose2D parkPos =

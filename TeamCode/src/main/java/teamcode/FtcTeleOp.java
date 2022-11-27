@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.util.Locale;
 
 import TrcCommonLib.trclib.TrcDriveBase;
+import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcGamepad;
@@ -478,22 +479,23 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-            //Cycling code
-            //if robot does not have a cone, initiate pickup
-            if (!robot.grabber.hasObject())
-            {
-                robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-                robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
-            }
-            //otherwise robot has a cone, turn turret to the left, raise arm, elevator, then score cone when that is done
-            else
-            {
-                robot.turret.setTarget(0, RobotParams.TURRET_LEFT, 0.9, null, this::scoreCone,
-                        0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
-            }
-
+                //Cycling code
+                //if robot does not have a cone, initiate pickup
+                if (!robot.grabber.hasObject())
+                {
+                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
+                    robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
+                }
+                //otherwise robot has a cone, turn turret to the left, raise arm, elevator, then score cone when that is done
+                else
+                {
+                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
+                    callbackEvent.setCallback(this::scoreCone, null);
+                    robot.turret.setTarget(
+                        0, RobotParams.TURRET_LEFT, 0.9, callbackEvent, 0,
+                        RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
+                }
                 break;
-
         }
     }   //driverButtonEvent
 
@@ -546,7 +548,7 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
 //                    robot.arm.setTarget(RobotParams.ARM_MAX_POS);
                     robot.turret.setTarget(
-                        RobotParams.TURRET_FRONT, 1.0, null, null, 0.0,
+                        RobotParams.TURRET_FRONT, 1.0, null, 0.0,
                         RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, RobotParams.ARM_MAX_POS);
 //                    robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, true, 1.0, null, null, 0.0);
                 }
@@ -558,7 +560,7 @@ public class FtcTeleOp extends FtcOpMode
                     robot.robotDrive.gridDrive != null)
                 {
                     robot.turret.setTarget(
-                       RobotParams.TURRET_LEFT, 1.0, null, null, 0.0,
+                       RobotParams.TURRET_LEFT, 1.0, null, 0.0,
                        RobotParams.ELEVATOR_SCORING_HEIGHT, 33.0);
                 }
                 break;
