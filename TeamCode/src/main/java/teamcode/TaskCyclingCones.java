@@ -322,7 +322,7 @@ public class TaskCyclingCones
                 case PREPARE_PICKUP:
                     robot.grabber.open();
                     robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, 0, 9.5, RobotParams.ARM_PICKUP_POS);
-                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
+                    sm.waitForSingleEvent(event, State.PICKUP_CONE);
                     break;
 
                 case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
