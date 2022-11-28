@@ -81,6 +81,7 @@ public class FtcTeleOp extends FtcOpMode
     private boolean manualOverride = false;
     private boolean lockOnPole = false;
     private boolean autoNavigate = false;
+    private boolean autoAssistGrabberOn = false;
 //    private boolean atScoringLocation = false;
 //    private boolean lockOnCone = false;
 //    private TrcPidController coneAlignPidCtrl;
@@ -528,11 +529,23 @@ public class FtcTeleOp extends FtcOpMode
                     }
                     else if (pressed)
                     {
-                        robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
-                    }
-                    else
-                    {
-                        robot.grabber.cancelAutoAssist();
+                        autoAssistGrabberOn = !autoAssistGrabberOn;
+                        if (autoAssistGrabberOn)
+                        {
+                            robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
+                            if (robot.blinkin != null)
+                            {
+                                robot.blinkin.setPatternState(Vision.AUTOASSIST_GRABBER_ON, true);
+                            }
+                        }
+                        else
+                        {
+                            robot.grabber.cancelAutoAssist();
+                            if (robot.blinkin != null)
+                            {
+                                robot.blinkin.setPatternState(Vision.AUTOASSIST_GRABBER_ON, false);
+                            }
+                        }
                     }
                 }
                 break;

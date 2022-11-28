@@ -286,10 +286,10 @@ public class RobotDrive
         robotGridCell = gridDrive.adjustGridCellCenter(robotGridCell);
         double minDistance = Double.MAX_VALUE;
         // Initialize closestPole to something so the compiler won't complain about NullPointerException.
-        TrcPose2D closestPole = RobotParams.AUTONAV_HIGHPOLE[0];
+        TrcPose2D closestPole = RobotParams.AUTONAV_HIGHPOLES[0];
         TrcPose2D finalRobotGridCell = new TrcPose2D();
-
-        for(TrcPose2D pole : RobotParams.AUTONAV_HIGHPOLE)
+        // Find the closest high pole (the pole that has smallest distance from the robot).
+        for(TrcPose2D pole : RobotParams.AUTONAV_HIGHPOLES)
         {
             double distance = Math.pow(robotGridCell.x - pole.x, 2) + Math.pow(robotGridCell.y - pole.y, 2);
             if(distance < minDistance)
@@ -298,7 +298,9 @@ public class RobotDrive
                 minDistance = distance;
             }
         }
-
+        // We can't just return the pole's coordinate because the robot will be sitting on top of it.
+        // We need to adjust the pole coordinate to one of its sides: north side, east side, south side, west side.
+        // We will pick the side that's closest to the current robot location and most convenient for its heading.
         double northDeltaDistance = closestPole.y - robotGridCell.y;
         double eastDeltaDistance = closestPole.x - robotGridCell.x;
         boolean poleIsNorthOfRobot = northDeltaDistance > 0.0;
@@ -308,16 +310,21 @@ public class RobotDrive
 
         if (!sameRow && !sameColumn)
         {
+            // Robot must travel in both X and Y directions (two movement segments) to get to the pole.
             if (robotGridCell.angle == 0.0 || robotGridCell.angle == 180.0)
             {
-                // First move is along the column, second move is along the row (so final x is the same as the pole).
+                // Robot is heading north/south.
+                // First move is along the column, second move is along the row.
+                // Final x is the same as the pole, final y is north or south side of the pole.
                 finalRobotGridCell.x = closestPole.x;
                 finalRobotGridCell.y = closestPole.y + (poleIsNorthOfRobot ? -0.5 : 0.5);
-                finalRobotGridCell.angle = poleIsEastOfRobot ? 90.0: 270.0;
+                finalRobotGridCell.angle = poleIsEastOfRobot ? 90.0 : 270.0;
             }
             else
             {
-                // First move is along the row, second move is along the column (so final y is the same as the pole).
+                // Robot is heading east/west.
+                // First move is along the row, second move is along the column.
+                // Final x is east or west side of the pole, final y is the same as the pole.
                 finalRobotGridCell.x = closestPole.x + (poleIsEastOfRobot ? -0.5 : 0.5);
                 finalRobotGridCell.y = closestPole.y;
                 finalRobotGridCell.angle = poleIsNorthOfRobot ? 0.0 : 180.0;
@@ -325,14 +332,14 @@ public class RobotDrive
         }
         else if (sameRow)
         {
-            // Robot is on the same row as the pole.
-            // Final x is the same as the pole and final y is the same as the robot.
+            // Robot is on the same row as the pole, so we just move along the row to get to the pole.
+            // Final x is the same as the pole, final y is the same as the robot.
             finalRobotGridCell.x = closestPole.x;
             finalRobotGridCell.y = robotGridCell.y;
             if (robotGridCell.angle == 0.0 || robotGridCell.angle == 180.0)
             {
                 // Robot heading is north/south, need to turn it to east/west.
-                finalRobotGridCell.angle = poleIsEastOfRobot ? 90.0: 270.0;
+                finalRobotGridCell.angle = poleIsEastOfRobot ? 90.0 : 270.0;
             }
             else
             {
@@ -342,8 +349,8 @@ public class RobotDrive
         }
         else
         {
-            // Robot is on the same column.
-            // Final x is the same as the robot and final y is the same as the pole.
+            // Robot is on the same column as the pole, so we just move along the column to get to the pole.
+            // Final x is the same as the robot, final y is the same as the pole.
             finalRobotGridCell.x = robotGridCell.x;
             finalRobotGridCell.y = closestPole.y;
             if (robotGridCell.angle == 90.0 || robotGridCell.angle == 270.0)

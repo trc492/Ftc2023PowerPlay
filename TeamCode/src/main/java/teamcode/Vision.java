@@ -60,6 +60,7 @@ public class Vision
     public static final String DRIVE_ORIENTATION_FIELD = "FieldMode";
     public static final String DRIVE_ORIENTATION_ROBOT = "RobotMode";
     public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
+    public static final String AUTOASSIST_GRABBER_ON = "AutoAssistGrabberOn";
 
     private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
         {   // Sorted in increasing priorities.
@@ -76,6 +77,7 @@ public class Vision
             new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
             new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
             new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
+            new TrcRevBlinkin.Pattern(AUTOASSIST_GRABBER_ON, TrcRevBlinkin.RevLedPattern.FixedStrobeRed)
         };
 
     private final Robot robot;

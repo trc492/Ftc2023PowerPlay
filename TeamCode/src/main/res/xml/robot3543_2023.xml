@@ -45,5 +45,6 @@ SOFTWARE.
         </LynxModule>
     </LynxUsbDevice>
     <Webcam name="Webcam 1" serialNumber="B580F950" />
+    <!--<Webcam name="Webcam 1" serialNumber="A8784D40" />-->
     <Webcam name="Webcam 2" serialNumber="816BAF60" />
 </Robot>

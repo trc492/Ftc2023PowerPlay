@@ -190,7 +190,7 @@ public class RobotParams
     public static final int AUTONAV_LEFT_CONESTACK_INDEX        = 2;
     public static final int AUTONAV_RIGHT_CONESTACK_INDEX       = 3;
 
-    public static final TrcPose2D[] AUTONAV_HIGHPOLE = {
+    public static final TrcPose2D[] AUTONAV_HIGHPOLES = {
         HIGHPOLE_SUBSTATION_RED,
         HIGHPOLE_SUBSTATION_BLUE,
         HIGHPOLE_AUDIENCE,
