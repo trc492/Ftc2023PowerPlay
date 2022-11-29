@@ -89,7 +89,7 @@ public class Turret
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
-        pidTurret.setMsgTracer(robot.globalTracer);
+        pidTurret.setMsgTracer(robot.globalTracer, true);
         delayTimer = new TrcTimer(moduleName);
         callbackEvent1 = new TrcEvent(moduleName + ".callback1");
         callbackEvent2 = new TrcEvent(moduleName + ".callback2");
