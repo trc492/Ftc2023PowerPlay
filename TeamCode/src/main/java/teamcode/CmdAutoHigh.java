@@ -144,9 +144,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     if (robot.vision != null)
                     {
                         signalPos = robot.vision.getLastSignal();
-                        msg = "Signal found at position " + signalPos;
-                        robot.globalTracer.traceInfo(moduleName, msg);
-                        robot.speak(msg);
+                        if (signalPos > 0)
+                        {
+                            msg = "Signal found at position " + signalPos;
+                            robot.globalTracer.traceInfo(moduleName, msg);
+                            robot.speak(msg);
+                        }
                     }
 
                     if (signalPos == 0)

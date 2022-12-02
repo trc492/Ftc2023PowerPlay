@@ -134,8 +134,8 @@ public class Vision
             // EOCV sometimes timed out on opening the camera. The default timeout was 2 seconds. It seems setting
             // it to 3 seconds would do wonder here.
             robot.globalTracer.traceInfo("Vision", "Starting EocvVision...");
-            frontWebcam.setMillisecondsPermissionTimeout(3000);
-            elevatorWebcam.setMillisecondsPermissionTimeout(3000);
+            frontWebcam.setMillisecondsPermissionTimeout(RobotParams.FRONTCAM_PERMISSION_TIMEOUT);
+            elevatorWebcam.setMillisecondsPermissionTimeout(RobotParams.ELEVATORCAM_PERMISSION_TIMEOUT);
 
             frontEocvVision = new EocvVision(
                 "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,

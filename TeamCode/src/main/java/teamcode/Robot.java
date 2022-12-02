@@ -178,6 +178,7 @@ public class Robot
                         .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
                         .setPidParams(new TrcPidController.PidParameters(
                             RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
+                        .resetPositionOnLowerLimit(true)
 //                        .setStallProtectionParams(
 //                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
 //                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)

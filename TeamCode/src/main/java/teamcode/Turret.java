@@ -23,8 +23,13 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcEvent;
+import TrcCommonLib.trclib.TrcExclusiveSubsystem;
+import TrcCommonLib.trclib.TrcOwnershipMgr;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
+import TrcCommonLib.trclib.TrcRobot;
+import TrcCommonLib.trclib.TrcStateMachine;
+import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcTimer;
 import TrcFtcLib.ftclib.FtcDigitalInput;
 import TrcFtcLib.ftclib.FtcMotorActuator;
@@ -35,35 +40,43 @@ import TrcFtcLib.ftclib.FtcMotorActuator;
  * the overriding methods of setPower and setTarget that will make sure the intake is raised above "safe level"
  * before turning the turret.
  */
-public class Turret
+public class Turret implements TrcExclusiveSubsystem
 {
+    private static final boolean debugEnabled = false;
+
+    private enum State
+    {
+        START,
+        CHECK_SAFETY,
+        TURN_TURRET,
+        DO_POST_OP,
+        DONE
+    }   //enum State
+
     private static class ActionParams
     {
+        double delay;
         double target;
         double powerLimit;
         TrcEvent event;
         double timeout;
         Double elevatorTarget;
         Double armTarget;
+        boolean isSetPower;
     }   //class ActionParams
 
     private static final String moduleName = "Turret";
+    private final ActionParams actionParams = new ActionParams();
     private final Robot robot;
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcPidActuator pidTurret;
-    private final TrcTimer delayTimer;
-    private final TrcEvent callbackEvent1;
-    private final TrcEvent callbackEvent2;
-    private double turretTarget = 0.0;
-    private double turretPowerLimit = 1.0;
-    private TrcEvent turretEvent = null;
-    private double turretTimeout = 0.0;
-    private Double turretElevatorTarget = null;
-    private Double turretArmTarget = null;
-    private boolean armLevelSafe = false;
-    private boolean elevatorLevelSafe = false;
+    private final TrcEvent armEvent;
+    private final TrcEvent elevatorEvent;
+    private final TrcEvent event;
+    private final TrcTimer timer;
+    private final TrcStateMachine<State> sm;
+    private final TrcTaskMgr.TaskObject turretTaskObj;
     private double prevTurretPower = 0.0;
-    private final ActionParams actionParams = new ActionParams();
 
     public Turret(Robot robot)
     {
@@ -82,19 +95,17 @@ public class Turret
             .setPidParams(new TrcPidController.PidParameters(
                 RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
                 RobotParams.TURRET_TOLERANCE))
-//            .setStallProtectionParams(
-//                RobotParams.TURRET_STALL_MIN_POWER, RobotParams.TURRET_STALL_TOLERANCE,
-//                RobotParams.TURRET_STALL_TIMEOUT, RobotParams.TURRET_RESET_TIMEOUT)
             .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
-        pidTurret.setMsgTracer(robot.globalTracer, true);
-        delayTimer = new TrcTimer(moduleName);
-        callbackEvent1 = new TrcEvent(moduleName + ".callback1");
-        callbackEvent2 = new TrcEvent(moduleName + ".callback2");
-
-        //pidTurret.getPidController().setOutputLimit(0.5);
+        pidTurret.setMsgTracer(robot.globalTracer);
+        armEvent = new TrcEvent(moduleName + ".armEvent");
+        elevatorEvent = new TrcEvent(moduleName + ".elevatorEvent");
+        event = new TrcEvent(moduleName);
+        timer = new TrcTimer(moduleName);
+        sm = new TrcStateMachine<>(moduleName);
+        turretTaskObj = TrcTaskMgr.createTask("turretTask", this::turretTask);
     }   //Turret
 
     /**
@@ -149,8 +160,8 @@ public class Turret
     public void zeroCalibrate()
     {
         robot.elevator.zeroCalibrate(RobotParams.ELEVATOR_CAL_POWER);
-        callbackEvent1.setCallback(this::armZeroCalDoneCallback, null);
-        robot.arm.zeroCalibrate(RobotParams.ARM_CAL_POWER, callbackEvent1);
+        event.setCallback(this::armZeroCalDoneCallback, null);
+        robot.arm.zeroCalibrate(RobotParams.ARM_CAL_POWER, event);
     }   //zeroCalibrate
 
     /**
@@ -162,7 +173,6 @@ public class Turret
     private void armZeroCalDoneCallback(Object context)
     {
         double calPower = Math.abs(RobotParams.TURRET_CAL_POWER);
-
         pidTurret.zeroCalibrate(calDirectionSwitch.isActive()? calPower: -calPower);
     }   //armZeroCalDoneCallback
 
@@ -196,15 +206,81 @@ public class Turret
     }   //presetPositionDown
 
     /**
-     * This method is called after the delay timer has expired to perform the turret action.
+     * This method check if a turret operation is in progress.
      *
-     * @param context not used.
+     * @return true if a turret operation is in progress, false otherwise.
      */
-    private void performAction(Object context)
+    public boolean isActive()
     {
-        setTarget(actionParams.target, actionParams.powerLimit, actionParams.event, actionParams.timeout,
-                  actionParams.elevatorTarget, actionParams.armTarget);
-    }   //performAction
+        return sm.isEnabled();
+    }   //isActive
+
+    /**
+     * This method cancels a turret operation if one is in progress.
+     */
+    public void cancel()
+    {
+        if (sm.isEnabled())
+        {
+            setTaskEnabled(false);
+            pidTurret.cancel();
+            robot.arm.releaseExclusiveAccess(moduleName);
+            robot.elevator.releaseExclusiveAccess(moduleName);
+        }
+    }   //cancel
+
+    /**
+     * This method enables/disables the turret task.
+     *
+     * @param enabled specifies true to enable, false to disable.
+     */
+    private void setTaskEnabled(boolean enabled)
+    {
+        boolean active = sm.isEnabled();
+
+        if (!active && enabled)
+        {
+            sm.start(State.START);
+            turretTaskObj.registerTask(TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK);
+        }
+        else if (active && !enabled)
+        {
+            turretTaskObj.unregisterTask();
+            sm.stop();
+        }
+    }   //setTaskEnabled
+
+    /**
+     * This method sets the turret target position. It first checks if it's safe for the turret to turn without
+     * hitting anything. If it's not safe, it will first raise the arm above the "safe level" before setting the
+     * target for the turret.
+     *
+     * @param owner specifies the owner ID to check if the caller has ownership of the subsystem.
+     * @param delay specifies the delay in seconds before performing the action.
+     * @param target specifies the target position of the turret in degrees.
+     * @param powerLimit specifies the maximum power the turret will turn.
+     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
+     * @param timeout specifies timeout in seconds for the operation.
+     * @param elevatorTarget specifies optionally the elevator target, can be null if no additional elevator movement.
+     * @param armTarget specifies optionally the arm target, can be null if no additional arm movement.
+     */
+    public void setTarget(
+        String owner, double delay, double target, double powerLimit, TrcEvent event, double timeout,
+        Double elevatorTarget, Double armTarget)
+    {
+        if (validateOwnership(owner))
+        {
+            actionParams.delay = delay;
+            actionParams.target = target;
+            actionParams.powerLimit = powerLimit;
+            actionParams.event = event;
+            actionParams.timeout = timeout;
+            actionParams.elevatorTarget = elevatorTarget;
+            actionParams.armTarget = armTarget;
+            actionParams.isSetPower = false;
+            setTaskEnabled(true);
+        }
+    }   //setTarget
 
     /**
      * This method sets the turret target position. It first checks if it's safe for the turret to turn without
@@ -223,20 +299,7 @@ public class Turret
         double delay, double target, double powerLimit, TrcEvent event, double timeout,
         Double elevatorTarget, Double armTarget)
     {
-        if (delay > 0.0)
-        {
-            actionParams.target = target;
-            actionParams.powerLimit = powerLimit;
-            actionParams.event = event;
-            actionParams.timeout = timeout;
-            actionParams.elevatorTarget = elevatorTarget;
-            actionParams.armTarget = armTarget;
-            delayTimer.set(delay, this::performAction);
-        }
-        else
-        {
-            setTarget(target, powerLimit, event, timeout, elevatorTarget, armTarget);
-        }
+        setTarget(null, delay, target, powerLimit, event, timeout, elevatorTarget, armTarget);
     }   //setTarget
 
     /**
@@ -254,43 +317,36 @@ public class Turret
     public void setTarget(
         double target, double powerLimit, TrcEvent event, double timeout, Double elevatorTarget, Double armTarget)
     {
-        double armPos = robot.arm.getPosition();
-        double elevatorPos = robot.elevator.getPosition();
+        setTarget(null, 0.0, target, powerLimit, event, timeout, elevatorTarget, armTarget);
+    }   //setTarget
 
-        armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
-        elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
-        if (!turnTurretToPos(target, powerLimit, event, timeout, elevatorTarget, armTarget))
-        {
-            // Either the arm or the elevator are not at safe level, we need to raise them first before the turn.
-            turretTarget = target;
-            turretPowerLimit = powerLimit;
-            turretEvent = event;
-            turretTimeout = timeout;
-            turretElevatorTarget = elevatorTarget;
-            turretArmTarget = armTarget;
+    /**
+     * This method sets the turret target position. It first checks if it's safe for the turret to turn without
+     * hitting anything. If it's not safe, it will first raise the arm above the "safe level" before setting the
+     * target for the turret.
+     *
+     * @param target specifies the target position of the turret in degrees.
+     * @param powerLimit specifies the maximum power the turret will turn.
+     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
+     * @param timeout specifies timeout in seconds for the operation.
+     */
+    public void setTarget(double target, double powerLimit, TrcEvent event, double timeout)
+    {
+        setTarget(null, 0.0, target, powerLimit, event, timeout, null, null);
+    }   //setTarget
 
-            if (!armLevelSafe)
-            {
-                // Acquiring arm ownership will prevent teleop from interfering with our arm movement.
-                if (robot.arm.acquireExclusiveAccess(moduleName))
-                {
-                    callbackEvent1.setCallback(this::armRaiseDoneCallbackWithTurretTurn, null);
-                    robot.arm.setTarget(
-                        moduleName, RobotParams.ARM_POS_FOR_TURRET_TURN, false, 1.0, callbackEvent1, 0.0);
-                }
-            }
-
-            if (!elevatorLevelSafe)
-            {
-                // Acquiring elevator ownership will prevent teleop from interfering with our elevator movement.
-                if (robot.elevator.acquireExclusiveAccess(moduleName))
-                {
-                    callbackEvent2.setCallback(this::elevatorRaiseDoneCallbackWithTurretTurn, null);
-                    robot.elevator.setTarget(
-                        moduleName, RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, true, 1.0, callbackEvent2, 0.0);
-                }
-            }
-        }
+    /**
+     * This method sets the turret target position. It first checks if it's safe for the turret to turn without
+     * hitting anything. If it's not safe, it will first raise the arm above the "safe level" before setting the
+     * target for the turret.
+     *
+     * @param target specifies the target position of the turret in degrees.
+     * @param powerLimit specifies the maximum power the turret will turn.
+     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
+     */
+    public void setTarget(double target, double powerLimit, TrcEvent event)
+    {
+        setTarget(null, 0.0, target, powerLimit, event, 0.0, null, null);
     }   //setTarget
 
     /**
@@ -303,7 +359,7 @@ public class Turret
      */
     public void setTarget(double target, double powerLimit)
     {
-        setTarget(target, powerLimit, null, 0.0, null, null);
+        setTarget(null, 0.0, target, powerLimit, null, 0.0, null, null);
     }   //setTarget
 
     /**
@@ -315,8 +371,55 @@ public class Turret
      */
     public void setTarget(double target)
     {
-        setTarget(target, 1.0, null, 0.0, null, null);
+        setTarget(null, 0.0, target, 1.0, null, 0.0, null, null);
     }   //setTarget
+
+    /**
+     * This method sets the turret in motion with the given power but it will first check if it's safe to turn the
+     * turret. If not, it will instead raise the arm to above the safe level. Since setPower is generally called by
+     * TeleOp code, it will not do the actual setPower after raising the arm because by the time the arm is raised
+     * the gamepad control may have a different turret power value. Therefore, the TeleOp code will call again with
+     * the new power value and this time it is safe to turn the turret.
+     *
+     * @param owner specifies the owner ID to check if the caller has ownership of the subsystem.
+     * @param power specifies the power value to turn the turret.
+     * @param usePid specifies true to use PID control, false otherwise.
+     */
+    public void setPower(String owner, double power, boolean usePid)
+    {
+        if (validateOwnership(owner))
+        {
+            if (power != prevTurretPower)
+            {
+                if (power == 0.0)
+                {
+                    cancel();
+                    pidTurret.setPidPower(power, false);
+                    prevTurretPower = power;
+                }
+                else if (!isActive())
+                {
+                    if (isArmLevelSafe() && isElevatorLevelSafe())
+                    {
+                        if (usePid)
+                        {
+                            pidTurret.setPidPower(power);
+                        }
+                        else
+                        {
+                            pidTurret.setPower(power);
+                        }
+                        prevTurretPower = power;
+                    }
+                    else
+                    {
+                        actionParams.isSetPower = true;
+                        setTaskEnabled(true);
+                    }
+                }
+            }
+        }
+    }   //setPower
 
     /**
      * This method sets the turret in motion with the given power but it will first check if it's safe to turn the
@@ -330,44 +433,7 @@ public class Turret
      */
     public void setPower(double power, boolean usePid)
     {
-        if (power != prevTurretPower)
-        {
-            if (power == 0.0)
-            {
-                prevTurretPower = power;
-                pidTurret.setPidPower(power, false);
-            }
-            else
-            {
-                double armPos = robot.arm.getPosition();
-                double elevatorPos = robot.elevator.getPosition();
-
-                armLevelSafe = armPos <= RobotParams.ARM_MIN_POS_FOR_TURRET;
-                elevatorLevelSafe = elevatorPos >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
-                if (!turnTurretWithPower(power, usePid))
-                {
-                    if (!armLevelSafe)
-                    {
-                        if (robot.arm.acquireExclusiveAccess(moduleName))
-                        {
-                            callbackEvent1.setCallback(this::armRaiseDoneCallback, null);
-                            robot.arm.setTarget(
-                                moduleName, RobotParams.ARM_POS_FOR_TURRET_TURN, false, 1.0, callbackEvent1, 0.0);
-                        }
-                    }
-
-                    if (!elevatorLevelSafe)
-                    {
-                        if (robot.elevator.acquireExclusiveAccess(moduleName))
-                        {
-                            callbackEvent2.setCallback(this::elevatorRaiseDoneCallback, null);
-                            robot.elevator.setTarget(
-                                moduleName, RobotParams.ELEVATOR_POS_FOR_TURRET_TURN, true, 1.0, callbackEvent2, 0.0);
-                        }
-                    }
-                }
-            }
-        }
+        setPower(null, power, usePid);
     }   //setPower
 
     /**
@@ -381,155 +447,193 @@ public class Turret
      */
     public void setPower(double power)
     {
-        setPower(power, true);
+        setPower(null, power, true);
     }   //setPower
 
     /**
-     * This method checks if the arm and elevator positions are safe to turn the turret to the given position without
-     * hitting anything.
+     * This method is called periodically to perform the specified turret task.
      *
-     * @param target specifies the target position of the turret in degrees.
-     * @param powerLimit specifies the maximum power the turret will turn.
-     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
-     * @param elevatorTarget specifies optionally the elevator target, can be null if no additional elevator movement.
-     * @param armTarget specifies optionally the arm target, can be null if no additional arm movement.
-     * @return true if it was safe and we successfully initiated the turn, false if we did not turn.
+     * @param taskType specifies the type of task being run.
+     * @param runMode specifies the competition mode that is running.
      */
-    private boolean turnTurretToPos(
-        double target, double powerLimit, TrcEvent event, double timeout, Double elevatorTarget, Double armTarget)
+    private void turretTask(TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
     {
-        boolean safeToTurn = armLevelSafe && elevatorLevelSafe;
+        final String funcName = "turretTask";
+        State state = sm.checkReadyAndGetState();
 
-        if (safeToTurn)
+        if (state != null)
         {
-            if (elevatorTarget != null || armTarget != null)
+            boolean waitForArmOrElevator = false;
+
+            switch (state)
             {
-                turretEvent = event;
-                callbackEvent1.setCallback(this::setElevatorAndArmTargets, null);
-                event = callbackEvent1;
-                turretElevatorTarget = elevatorTarget;
-                turretArmTarget = armTarget;
+                case START:
+                    if (!actionParams.isSetPower && actionParams.delay > 0.0)
+                    {
+                        if (debugEnabled)
+                        {
+                            robot.globalTracer.traceInfo(funcName, "Doing delay=%.3f", actionParams.delay);
+                        }
+                        timer.set(actionParams.delay, event);
+                        sm.waitForSingleEvent(event, State.CHECK_SAFETY);
+                        break;
+                    }
+                    else
+                    {
+                        sm.setState(State.CHECK_SAFETY);
+                        //
+                        // Intentionally falling through to the next state.
+                        //
+                    }
+
+                case CHECK_SAFETY:
+                    boolean abort = false;
+
+                    if (!isArmLevelSafe())
+                    {
+                        if (robot.arm.acquireExclusiveAccess(moduleName))
+                        {
+                            if (debugEnabled)
+                            {
+                                robot.globalTracer.traceInfo(funcName, "Moving arm to safe level.");
+                            }
+                            robot.arm.setTarget(
+                                moduleName, RobotParams.ARM_MIN_POS_FOR_TURRET, false, 1.0, armEvent, 0.0);
+                            sm.addEvent(armEvent);
+                            waitForArmOrElevator = true;
+                        }
+                        else
+                        {
+                            robot.globalTracer.traceWarn(
+                                funcName, "Failed to acquire arm ownership (armOwner=%s).",
+                                TrcOwnershipMgr.getInstance().getOwner(robot.arm));
+                            abort = true;
+                        }
+                    }
+
+                    if (!isElevatorLevelSafe())
+                    {
+                        if (robot.elevator.acquireExclusiveAccess(moduleName))
+                        {
+                            if (debugEnabled)
+                            {
+                                robot.globalTracer.traceInfo(funcName, "Moving elevator to safe level.");
+                            }
+                            robot.elevator.setTarget(
+                                moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET + 2.0, true, 1.0, elevatorEvent,
+                                0.25);
+                            sm.addEvent(elevatorEvent);
+                            waitForArmOrElevator = true;
+                        }
+                        else
+                        {
+                            robot.globalTracer.traceWarn(
+                                funcName, "Failed to acquire elevator ownership (elevatorOwner=%s).",
+                                TrcOwnershipMgr.getInstance().getOwner(robot.elevator));
+                            abort = true;
+                        }
+                    }
+
+                    if (waitForArmOrElevator)
+                    {
+                        sm.waitForEvents(State.TURN_TURRET);
+                    }
+                    else
+                    {
+                        sm.setState(abort? State.DONE: State.TURN_TURRET);
+                    }
+                    break;
+
+                case TURN_TURRET:
+                    robot.arm.releaseExclusiveAccess(moduleName);
+                    robot.elevator.releaseExclusiveAccess(moduleName);
+                    if (!actionParams.isSetPower)
+                    {
+                        if (debugEnabled)
+                        {
+                            robot.globalTracer.traceInfo(
+                                funcName, "Turning turret to position %.1f.", actionParams.target);
+                        }
+                        pidTurret.setTarget(actionParams.target, true, 1.0, event);
+                        sm.waitForSingleEvent(event, State.DO_POST_OP);
+                    }
+                    else
+                    {
+                        sm.setState(State.DONE);
+                    }
+                    break;
+
+                case DO_POST_OP:
+                    prevTurretPower = 0.0;
+                    if (actionParams.armTarget != null)
+                    {
+                        if (debugEnabled)
+                        {
+                            robot.globalTracer.traceInfo(
+                                funcName, "Setting arm to post-op position %.1f.", actionParams.armTarget);
+                        }
+                        robot.arm.setTarget(actionParams.armTarget, false, 1.0, armEvent);
+                        sm.addEvent(armEvent);
+                        waitForArmOrElevator = true;
+                    }
+
+                    if (actionParams.elevatorTarget != null)
+                    {
+                        if (debugEnabled)
+                        {
+                            robot.globalTracer.traceInfo(
+                                funcName, "Setting elevator to post-op position %.1f.", actionParams.elevatorTarget);
+                        }
+                        robot.elevator.setTarget(actionParams.elevatorTarget, true, 1.0, elevatorEvent);
+                        sm.addEvent(elevatorEvent);
+                        waitForArmOrElevator = true;
+                    }
+
+                    if (waitForArmOrElevator)
+                    {
+                        sm.waitForEvents(State.DONE);
+                    }
+                    else
+                    {
+                        sm.setState(State.DONE);
+                    }
+                    break;
+
+                default:
+                case DONE:
+                    cancel();
+                    if (actionParams.event != null)
+                    {
+                        actionParams.event.signal();
+                    }
+                    break;
             }
-            pidTurret.setTarget(target, true, powerLimit, event, timeout);
-        }
 
-        return safeToTurn;
-    }   //turnTurretToPos
-
-    /**
-     * This method checks if the arm and elevator positions are safe to turn the turret at the given power without
-     * hitting anything.
-     *
-     * @param power specifies the power to turn the turret.
-     * @param usePid specifies true to use PID control, false otherwise.
-     * @return true if it was safe and we successfully initiated the turn, false if we did not turn.
-     */
-    private boolean turnTurretWithPower(double power, boolean usePid)
-    {
-        boolean safeToTurn = armLevelSafe && elevatorLevelSafe;
-
-        if (safeToTurn)
-        {
-            if (usePid)
+            if (debugEnabled)
             {
-                pidTurret.setPidPower(power);
+                robot.globalTracer.traceStateInfo(sm.toString(), sm.getState(), null, null, null, null);
             }
-            else
-            {
-                pidTurret.setPower(power);
-            }
-            prevTurretPower = power;
         }
-
-        return safeToTurn;
-    }   //turnTurretWithPower
+    }   //turretTask
 
     /**
-     * This method is called when the arm is done raising to the safe level. It will release exclusive ownership of
-     * the arm.
+     * This method checks if the arm level is safe for the turret turn.
      *
-     * @param context not used
+     * @return true if it's safe for the turret to turn without hitting things, false otherwise.
      */
-    private void armRaiseDoneCallback(Object context)
+    private boolean isArmLevelSafe()
     {
-        armLevelSafe = true;
-        robot.arm.releaseExclusiveAccess(moduleName);
-    }   //armRaiseDoneCallback
+        return robot.arm.getPosition() <= RobotParams.ARM_MIN_POS_FOR_TURRET;
+    }   //isArmLevelSafe
 
     /**
-     * This method is called when the elevator is done raising to the safe level. It will release exclusive ownership
-     * of the elevator.
+     * This method checks if the elevator level is safe for the turret turn.
      *
-     * @param context not used
+     * @return true if it's safe for the turret to turn without hitting things, false otherwise.
      */
-    private void elevatorRaiseDoneCallback(Object context)
+    private boolean isElevatorLevelSafe()
     {
-        elevatorLevelSafe = true;
-        robot.elevator.releaseExclusiveAccess(moduleName);
-    }   //elevatorRaiseDoneCallback
-
-    /**
-     * This method is called when the arm is done raising to the safe level. It will try to check if the elevator is
-     * at safe level and turn the turret.
-     *
-     * @param context not used
-     */
-    private void armRaiseDoneCallbackWithTurretTurn(Object context)
-    {
-        armRaiseDoneCallback(context);
-        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretTimeout,
-                            turretElevatorTarget, turretArmTarget))
-        {
-            turretTarget = 0.0;
-            turretPowerLimit = 1.0;
-            turretEvent = null;
-            turretTimeout = 0.0;
-        }
-    }   //armRaiseDoneCallbackWithTurretTurn
-
-    /**
-     * This method is called when the elevator is done raising to the safe level. It will try to check if the arm is
-     * at safe level and turn the turret.
-     *
-     * @param context not used
-     */
-    private void elevatorRaiseDoneCallbackWithTurretTurn(Object context)
-    {
-        elevatorRaiseDoneCallback(context);
-        if (turnTurretToPos(turretTarget, turretPowerLimit, turretEvent, turretTimeout,
-                            turretElevatorTarget, turretArmTarget))
-        {
-            turretTarget = 0.0;
-            turretPowerLimit = 1.0;
-            turretEvent = null;
-            turretTimeout = 0.0;
-        }
-    }   //elevatorRaiseDoneCallbackWithTurretTurn
-
-    /**
-     * This method sets the elevator and arm targets after the turret target has been reached.
-     *
-     * @param context not used.
-     */
-    private void setElevatorAndArmTargets(Object context)
-    {
-        if (turretElevatorTarget != null)
-        {
-            robot.elevator.setTarget(turretElevatorTarget, true, 1.0, turretEvent);
-            turretElevatorTarget = null;
-            turretEvent = null;
-        }
-
-        if (turretArmTarget != null)
-        {
-            robot.arm.setTarget(turretArmTarget);
-            turretArmTarget = null;
-        }
-    }   //setElevatorAndArmTargets
-
-    public void cancel()
-    {
-        pidTurret.cancel();
-    }
+        return robot.elevator.getPosition() >= RobotParams.ELEVATOR_MIN_POS_FOR_TURRET;
+    }   //isElevatorLevelSafe
 
 }   //class Turret

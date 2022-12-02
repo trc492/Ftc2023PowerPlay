@@ -231,6 +231,8 @@ public class RobotParams
     public static final int ELEVATORCAM_IMAGE_HEIGHT            = 480;
     public static final double ELEVATORCAM_VERTICAL_FOV         = 26.0;     // in degrees
     public static final double ELEVATORCAM_ANGLE_PER_PIXEL      = ELEVATORCAM_VERTICAL_FOV/ELEVATORCAM_IMAGE_HEIGHT;
+    public static final int FRONTCAM_PERMISSION_TIMEOUT         = 5000;
+    public static final int ELEVATORCAM_PERMISSION_TIMEOUT      = 5000;
 
     // Measurement unit: pixels
     public static final double HOMOGRAPHY_CAMERA_TOPLEFT_X      = 0.0;
@@ -479,7 +481,7 @@ public class RobotParams
     static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
     static final double TURRET_OFFSET                           = 0.0;
     static final double TURRET_MIN_POS                          = 0.0;
-    static final double TURRET_MAX_POS                          = 359.0;
+    static final double TURRET_MAX_POS                          = 300.0;
     // continuously?
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
@@ -488,7 +490,7 @@ public class RobotParams
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
     static final double TURRET_CAL_POWER                        = 0.3;
-    static final double TURRET_POWER_SCALE                      = 1.0;
+    static final double TURRET_POWER_SCALE                      = 0.6;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;

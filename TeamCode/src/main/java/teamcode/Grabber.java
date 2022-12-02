@@ -50,7 +50,7 @@ public class Grabber
             FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcAnalogSensorTrigger<>(
                 instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
-                new double[]{params.analogThreshold}, this::analogTriggerEvent, false);
+                new double[]{params.analogThreshold}, false, this::analogTriggerEvent);
         }
 
         grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, params, analogTrigger);
@@ -70,20 +70,21 @@ public class Grabber
     /**
      * This method is called when an analog sensor threshold has been crossed.
      *
-     * @param currZone specifies the zone it is going into.
-     * @param prevZone specifies the zone it is coming out of.
-     * @param value specifies the actual sensor value.
+     * @param context specifies the callback context.
      */
-    private void analogTriggerEvent(int currZone, int prevZone, double value)
+    private void analogTriggerEvent(Object context)
     {
         final String funcName = "analogTriggerEvent";
+        TrcAnalogSensorTrigger.CallbackContext callbackContext = (TrcAnalogSensorTrigger.CallbackContext) context;
 
         if (params.msgTracer != null)
         {
-            params.msgTracer.traceInfo(funcName, "Zone=%d->%d, value=%.3f", prevZone, currZone, value);
+            params.msgTracer.traceInfo(
+                funcName, "Zone=%d->%d, value=%.3f",
+                callbackContext.prevZone, callbackContext.currZone, callbackContext.sensorValue);
         }
 
-        if (grabber.isAutoAssistActive() && prevZone != -1)
+        if (grabber.isAutoAssistActive() && callbackContext.prevZone != -1)
         {
             boolean inProximity = grabber.objectInProximity();
 
