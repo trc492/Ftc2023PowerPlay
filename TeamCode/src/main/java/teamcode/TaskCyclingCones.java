@@ -51,8 +51,11 @@ public class TaskCyclingCones
         SCORING_ONLY,//assumes robot already has a cone, scores it onto the pole
         PICKUP_ONLY_TELEOP,//picks up a cone from the stack
 
-        SCORE_WITH_VISION
-    }
+        SCORE_WITH_VISION,
+        TELEOP_ALIGN_CONE_ONLY,
+        TELEOP_ALIGN_POLE_ONLY
+
+        }
 
     public enum VisionType
     {
@@ -76,6 +79,7 @@ public class TaskCyclingCones
     {
         START,
         LOOK_FOR_CONE,
+        TURN_TO_FACE_CONE,
         DRIVE_TO_CONE,
         PREPARE_PICKUP,
         PICKUP_CONE,
@@ -133,6 +137,14 @@ public class TaskCyclingCones
             onFinishEvent = null;
         }
     }   //cancel
+    //used in teleop, aligns robot to cones
+    public void doConeAlignOnly(VisionType visionType){
+        startCycling(CycleType.TELEOP_ALIGN_CONE_ONLY, VisionType.CONE_VISION, 1, null);
+    }
+    public void doPoleAlignOnly(VisionType visionType){
+        startCycling(CycleType.TELEOP_ALIGN_POLE_ONLY, VisionType.CONE_AND_POLE_VISION, 1, null);
+
+    }
 
     //doFullAutoCycle pickups and scores 1 cone
     /* Preconditions & Postconditions (AUTO_FULL_CYCLE)
@@ -198,6 +210,11 @@ public class TaskCyclingCones
             case PICKUP_ONLY_TELEOP:
                 sm.start(State.LOOK_FOR_CONE);
                 break;
+            case TELEOP_ALIGN_CONE_ONLY:
+                sm.start(State.LOOK_FOR_CONE);
+                break;
+            case TELEOP_ALIGN_POLE_ONLY:
+                sm.start(State.LOOK_FOR_POLE);
 
         }
         sm.start(cycleType == CycleType.SCORING_ONLY? State.LOOK_FOR_POLE: State.START);
@@ -258,14 +275,24 @@ public class TaskCyclingCones
                             robot.robotDrive.driveBase.stop();
                             targetLocation = new TrcPose2D(
                                 coneInfo.distanceFromCamera.x - 1.0, coneInfo.distanceFromCamera.y - 6.0,
-                                0);//coneInfo.horizontalAngle);
+                                coneInfo.horizontalAngle);
                         }
                     }
                     if (targetLocation != null)
                     {
-                        // We found the target with vision, go to the next state.
-                        robot.globalTracer.traceInfo(funcName, "ConeLocation=%s", targetLocation);
-                        sm.setState(State.DRIVE_TO_CONE);
+                        //only doing alignment, use pure pursuit to align to the cone
+                        if(cycleType == CycleType.TELEOP_ALIGN_CONE_ONLY){
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), true,
+                                    new TrcPose2D(0 , 0, targetLocation.angle));
+                            sm.waitForSingleEvent(event, State.DONE);
+                        }
+                        else{
+                            // We found the target with vision and are doing full pickup, go to the next state.
+                            robot.globalTracer.traceInfo(funcName, "ConeLocation=%s", targetLocation);
+                            sm.setState(State.DRIVE_TO_CONE);
+                        }
+
                     }
                     else if (visionType != VisionType.NO_VISION)
                     {
