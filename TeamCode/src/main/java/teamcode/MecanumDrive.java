@@ -57,8 +57,8 @@ public class MecanumDrive extends RobotDrive
         if (RobotParams.Preferences.useExternalOdometry)
         {
             //
-            // Create the external odometry device that uses the left front encoder port as the X odometry and
-            // the left and right back encoder ports as the Y1 and Y2 odometry. Gyro will serve as the angle
+            // Create the external odometry device that uses the right back encoder port as the X odometry and
+            // the left and right front encoder ports as the Y1 and Y2 odometry. Gyro will serve as the angle
             // odometry.
             //
             TrcDriveBaseOdometry driveBaseOdometry = new TrcDriveBaseOdometry(
