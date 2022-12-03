@@ -411,7 +411,7 @@ public class RobotParams
         STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
         STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
     };
-    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.2;
+    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.4;
     //
     // Arm subsystem.
     //
