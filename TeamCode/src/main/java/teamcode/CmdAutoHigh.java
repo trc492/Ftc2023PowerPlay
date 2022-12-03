@@ -58,7 +58,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     // Tells us number cones left on the conestack.
     private int conesRemaining = 5;
     private final boolean debugPoleVision = false;
-    private final boolean debugCycleTask = true;
+    private final boolean debugCycleTask = false;
 
 
     /**
@@ -191,6 +191,14 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         // Todo: add option to do center high poles
                         //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                         //corresponding cone stack, facing the cone stack
+                        if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE && autoChoices.startPos == FtcAuto.StartPos.LEFT){
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
+                                    robot.robotDrive.getAutoTargetPoint(-0.5, -0.55, 0.0, autoChoices),
+                                    robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -91.5, autoChoices));
+                        }
+
                         robot.robotDrive.purePursuitDrive.start(
                                 event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
@@ -205,7 +213,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case RAISE_ELEVATOR_TO_SCORE:
                     robot.arm.setTarget(25.0);
-                    robot.elevator.setTarget(33, true, 1.0, event, 0.0);
+                    robot.elevator.setTarget(33, true, 1.0, event, 5.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
