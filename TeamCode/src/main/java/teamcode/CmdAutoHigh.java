@@ -198,12 +198,14 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                                     robot.robotDrive.getAutoTargetPoint(-0.5, -0.55, 0.0, autoChoices),
                                     robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -91.5, autoChoices));
                         }
+                        else{
+                            robot.robotDrive.purePursuitDrive.start(
+                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                    robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
+                                    robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
+                                    robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
+                        }
 
-                        robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                                robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                                robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
                         sm.waitForSingleEvent(
                                 event,
                                 autoChoices.strategy != FtcAuto.AutoStrategy.PARKING_ONLY ?
