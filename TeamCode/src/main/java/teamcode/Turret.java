@@ -99,7 +99,7 @@ public class Turret implements TrcExclusiveSubsystem
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
-        pidTurret.setMsgTracer(robot.globalTracer);
+        pidTurret.setMsgTracer(robot.globalTracer, true);
         armEvent = new TrcEvent(moduleName + ".armEvent");
         elevatorEvent = new TrcEvent(moduleName + ".elevatorEvent");
         event = new TrcEvent(moduleName);
@@ -520,7 +520,7 @@ public class Turret implements TrcExclusiveSubsystem
                                 robot.globalTracer.traceInfo(funcName, "Moving elevator to safe level.");
                             }
                             robot.elevator.setTarget(
-                                moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET + 2.0, true, 1.0, elevatorEvent,
+                                moduleName, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET + 5.0, true, 1.0, elevatorEvent,
                                 0.25);
                             sm.addEvent(elevatorEvent);
                             waitForArmOrElevator = true;

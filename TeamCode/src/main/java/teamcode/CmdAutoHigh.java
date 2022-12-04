@@ -194,16 +194,16 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE && autoChoices.startPos == FtcAuto.StartPos.LEFT){
                             robot.robotDrive.purePursuitDrive.start(
                                     event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-0.5, -0.55, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -91.5, autoChoices));
+                                    robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
+                                    robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
+                                    robot.robotDrive.pathPoint(0.95, 0.6, 90));
                         }
                         else{
                             robot.robotDrive.purePursuitDrive.start(
                                     event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                     robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                                     robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
+                                    robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91, autoChoices));
                         }
 
                         sm.waitForSingleEvent(
@@ -214,8 +214,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
-                    robot.arm.setTarget(25.0);
-                    robot.elevator.setTarget(33, true, 1.0, event, 5.0);
+                    if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE){
+                        robot.arm.setTarget(16);
+                    }
+                    else{
+                        robot.arm.setTarget(17);//5.0);
+                    }
+                    robot.elevator.setTarget(33, false, 1.0, event, 0.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -228,12 +233,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
-                        0.75, event, 2.0, null, null);
-                    sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
+                        0.75, event, 8.0, null, null);
+                    sm.waitForSingleEvent(event, State.DONE);//LOWER_ELEVATOR);
                     break;
                 case LOWER_ELEVATOR:
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true, 1.0, event);
-                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
+                    sm.waitForSingleEvent(event, State.DONE);//SCORE_PRELOAD);
                     break;
                 //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
@@ -241,7 +246,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case SCORE_PRELOAD:
 
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
-                    sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
+                    sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     break;
 
 
@@ -250,7 +255,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //if time >= 26 or no more cones on the conestack, go to park
                     //otherwise call the doCycle method for each cone on the stack
                     //if driveOnly, just drive back and forth to simulate it
-                    if (TrcUtil.getModeElapsedTime() >= 27 || conesRemaining == 0)
+                    if (TrcUtil.getModeElapsedTime() >= 25 || conesRemaining == 0)
                     {
                         sm.setState(State.PARK);
                     }

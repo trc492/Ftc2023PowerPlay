@@ -52,9 +52,9 @@ public class RobotParams
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = true;
+        public static boolean showEasyOpenCvView = false;
         public static boolean useFrontWebcam = true;
-        public static boolean useElevatorWebcam = true;
+        public static boolean useElevatorWebcam = false;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;
@@ -330,7 +330,7 @@ public class RobotParams
     public static final Double Y_RAMP_RATE                      = null;//10.0;
 
     public static final TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.025, 0.02, 0.000, 0.0, 30.0);
+        new TrcPidController.PidCoefficients(0.022, 0.02, 0.000, 0.0, 30.0);
     public static final double TURN_SETTLING                    = TrcPidController.DEF_SETTLING_TIME;
     public static final double TURN_TOLERANCE                   = 1.0;
     public static final double TURN_STEADY_STATE_ERR            = 2.0;
@@ -364,9 +364,10 @@ public class RobotParams
     // Elevator Subsystem
     //
     static final double ELEVATOR_KP                             = 0.5;
-    static final double ELEVATOR_KI                             = 0.0;
+    static final double ELEVATOR_KI                             = 0;//0.5;
     static final double ELEVATOR_KD                             = 0.025;
     static final double ELEVATOR_TOLERANCE                      = 2.0;
+    static final double ELEVATOR_IZONE                          = 10.0;
     static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_435_ENCODER_PPR;
     static final double ELEVATOR_PULLEY_DIAMETER                = 1.5*1.06;         // in inches
     static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
@@ -413,7 +414,7 @@ public class RobotParams
         STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
         STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
     };
-    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.4;
+    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.6;
     //
     // Arm subsystem.
     //
@@ -483,7 +484,7 @@ public class RobotParams
     static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
     static final double TURRET_OFFSET                           = 0.0;
     static final double TURRET_MIN_POS                          = 0.0;
-    static final double TURRET_MAX_POS                          = 300.0;
+    static final double TURRET_MAX_POS                          = 320.0;
     // continuously?
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
@@ -491,8 +492,8 @@ public class RobotParams
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = 0.3;
-    static final double TURRET_POWER_SCALE                      = 0.6;
+    static final double TURRET_CAL_POWER                        = 0.5;
+    static final double TURRET_POWER_SCALE                      = 0.8;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
