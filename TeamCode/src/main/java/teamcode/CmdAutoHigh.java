@@ -59,6 +59,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int conesRemaining = 5;
     private final boolean debugPoleVision = false;
     private final boolean debugCycleTask = false;
+    private final boolean preloadOnly = true;
+    private final boolean debugPreloadMode = false;
 
 
     /**
@@ -194,16 +196,16 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE && autoChoices.startPos == FtcAuto.StartPos.LEFT){
                             robot.robotDrive.purePursuitDrive.start(
                                     event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-0.5, -0.55, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1.0, -0.5, -91.5, autoChoices));
+                                    robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
+                                    robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
+                                    robot.robotDrive.pathPoint(0.95, 0.6, 90));
                         }
                         else{
                             robot.robotDrive.purePursuitDrive.start(
                                     event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                     robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                                     robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1.0, -0.55, -91.5, autoChoices));
+                                    robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91, autoChoices));
                         }
 
                         sm.waitForSingleEvent(
@@ -214,8 +216,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
-                    robot.arm.setTarget(25.0);
-                    robot.elevator.setTarget(33, true, 1.0, event, 5.0);
+                    if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE){
+                        robot.arm.setTarget(16);
+                    }
+                    else{
+                        robot.arm.setTarget(17);//5.0);
+                    }
+                    robot.elevator.setTarget(33, false, 1.0, event, 6.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -228,8 +235,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
-                        0.75, event, 2.0, null, null);
-                    sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
+                        0.75, event, 8.0, null, null);
+                    if(debugPreloadMode){
+                        sm.waitForSingleEvent(event, State.DONE);
+                    }
+                    else{
+                        sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
+                    }
                     break;
                 case LOWER_ELEVATOR:
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true, 1.0, event);
@@ -241,16 +253,25 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case SCORE_PRELOAD:
 
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
-                    sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
+                    if(preloadOnly){
+                        sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
+                    }
+                    else{
+                        sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
+                    }
                     break;
 
-
+                case PREP_FOR_TRAVEL:
+                    robot.turret.setTarget(
+                            RobotParams.TURRET_FRONT, 1.0, event, 3.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                    sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    break;
                 case DO_CYCLE:
 
                     //if time >= 26 or no more cones on the conestack, go to park
                     //otherwise call the doCycle method for each cone on the stack
                     //if driveOnly, just drive back and forth to simulate it
-                    if (TrcUtil.getModeElapsedTime() >= 27 || conesRemaining == 0)
+                    if (TrcUtil.getModeElapsedTime() >= 25 || conesRemaining == 0)
                     {
                         sm.setState(State.PARK);
                     }
@@ -259,7 +280,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         robot.cyclingTask.doFullAutoCycle(
                             TaskCyclingCones.VisionType.CONE_VISION, conesRemaining, event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
+                        sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     }
                     break;
 
