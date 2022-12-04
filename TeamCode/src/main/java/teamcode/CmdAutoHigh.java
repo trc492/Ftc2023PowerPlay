@@ -59,6 +59,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int conesRemaining = 5;
     private final boolean debugPoleVision = false;
     private final boolean debugCycleTask = false;
+    private final boolean preloadOnly = true;
+    private final boolean debugPreloadMode = false;
 
 
     /**
@@ -220,7 +222,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     else{
                         robot.arm.setTarget(17);//5.0);
                     }
-                    robot.elevator.setTarget(33, false, 1.0, event, 0.0);
+                    robot.elevator.setTarget(33, false, 1.0, event, 10.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -234,11 +236,16 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
                         0.75, event, 8.0, null, null);
-                    sm.waitForSingleEvent(event, State.DONE);//LOWER_ELEVATOR);
+                    if(debugPreloadMode){
+                        sm.waitForSingleEvent(event, State.DONE);
+                    }
+                    else{
+                        sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
+                    }
                     break;
                 case LOWER_ELEVATOR:
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true, 1.0, event);
-                    sm.waitForSingleEvent(event, State.DONE);//SCORE_PRELOAD);
+                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
                 //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
@@ -246,7 +253,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case SCORE_PRELOAD:
 
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
-                    sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
+                    if(preloadOnly){
+                        sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
+                    }
+                    else{
+                        sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    }
                     break;
 
 
@@ -264,7 +276,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         robot.cyclingTask.doFullAutoCycle(
                             TaskCyclingCones.VisionType.CONE_VISION, conesRemaining, event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
+                        sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     }
                     break;
 

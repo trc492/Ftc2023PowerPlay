@@ -369,7 +369,7 @@ public class TaskCyclingCones
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     robot.robotDrive.driveBase.stop();
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, 2.0);
-                    sm.waitForSingleEvent(event, State.DONE); //DRIVE_TO_POLE);
+                    sm.waitForSingleEvent(event, State.DRIVE_TO_POLE);
                     break;
 
                 case DRIVE_TO_POLE:
@@ -388,7 +388,7 @@ public class TaskCyclingCones
 
                 case LOOK_FOR_POLE:
                     // Call vision to detect the junction pole
-                    if (visionType == VisionType.NO_VISION)
+                    if (visionType != VisionType.CONE_AND_POLE_VISION)
                     {
                         sm.setState(State.SCORE);
                     }
