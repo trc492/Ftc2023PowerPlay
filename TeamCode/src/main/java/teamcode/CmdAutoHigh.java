@@ -222,7 +222,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     else{
                         robot.arm.setTarget(17);//5.0);
                     }
-                    robot.elevator.setTarget(33, false, 1.0, event, 10.0);
+                    robot.elevator.setTarget(33, false, 1.0, event, 6.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -257,11 +257,15 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     }
                     else{
-                        sm.waitForSingleEvent(event, State.DO_CYCLE);
+                        sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
                     }
                     break;
 
-
+                case PREP_FOR_TRAVEL:
+                    robot.turret.setTarget(
+                            RobotParams.TURRET_FRONT, 1.0, event, 3.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                    sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    break;
                 case DO_CYCLE:
 
                     //if time >= 26 or no more cones on the conestack, go to park
