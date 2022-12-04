@@ -117,14 +117,7 @@ public class Robot
             //
             if (RobotParams.Preferences.useBlinkin)
             {
-                blinkin = new FtcRevBlinkin(RobotParams.HWNAME_BLINKIN);
-                //
-                // Vision uses Blinkin as an indicator, so set it up.
-                //
-                if (vision != null)
-                {
-                    vision.setupBlinkin();
-                }
+                blinkin = (new BlinkinLEDs(RobotParams.HWNAME_BLINKIN)).getRevBlinkin();
             }
 
             if (RobotParams.Preferences.useBatteryMonitor)

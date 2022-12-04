@@ -340,21 +340,21 @@ public class FtcTeleOp extends FtcOpMode
     {
         if (robot.blinkin != null)
         {
-            robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_FIELD, false);
-            robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_ROBOT, false);
-            robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_INVERTED, false);
+            robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_FIELD, false);
+            robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_ROBOT, false);
+            robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_INVERTED, false);
             switch (driveOrientation)
             {
                 case FIELD:
-                    robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_FIELD, true);
+                    robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_FIELD, true);
                     break;
 
                 case ROBOT:
-                    robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_ROBOT, true);
+                    robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_ROBOT, true);
                     break;
 
                 case INVERTED:
-                    robot.blinkin.setPatternState(Vision.DRIVE_ORIENTATION_INVERTED, true);
+                    robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_INVERTED, true);
                     break;
             }
         }
@@ -538,7 +538,7 @@ public class FtcTeleOp extends FtcOpMode
                             robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
                             if (robot.blinkin != null)
                             {
-                                robot.blinkin.setPatternState(Vision.AUTOASSIST_GRABBER_ON, true);
+                                robot.blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, true);
                             }
                         }
                         else
@@ -546,7 +546,7 @@ public class FtcTeleOp extends FtcOpMode
                             robot.grabber.cancelAutoAssist();
                             if (robot.blinkin != null)
                             {
-                                robot.blinkin.setPatternState(Vision.AUTOASSIST_GRABBER_ON, false);
+                                robot.blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, false);
                             }
                         }
                     }

@@ -1,0 +1,76 @@
+/*
+ * Copyright (c) 2022 Titan Robotics Club (http://www.titanrobotics.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package teamcode;
+
+import TrcCommonLib.trclib.TrcRevBlinkin;
+import TrcFtcLib.ftclib.FtcRevBlinkin;
+
+class BlinkinLEDs
+{
+    public static final String LABEL_BOLT = "1 Bolt";
+    public static final String LABEL_BULB = "2 Bulb";
+    public static final String LABEL_PANEL = "3 Panel";
+    public static final String GOT_RED_CONE = "GotRedCone";
+    public static final String GOT_BLUE_CONE = "GotBlueCone";
+    public static final String GOT_YELLOW_POLE = "GotYellowPole";
+    public static final String IMAGE1_NAME = "Red Audience Wall";
+    public static final String IMAGE2_NAME = "Red Rear Wall";
+    public static final String IMAGE3_NAME = "Blue Audience Wall";
+    public static final String IMAGE4_NAME = "Blue Rear Wall";
+    public static final String DRIVE_ORIENTATION_FIELD = "FieldMode";
+    public static final String DRIVE_ORIENTATION_ROBOT = "RobotMode";
+    public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
+    public static final String AUTOASSIST_GRABBER_ON = "AutoAssistGrabberOn";
+
+    private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
+        {   // Sorted in increasing priorities.
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
+            new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
+            new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
+            new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
+            new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue),
+            new TrcRevBlinkin.Pattern(AUTOASSIST_GRABBER_ON, TrcRevBlinkin.RevLedPattern.FixedStrobeWhite),
+            new TrcRevBlinkin.Pattern(GOT_RED_CONE, TrcRevBlinkin.RevLedPattern.SolidRed),
+            new TrcRevBlinkin.Pattern(GOT_BLUE_CONE, TrcRevBlinkin.RevLedPattern.SolidBlue),
+            new TrcRevBlinkin.Pattern(GOT_YELLOW_POLE, TrcRevBlinkin.RevLedPattern.SolidYellow),
+            new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
+            new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
+            new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue)
+        };
+
+    private FtcRevBlinkin revBlinkin;
+
+    public BlinkinLEDs(String instanceName)
+    {
+        revBlinkin = new FtcRevBlinkin(instanceName);
+        revBlinkin.setPatternPriorities(ledPatternPriorities);
+    }   //BlinkinLEDs
+
+    public FtcRevBlinkin getRevBlinkin()
+    {
+        return revBlinkin;
+    }   //getRevBlinkin
+
+}   //class BlinkinLEDs

@@ -121,16 +121,16 @@ public class VuforiaVision
         //
         FtcVuforia.TargetInfo[] imageTargetsInfo = {
             new FtcVuforia.TargetInfo(
-                0, Vision.IMAGE1_NAME, false,
+                0, BlinkinLEDs.IMAGE1_NAME, false,
                 createImageLocation(-halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90)),
             new FtcVuforia.TargetInfo(
-                1, Vision.IMAGE2_NAME, false,
+                1, BlinkinLEDs.IMAGE2_NAME, false,
                 createImageLocation(halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90)),
             new FtcVuforia.TargetInfo(
-                2, Vision.IMAGE3_NAME, false,
+                2, BlinkinLEDs.IMAGE3_NAME, false,
                 createImageLocation(-halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90)),
             new FtcVuforia.TargetInfo(
-                3, Vision.IMAGE4_NAME, false,
+                3, BlinkinLEDs.IMAGE4_NAME, false,
                 createImageLocation(halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90))
         };
         vuforia.addTargetList(TRACKABLE_IMAGES_FILE, imageTargetsInfo, cameraLocationOnRobot);

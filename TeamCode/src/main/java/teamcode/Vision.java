@@ -31,7 +31,6 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcOpenCvDetector;
-import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcEocvAprilTagPipeline;
 import TrcFtcLib.ftclib.FtcOpMode;
@@ -46,39 +45,9 @@ import TrcFtcLib.ftclib.FtcVuforia;
 public class Vision
 {
     public static final String OPENCV_NATIVE_LIBRARY_NAME = "EasyOpenCV";
-    public static final String LABEL_BOLT = "1 Bolt";
-    public static final String LABEL_BULB = "2 Bulb";
-    public static final String LABEL_PANEL = "3 Panel";
-    public static final String GOT_RED_CONE = "GotRedCone";
-    public static final String GOT_BLUE_CONE = "GotBlueCone";
-    public static final String GOT_YELLOW_POLE = "GotYellowPole";
-    public static final String IMAGE1_NAME = "Red Audience Wall";
-    public static final String IMAGE2_NAME = "Red Rear Wall";
-    public static final String IMAGE3_NAME = "Blue Audience Wall";
-    public static final String IMAGE4_NAME = "Blue Rear Wall";
-    public static final String[] TARGET_LABELS = {LABEL_BOLT, LABEL_BULB, LABEL_PANEL};
-    public static final String DRIVE_ORIENTATION_FIELD = "FieldMode";
-    public static final String DRIVE_ORIENTATION_ROBOT = "RobotMode";
-    public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
-    public static final String AUTOASSIST_GRABBER_ON = "AutoAssistGrabberOn";
-
-    private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
-        {   // Sorted in increasing priorities.
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
-            new TrcRevBlinkin.Pattern(IMAGE1_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeRed),
-            new TrcRevBlinkin.Pattern(IMAGE2_NAME, TrcRevBlinkin.RevLedPattern.FixedStrobeBlue),
-            new TrcRevBlinkin.Pattern(IMAGE3_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseRed),
-            new TrcRevBlinkin.Pattern(IMAGE4_NAME, TrcRevBlinkin.RevLedPattern.FixedLightChaseBlue),
-            new TrcRevBlinkin.Pattern(AUTOASSIST_GRABBER_ON, TrcRevBlinkin.RevLedPattern.FixedStrobeWhite),
-            new TrcRevBlinkin.Pattern(GOT_RED_CONE, TrcRevBlinkin.RevLedPattern.SolidRed),
-            new TrcRevBlinkin.Pattern(GOT_BLUE_CONE, TrcRevBlinkin.RevLedPattern.SolidBlue),
-            new TrcRevBlinkin.Pattern(GOT_YELLOW_POLE, TrcRevBlinkin.RevLedPattern.SolidYellow),
-            new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
-            new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
-            new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue)
-        };
+    public static final String[] TARGET_LABELS = {
+        BlinkinLEDs.LABEL_BOLT, BlinkinLEDs.LABEL_BULB, BlinkinLEDs.LABEL_PANEL
+    };
 
     private final Robot robot;
     public VuforiaVision vuforiaVision;
@@ -191,14 +160,6 @@ public class Vision
     }   //Vision
 
     /**
-     * This method sets up the Blinkin with a priority pattern list and a pattern name map.
-     */
-    public void setupBlinkin()
-    {
-        robot.blinkin.setPatternPriorities(ledPatternPriorities);
-    }   //setupBlinkin
-
-    /**
      * This method shuts down TensorFlow.
      */
     public void tensorFlowShutdown()
@@ -252,15 +213,15 @@ public class Vision
 
                 switch (detectedObj.label)
                 {
-                    case LABEL_BOLT:
+                    case BlinkinLEDs.LABEL_BOLT:
                         detectedSignal = 1;
                         break;
 
-                    case LABEL_BULB:
+                    case BlinkinLEDs.LABEL_BULB:
                         detectedSignal = 2;
                         break;
 
-                    case LABEL_PANEL:
+                    case BlinkinLEDs.LABEL_PANEL:
                         detectedSignal = 3;
                         break;
                 }
@@ -280,22 +241,22 @@ public class Vision
             if (robot.blinkin != null)
             {
                 // Turn off previous detection indication.
-                robot.blinkin.setPatternState(Vision.LABEL_BOLT, false);
-                robot.blinkin.setPatternState(Vision.LABEL_BULB, false);
-                robot.blinkin.setPatternState(Vision.LABEL_PANEL, false);
+                robot.blinkin.setPatternState(BlinkinLEDs.LABEL_BOLT, false);
+                robot.blinkin.setPatternState(BlinkinLEDs.LABEL_BULB, false);
+                robot.blinkin.setPatternState(BlinkinLEDs.LABEL_PANEL, false);
 
                 switch (detectedSignal)
                 {
                     case 1:
-                        robot.blinkin.setPatternState(Vision.LABEL_BOLT, true, 1.0);
+                        robot.blinkin.setPatternState(BlinkinLEDs.LABEL_BOLT, true, 1.0);
                         break;
 
                     case 2:
-                        robot.blinkin.setPatternState(Vision.LABEL_BULB, true, 1.0);
+                        robot.blinkin.setPatternState(BlinkinLEDs.LABEL_BULB, true, 1.0);
                         break;
 
                     case 3:
-                        robot.blinkin.setPatternState(Vision.LABEL_PANEL, true, 1.0);
+                        robot.blinkin.setPatternState(BlinkinLEDs.LABEL_PANEL, true, 1.0);
                         break;
                 }
                 robot.dashboard.displayPrintf(15, "Found the signal at %d", detectedSignal);
@@ -346,7 +307,9 @@ public class Vision
                 if (targets != null && robot.blinkin != null)
                 {
                     robot.blinkin.setPatternState(
-                        detectObjType == EocvVision.ObjectType.RED_CONE ? GOT_RED_CONE : GOT_BLUE_CONE, true, 1.0);
+                        detectObjType == EocvVision.ObjectType.RED_CONE?
+                            BlinkinLEDs.GOT_RED_CONE: BlinkinLEDs.GOT_BLUE_CONE,
+                        true, 1.0);
                 }
             }
         }
@@ -369,7 +332,7 @@ public class Vision
 
             if (targets != null && robot.blinkin != null)
             {
-                robot.blinkin.setPatternState(GOT_YELLOW_POLE, true, 1.0);
+                robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, true, 1.0);
             }
         }
 
