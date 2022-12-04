@@ -99,9 +99,10 @@ public class Robot
         //
         // Initialize vision subsystems.
         //
-        if (RobotParams.Preferences.useVuforia ||
-            RobotParams.Preferences.useTensorFlow ||
-            RobotParams.Preferences.useEasyOpenCV)
+        if (runMode != TrcRobot.RunMode.TELEOP_MODE &&
+            (RobotParams.Preferences.useVuforia ||
+             RobotParams.Preferences.useTensorFlow ||
+             RobotParams.Preferences.useEasyOpenCV))
         {
             vision = new Vision(this);
         }

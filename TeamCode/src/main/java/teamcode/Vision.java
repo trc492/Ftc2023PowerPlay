@@ -104,45 +104,66 @@ public class Vision
         this.robot = robot;
         if (RobotParams.Preferences.useEasyOpenCV)
         {
-            OpenCvWebcam frontWebcam, elevatorWebcam;
+            OpenCvWebcam frontWebcam = null, elevatorWebcam = null;
 
             if (RobotParams.Preferences.showEasyOpenCvView)
             {
                 int[] viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(
                     cameraViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
 
-                frontWebcam =
-                    OpenCvCameraFactory.getInstance().createWebcam(
-                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM),
-                        viewportContainerIds[0]);
-                elevatorWebcam =
-                    OpenCvCameraFactory.getInstance().createWebcam(
-                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM),
-                        viewportContainerIds[1]);
-                frontWebcam.showFpsMeterOnViewport(false);
-                elevatorWebcam.showFpsMeterOnViewport(false);
+                if (RobotParams.Preferences.useFrontWebcam)
+                {
+                    frontWebcam =
+                        OpenCvCameraFactory.getInstance().createWebcam(
+                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM),
+                            viewportContainerIds[0]);
+                    frontWebcam.showFpsMeterOnViewport(false);
+                }
+
+                if (RobotParams.Preferences.useElevatorWebcam)
+                {
+                    elevatorWebcam =
+                        OpenCvCameraFactory.getInstance().createWebcam(
+                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM),
+                            viewportContainerIds[1]);
+                    elevatorWebcam.showFpsMeterOnViewport(false);
+                }
             }
             else
             {
-                frontWebcam =
-                    OpenCvCameraFactory.getInstance().createWebcam(
-                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM));
-                elevatorWebcam =
-                    OpenCvCameraFactory.getInstance().createWebcam(
-                        opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM));
+                if (RobotParams.Preferences.useFrontWebcam)
+                {
+                    frontWebcam =
+                        OpenCvCameraFactory.getInstance().createWebcam(
+                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM));
+                }
+
+                if (RobotParams.Preferences.useElevatorWebcam)
+                {
+                    elevatorWebcam =
+                        OpenCvCameraFactory.getInstance().createWebcam(
+                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM));
+                }
             }
             // EOCV sometimes timed out on opening the camera. The default timeout was 2 seconds. It seems setting
             // it to 3 seconds would do wonder here.
             robot.globalTracer.traceInfo("Vision", "Starting EocvVision...");
-            frontWebcam.setMillisecondsPermissionTimeout(RobotParams.FRONTCAM_PERMISSION_TIMEOUT);
-            elevatorWebcam.setMillisecondsPermissionTimeout(RobotParams.ELEVATORCAM_PERMISSION_TIMEOUT);
 
-            frontEocvVision = new EocvVision(
-                "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,
-                RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT, null);
-            elevatorEocvVision = new EocvVision(
-                "elevatorEocvVision", RobotParams.ELEVATORCAM_IMAGE_WIDTH, RobotParams.ELEVATORCAM_IMAGE_HEIGHT,
-                null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_RIGHT, null);
+            if (frontWebcam != null)
+            {
+                frontWebcam.setMillisecondsPermissionTimeout(RobotParams.FRONTCAM_PERMISSION_TIMEOUT);
+                frontEocvVision = new EocvVision(
+                    "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,
+                    RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT, null);
+            }
+
+            if (elevatorWebcam != null)
+            {
+                elevatorWebcam.setMillisecondsPermissionTimeout(RobotParams.ELEVATORCAM_PERMISSION_TIMEOUT);
+                elevatorEocvVision = new EocvVision(
+                    "elevatorEocvVision", RobotParams.ELEVATORCAM_IMAGE_WIDTH, RobotParams.ELEVATORCAM_IMAGE_HEIGHT,
+                    null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_RIGHT, null);
+            }
         }
         else if (RobotParams.Preferences.useVuforia || RobotParams.Preferences.useTensorFlow)
         {
@@ -313,17 +334,20 @@ public class Vision
     public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedConeInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
-        EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
 
-        if (frontEocvVision != null && frontEocvVision.isEnabled() &&
-            (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE))
+        if (frontEocvVision != null && frontEocvVision.isEnabled())
         {
-            targets = frontEocvVision.getDetectedTargetsInfo(null, this::compareBottomY, 0.0, 0.0);
+            EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
 
-            if (targets != null && robot.blinkin != null)
+            if (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE)
             {
-                robot.blinkin.setPatternState(
-                    detectObjType == EocvVision.ObjectType.RED_CONE? GOT_RED_CONE: GOT_BLUE_CONE, true, 1.0);
+                targets = frontEocvVision.getDetectedTargetsInfo(null, this::compareBottomY, 0.0, 0.0);
+
+                if (targets != null && robot.blinkin != null)
+                {
+                    robot.blinkin.setPatternState(
+                        detectObjType == EocvVision.ObjectType.RED_CONE ? GOT_RED_CONE : GOT_BLUE_CONE, true, 1.0);
+                }
             }
         }
 

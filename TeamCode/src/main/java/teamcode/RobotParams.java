@@ -53,6 +53,8 @@ public class RobotParams
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
         public static boolean showEasyOpenCvView = true;
+        public static boolean useFrontWebcam = true;
+        public static boolean useElevatorWebcam = true;
         // Robot
         public static boolean noRobot = false;
         public static boolean swerveRobot = false;

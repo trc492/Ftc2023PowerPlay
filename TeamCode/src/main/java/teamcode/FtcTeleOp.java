@@ -125,7 +125,7 @@ public class FtcTeleOp extends FtcOpMode
             robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
         }
 
-        if (robot.vision != null)
+        if (robot.vision != null && robot.vision.frontEocvVision != null)
         {
             robot.vision.frontEocvVision.setDetectObjectType(
                 FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
