@@ -25,8 +25,13 @@ package teamcode;
 import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcFtcLib.ftclib.FtcRevBlinkin;
 
-class BlinkinLEDs
+/**
+ * This class encapsulates the REV Blinkin LED controller to provide a priority indicator showing the status of the
+ * robot.
+ */
+class BlinkinLEDs extends FtcRevBlinkin
 {
+    // LED pattern names.
     public static final String LABEL_BOLT = "1 Bolt";
     public static final String LABEL_BULB = "2 Bulb";
     public static final String LABEL_PANEL = "3 Panel";
@@ -41,9 +46,17 @@ class BlinkinLEDs
     public static final String DRIVE_ORIENTATION_ROBOT = "RobotMode";
     public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
     public static final String AUTOASSIST_GRABBER_ON = "AutoAssistGrabberOn";
+    // LED pattern priority list in increasing priority order.
 
-    private final TrcRevBlinkin.Pattern[] ledPatternPriorities =
-        {   // Sorted in increasing priorities.
+    /**
+     * Constructor: Create an instance of the object.
+     *
+     * @param instanceName specifies the instance name. This is also the REV Blinkin's hardware name.
+     */
+    public BlinkinLEDs(String instanceName)
+    {
+        super(instanceName);
+        final TrcRevBlinkin.Pattern[] ledPatternPriorities = {
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
@@ -59,18 +72,7 @@ class BlinkinLEDs
             new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
             new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue)
         };
-
-    private FtcRevBlinkin revBlinkin;
-
-    public BlinkinLEDs(String instanceName)
-    {
-        revBlinkin = new FtcRevBlinkin(instanceName);
-        revBlinkin.setPatternPriorities(ledPatternPriorities);
+        setPatternPriorities(ledPatternPriorities);
     }   //BlinkinLEDs
-
-    public FtcRevBlinkin getRevBlinkin()
-    {
-        return revBlinkin;
-    }   //getRevBlinkin
 
 }   //class BlinkinLEDs

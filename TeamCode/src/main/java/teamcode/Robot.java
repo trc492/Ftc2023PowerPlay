@@ -117,7 +117,7 @@ public class Robot
             //
             if (RobotParams.Preferences.useBlinkin)
             {
-                blinkin = (new BlinkinLEDs(RobotParams.HWNAME_BLINKIN)).getRevBlinkin();
+                blinkin = new BlinkinLEDs(RobotParams.HWNAME_BLINKIN);
             }
 
             if (RobotParams.Preferences.useBatteryMonitor)

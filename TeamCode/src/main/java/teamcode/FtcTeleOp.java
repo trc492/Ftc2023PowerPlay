@@ -272,8 +272,9 @@ public class FtcTeleOp extends FtcOpMode
             }
 
             robot.dashboard.displayPrintf(
-                3, "Elevator: power=%.2f, current=%.1f pos=%.1f, LimitSW=%s",
-                elevatorPower, robot.elevator.getMotor().getCurrent(), robot.elevator.getPosition(), robot.elevator.isLowerLimitSwitchActive());
+                3, "Elevator: power=%.2f, current=%.1f, pos=%.1f, LimitSW=%s",
+                elevatorPower, robot.elevator.getMotor().getCurrent(), robot.elevator.getPosition(),
+                robot.elevator.isLowerLimitSwitchActive());
         }
 
         if (robot.arm != null)
@@ -314,7 +315,7 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.getPidActuator().setPower(turretPower);
                 }
                 else{
-                    robot.turret.setPower(turretPower, !manualOverride);
+                    robot.turret.setPower(turretPower);
                 }
 //                double turretX = operatorGamepad.getLeftStickX();
 //                double turretY = operatorGamepad.getLeftStickY();
