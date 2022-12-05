@@ -311,12 +311,13 @@ public class FtcTeleOp extends FtcOpMode
             else
             {
                 double turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE;
-                if(manualOverride){
-                    robot.turret.getPidActuator().setPower(turretPower);
-                }
-                else{
-                    robot.turret.setPower(turretPower);
-                }
+                robot.turret.setPower(turretPower, !manualOverride);
+//                if(manualOverride){
+//                    robot.turret.getPidActuator().setPower(turretPower);
+//                }
+//                else{
+//                    robot.turret.setPower(turretPower);
+//                }
 //                double turretX = operatorGamepad.getLeftStickX();
 //                double turretY = operatorGamepad.getLeftStickY();
 //                double turretPower = operatorGamepad.getMagnitude(turretX, turretY);

@@ -99,7 +99,7 @@ public class Turret implements TrcExclusiveSubsystem
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
         pidTurret = new FtcMotorActuator(
             RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
-        pidTurret.setMsgTracer(robot.globalTracer, true);
+        pidTurret.setMsgTracer(robot.globalTracer, false);
         armEvent = new TrcEvent(moduleName + ".armEvent");
         elevatorEvent = new TrcEvent(moduleName + ".elevatorEvent");
         event = new TrcEvent(moduleName);

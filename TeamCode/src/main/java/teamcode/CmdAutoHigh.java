@@ -46,6 +46,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         PREP_FOR_TRAVEL,
         DO_CYCLE,
         PARK,
+        DRIVE_ELEVATOR_DOWN,
         DONE
     }   //enum State
 
@@ -193,19 +194,21 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         // Todo: add option to do center high poles
                         //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
                         //corresponding cone stack, facing the cone stack
+                        //robot.turret.setTarget(0.5, RobotParams.TURRET_BACK, 0.8, null, 1.0, null, null);
+                        //robot.turret.zeroCalibrate();
                         if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE && autoChoices.startPos == FtcAuto.StartPos.LEFT){
                             robot.robotDrive.purePursuitDrive.start(
                                     event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                     robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
                                     robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
-                                    robot.robotDrive.pathPoint(0.95, 0.6, 90));
+                                    robot.robotDrive.pathPoint(1.00, 0.6, 91));
                         }
                         else{
                             robot.robotDrive.purePursuitDrive.start(
                                     event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                     robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
                                     robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91, autoChoices));
+                                    robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
                         }
 
                         sm.waitForSingleEvent(
@@ -222,7 +225,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     else{
                         robot.arm.setTarget(17);//5.0);
                     }
-                    robot.elevator.setTarget(33, false, 1.0, event, 6.0);
+                    robot.elevator.setTarget(33, true, 1.0, event, 6.0);
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
@@ -235,15 +238,16 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
-                        0.75, event, 8.0, null, null);
+                        0.75, event, 5.0, null, null);
                     if(debugPreloadMode){
                         sm.waitForSingleEvent(event, State.DONE);
                     }
                     else{
-                        sm.waitForSingleEvent(event, State.LOWER_ELEVATOR);
+                        sm.waitForSingleEvent(event, State.LOWER_ELEVATOR, 5.0);
                     }
                     break;
                 case LOWER_ELEVATOR:
+                    robot.turret.cancel();
                     robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true, 1.0, event);
                     sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
@@ -303,8 +307,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         robot.robotDrive.purePursuitDrive.start(
                             event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90.0, autoChoices));
-                        sm.waitForSingleEvent(event, State.DONE);
+                        sm.waitForSingleEvent(event, State.DRIVE_ELEVATOR_DOWN);
                     }
+                    break;
+                case DRIVE_ELEVATOR_DOWN:
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS_FOR_TURRET + 5, true, 1.0, event);
+                    sm.waitForSingleEvent(event, State.DONE);
                     break;
 
                 case DONE:

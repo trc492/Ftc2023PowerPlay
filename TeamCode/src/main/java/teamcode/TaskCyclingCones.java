@@ -357,32 +357,42 @@ public class TaskCyclingCones
                     event2.setCallback(this::grabberCancelPurePursuit, null);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.2);
                     robot.grabber.cancelAutoAssist();
-                    robot.robotDrive.purePursuitDrive.start(
-                            null, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
+                    robot.robotDrive.driveBase.holonomicDrive(0.0, 0.2, 0.0);
+//                    robot.robotDrive.purePursuitDrive.start(
+//                            null, robot.robotDrive.driveBase.getFieldPosition(), false,
+//                            robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     // CodeReview: give it a timeout to prevent hanging.
-                    robot.grabber.enableAutoAssist(null, 0, event2, 0);
+                    robot.grabber.enableAutoAssist(null, 0, event2, 5);
                     sm.waitForSingleEvent(event2, State.RAISE_ELEVATOR);
                     break;
 
                 case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
+                    robot.grabber.cancelAutoAssist();
+                    robot.grabber.close();
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     robot.robotDrive.driveBase.stop();
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, 4.0);
+                    robot.elevator.setTarget(0.5, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, 4.0);
                     sm.waitForSingleEvent(event, State.DRIVE_TO_POLE);
                     break;
 
                 case DRIVE_TO_POLE:
-                    // Turn turret to the right side while driving backwards until intake is right above the pole
-                    robot.robotDrive.purePursuitDrive.start(
-                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91, FtcAuto.autoChoices));
-                    robot.turret.setTarget(
-                        FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT);
-                    robot.arm.setTarget(17, false, 1.0);
-                    sm.waitForSingleEvent(event,
-                            visionType == VisionType.CONE_AND_POLE_VISION? State.LOOK_FOR_POLE: State.ALIGN_TO_POLE);
+                    if(!robot.grabber.hasObject()){
+                        sm.setState(State.DONE);
+                    }
+                    else {
+
+
+                        // Turn turret to the right side while driving backwards until intake is right above the pole
+                        robot.robotDrive.purePursuitDrive.start(
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91, FtcAuto.autoChoices));
+                        robot.turret.setTarget(
+                                FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT ?
+                                        RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT);
+                        robot.arm.setTarget(17, false, 1.0);
+                        sm.waitForSingleEvent(event,
+                                visionType == VisionType.CONE_AND_POLE_VISION ? State.LOOK_FOR_POLE : State.ALIGN_TO_POLE);
+                    }
                     break;
 
                 case LOOK_FOR_POLE:

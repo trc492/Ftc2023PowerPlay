@@ -28,13 +28,16 @@ import java.util.Locale;
 
 import TrcCommonLib.command.CmdPidDrive;
 import TrcCommonLib.command.CmdTimedDrive;
+import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
+import TrcCommonLib.trclib.TrcTimer;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
 import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcValueMenu;
+import TrcFtcLib.ftclib.FtcVuforia;
 
 /**
  * This class contains the Autonomous Mode program.
@@ -42,6 +45,7 @@ import TrcFtcLib.ftclib.FtcValueMenu;
 @Autonomous(name="FtcAutonomous", group="Ftc3543")
 public class FtcAuto extends FtcOpMode
 {
+//    private boolean initDone = false;
     public enum Alliance
     {
         RED_ALLIANCE,
@@ -87,7 +91,6 @@ public class FtcAuto extends FtcOpMode
         public double turnTarget = 0.0;
         public double driveTime = 0.0;
         public double drivePower = 0.0;
-
         @Override
         public String toString()
         {
@@ -202,15 +205,19 @@ public class FtcAuto extends FtcOpMode
         if (robot.elevator != null && robot.arm != null && robot.turret != null)
         {
             robot.turret.zeroCalibrate();
+            robot.turret.getPidActuator().setTarget(2.0, 40, false, 0.8, null, 0.0);
+
         }
 
         if (robot.grabber != null)
         {
-
             robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
         }
     }   //initRobot
-
+    public void afterZeroTurnTurret(Object context){
+        robot.globalTracer.traceInfo("funcName", "afterZeroTurn called");
+        robot.turret.getPidActuator().setTarget(40);
+    }
     //
     // Overrides TrcRobot.RobotMode methods.
     //
@@ -227,6 +234,15 @@ public class FtcAuto extends FtcOpMode
         {
             robot.vision.getDetectedSignal();
         }
+//        if(!initDone){
+//            robot.globalTracer.traceInfo("Turning Turret", "turning turret");
+//            TrcTimer timer = new TrcTimer(moduleName);
+//            TrcEvent event = new TrcEvent(moduleName);
+//            event.setCallback(this::afterZeroTurnTurret, null);
+//            timer.set(2.0, event);
+//            initDone = true;
+//        }
+
     }   //initPeriodic
 
     /**

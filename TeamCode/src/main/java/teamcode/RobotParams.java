@@ -200,8 +200,8 @@ public class RobotParams
     };
 
     // In tile units.
-    public static final TrcPose2D CONE_STACK_RED_LEFT           = new TrcPose2D(-2.3, -0.5, -90.0);
-    public static final TrcPose2D LOOK_FOR_CONE_POS_LEFT        = new TrcPose2D(-2.0, -0.5, -90.0);
+    public static final TrcPose2D CONE_STACK_RED_LEFT           = new TrcPose2D(-2.4, -0.55, -90.0);
+    public static final TrcPose2D LOOK_FOR_CONE_POS_LEFT        = new TrcPose2D(-2.0, -0.55, -90.0);
 
     public static final TrcPose2D SCORE_LOCATION_RED_LEFT       = new TrcPose2D(-0.5, -1.0, 180.0);
     public static final TrcPose2D SUBSTATION_RED_LEFT           = new TrcPose2D(-0.55, -1.95, 150.0);
@@ -391,7 +391,7 @@ public class RobotParams
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = 3;//18.0;
     static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
-    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 32.0;
+    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 33.0;
     public static final double CAPPING_OFFSET                   = -8.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
         ELEVATOR_MIN_POS,                                       // Slot 0
