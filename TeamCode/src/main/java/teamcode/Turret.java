@@ -351,11 +351,13 @@ public class Turret
      *
      * @param relativeTarget specifies the relative target in degrees (negative to turn left, positive to turn right).
      * @param powerLimit specifies how fast the turret should turn.
+     * @param event specifies the event to signal when done, can be null if none provided.
+     * @param timeout specifies the maximum amount of time for the completion of this operation in seconds.
      */
-    public void autoAssistFindPole(double relativeTarget, double powerLimit)
+    public void autoAssistFindPole(double relativeTarget, double powerLimit, TrcEvent event, double timeout)
     {
-        // set turret target to relativeTarget.
         // arm the analog trigger to terminate turret turn when target is found.
+        // set turret target to relativeTarget.
     }   //autoAssistFindPole
 
     /**
