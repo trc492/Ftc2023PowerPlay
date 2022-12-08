@@ -210,6 +210,7 @@ public class RobotParams
     public static final double LOW_JUNCTION_HEIGHT              = 20.0;
     public static final double MID_JUNCTION_HEIGHT              = 26.5;
     public static final double HIGH_JUNCTION_HEIGHT             = 36.0;
+    public static final double POLE_RADIUS                      = 0.5; //In inches
     //
     // Vision subsystem.
     //
@@ -427,7 +428,11 @@ public class RobotParams
     static final double ARM_GEAR_RATIO                          = 28.0;
     static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
     static final double ARM_OFFSET                              = 7.0;
-    /*s
+    //For calculating angle for aligning claw to pole
+    static final double ARM_JOINT_LENGTH                        = 7.098; //In inches
+    static final double JOINT_TO_SENSOR                         = 0.0;
+    static final double JOINT_TO_MID_CLAW                       = 0.0;
+    /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
      */

@@ -22,6 +22,8 @@
 
 package teamcode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
@@ -105,7 +107,7 @@ public class TaskCyclingCones
     private Double visionExpireTime = null;
     //location of the cone or pole relative to the robot
     private TrcPose2D targetLocation = null;
-    private Double poleAngle;
+    private Double sensorDistance;
 
     public TaskCyclingCones(Robot robot)
     {
@@ -403,41 +405,30 @@ public class TaskCyclingCones
                     }
                     else
                     {
-                        Double poleAngle = robot.vision.getPoleAngle();
-
-                        if (poleAngle != null)
-                        {
-                            TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
-                            robot.speak("POLE FOUND");
-                            globalTracer.traceInfo("ALIGN_TO_POLE", "Angle: %f", poleAngle);
+                        //Some method to the distance from the sensor
+                        sensorDistance = robot.distanceSensor.sensor.getDistance(DistanceUnit.INCH);
+                        if(sensorDistance == null) {
+                            //Turning left then right to check for pole in both directions
+                            robot.turret.setTarget(robot.turret.getPosition()-10.0);
+                            robot.turret.setTarget(robot.turret.getPosition()+20.0);
                         }
-
-                        if (poleAngle != null)
+                        else
                         {
-                            sm.setState(State.ALIGN_TO_POLE);
-                        }
-                        //if we don't see the target give it another second to keep looking(we haven't set expireTime yet
-                        else if (visionExpireTime == null)
-                        {
-                            visionExpireTime = TrcUtil.getCurrentTime() + 0.5;
-                        }
-                        else if (TrcUtil.getCurrentTime() >= visionExpireTime)
-                        {
-                            //times up, reset expireTime, assume it's aligned and score.
-                            visionExpireTime = null;
-                            //sm.setState(State.SCORE);
+                            //Assuming that if the turret sees the pole, it is centered enough
+                            robot.turret.cancel();
                         }
                     }
                     break;
 
                 case ALIGN_TO_POLE:
                     // Call vision to detect the junction pole
-                    if(poleAngle != null){
-                        robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.75, event, 0.0, null, null);
-                    }
-                    else{
-                        robot.turret.setTarget(RobotParams.TURRET_RIGHT, 0.75, event, 2.0, null, null);
-                    }
+//                    if(poleAngle != null){
+//                        robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.75, event, 0.0, null, null);
+//                    }
+//                    else{
+//                        robot.turret.setTarget(RobotParams.TURRET_RIGHT, 0.75, event, 2.0, null, null);
+//                    }
+                    robot.arm.setTarget(scoringArmAngle(sensorDistance),false,1.0,event);
                     sm.waitForSingleEvent(event, State.SCORE);
                     break;
 
@@ -472,6 +463,11 @@ public class TaskCyclingCones
     //cancels pure pursuit when grabber sees object
     private void grabberCancelPurePursuit(Object context){
         robot.robotDrive.purePursuitDrive.cancel();
+    }
+
+    public double scoringArmAngle(double sensorDistance) {
+        return 90.0-Math.acos((sensorDistance + RobotParams.JOINT_TO_SENSOR +
+                RobotParams.POLE_RADIUS - RobotParams.JOINT_TO_MID_CLAW)/RobotParams.ARM_JOINT_LENGTH);
     }
 
 }   //class TaskCyclingCones
