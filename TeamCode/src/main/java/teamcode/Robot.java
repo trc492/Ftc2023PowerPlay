@@ -73,7 +73,8 @@ public class Robot
     public RobotDrive robotDrive;
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
-    public Turret turret;
+    public TurretOld turret;
+//    public Turret turret;
     public TrcIntake intake = null;
     public TrcServoGrabber grabber = null;
     public TaskCyclingCones cyclingTask;
@@ -127,7 +128,8 @@ public class Robot
                 battery = new FtcRobotBattery();
             }
 
-            androidTone = new FtcAndroidTone("androidTone");
+//            androidTone = new FtcAndroidTone("androidTone");
+            androidTone = null;
             distanceSensor = new FtcDistanceSensor("distanceSensor");
             //
             // Create and initialize RobotDrive.
@@ -161,7 +163,6 @@ public class Robot
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     elevator.getPidController().setOutputRange(-RobotParams.ELEVATOR_DOWN_POWER_SCALE, 1.0);
                     elevator.setMsgTracer(globalTracer);
-                    elevator.setBeep(androidTone);
                 }
 
                 if (RobotParams.Preferences.useArm)
@@ -184,12 +185,11 @@ public class Robot
                         .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);
-                    arm.setBeep(androidTone);
                 }
 
                 if(RobotParams.Preferences.useTurret)
                 {
-                    turret = new Turret(this);
+                    turret = new TurretOld(this);
                 }
 
                 if (RobotParams.Preferences.useGrabber)

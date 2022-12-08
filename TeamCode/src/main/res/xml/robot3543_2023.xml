@@ -28,7 +28,7 @@ SOFTWARE.
             <goBILDA5202SeriesMotor name="lbDriveMotor" port="2" />
             <goBILDA5202SeriesMotor name="rbDriveMotor" port="3" />
             <DigitalDevice name="turret.lowerLimit" port="0" />
-            <DigitalDevice name="turretDirSwitch" port="1" />
+            <DigitalDevice name="turret.dirSwitch" port="1" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
         <LynxModule name="Expansion Hub 2" port="2">
