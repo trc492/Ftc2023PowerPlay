@@ -170,6 +170,7 @@ public class Turret
     public void cancel()
     {
         pidTurret.cancel();
+        analogTrigger.setEnabled(false);
     }   //cancel
 
     /**
