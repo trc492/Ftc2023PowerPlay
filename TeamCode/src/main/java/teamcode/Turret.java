@@ -47,6 +47,8 @@ public class Turret
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger;
     private double prevTurretPower = 0.0;
+    private double sensorValue = 0.0;
+    private double analogTreshold = 1.0;
 
     public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
     {
@@ -357,8 +359,8 @@ public class Turret
      */
     public void autoAssistFindPole(double relativeTarget, double powerLimit, TrcEvent event, double timeout)
     {
-        // arm the analog trigger to terminate turret turn when target is found.
-        // set turret target to relativeTarget.
+        analogTrigger.setEnabled(true);
+        setTarget(getPosition() + relativeTarget, true, powerLimit, event, timeout);        // set turret target to relativeTarget.
     }   //autoAssistFindPole
 
     /**
@@ -378,6 +380,11 @@ public class Turret
                 callbackContext.prevZone, callbackContext.currZone, callbackContext.sensorValue);
         }
         // cancel the turret turn here.
+        if(getSensorState() && callbackContext.currZone == 0){
+            cancel();
+            sensorValue = getSensorValue();
+        }
+
     }   //analogTriggerEvent
 
 }   //class Turret
