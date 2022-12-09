@@ -29,22 +29,23 @@ SOFTWARE.
             <goBILDA5202SeriesMotor name="rbDriveMotor" port="3" />
             <DigitalDevice name="turret.lowerLimit" port="0" />
             <DigitalDevice name="turret.dirSwitch" port="1" />
+            <DigitalDevice name="elevator.lowerLimit" port="2" />
+            <DigitalDevice name="arm.lowerLimit" port="3" />
+            <RevColorSensorV3 name="grabber.sensor" port="0" bus="1"/>
+            <REV_VL53L0X_RANGE_SENSOR name="turret.poleSensor" port="0" buse="2"/>
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
         <LynxModule name="Expansion Hub 2" port="2">
             <RevRoboticsCoreHexMotor name="turret.motor" port="0" />
             <goBILDA5202SeriesMotor name="elevator.motor" port="1" />
             <goBILDA5202SeriesMotor name="arm.motor" port="2" />
-            <DigitalDevice name="elevator.lowerLimit" port="0" />
-            <DigitalDevice name="arm.lowerLimit" port="1" />
             <Servo name="grabber.left" port="0" />
             <Servo name="grabber.right" port="1" />
             <RevBlinkinLedDriver name="blinkin" port="5" />
-            <RevColorSensorV3 name="grabber.sensor" port="0" bus="1"/>
             <!--<LynxEmbeddedIMU name="imu 1" port="0" bus="0" />-->
         </LynxModule>
     </LynxUsbDevice>
     <Webcam name="Webcam 1" serialNumber="B580F950" />
     <!--<Webcam name="Webcam 1" serialNumber="A8784D40" />-->
-<!--    <Webcam name="Webcam 2" serialNumber="816BAF60" />-->
+    <!--<Webcam name="Webcam 2" serialNumber="816BAF60" />-->
 </Robot>
