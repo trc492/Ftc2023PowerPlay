@@ -452,7 +452,6 @@ public class RobotParams
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
-    static final double ARM_RETRACTED                           = ARM_MIN_POS + 3;
     static final double ARM_SCORE_POS                           = 20;
     static final double ARM_SINGLE_CONE_POS                     = ARM_MAX_POS;
     static final double ARM_STACK_2_POS                         = ARM_MAX_POS;
