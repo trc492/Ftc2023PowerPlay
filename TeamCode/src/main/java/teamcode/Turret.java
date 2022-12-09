@@ -47,8 +47,6 @@ public class Turret
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger;
     private double prevTurretPower = 0.0;
-    private double sensorValue = 0.0;
-    private double analogTreshold = 1.0;
 
     public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
     {
@@ -76,7 +74,7 @@ public class Turret
             RobotParams.HWNAME_TURRET + ".dirSwitch", RobotParams.TURRET_DIR_SWITCH_INVERTED);
         if (RobotParams.Preferences.hasTurretSensor)
         {
-            FtcDistanceSensor sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".sensor");
+            FtcDistanceSensor sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".poleSensor");
             analogTrigger = new TrcAnalogSensorTrigger<FtcDistanceSensor.DataType>(
                 RobotParams.HWNAME_TURRET + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
                 new double[]{RobotParams.TURRET_SENSOR_THRESHOLD}, false, this::analogTriggerEvent);
@@ -114,7 +112,7 @@ public class Turret
      */
     public boolean getSensorState()
     {
-        return analogTrigger != null && analogTrigger.getCurrentZone() <= RobotParams.TURRET_SENSOR_THRESHOLD;
+        return analogTrigger != null && analogTrigger.getSensorValue() <= RobotParams.TURRET_SENSOR_THRESHOLD;
     }   //getSensorState
 
     /**
@@ -360,7 +358,7 @@ public class Turret
     public void autoAssistFindPole(double relativeTarget, double powerLimit, TrcEvent event, double timeout)
     {
         analogTrigger.setEnabled(true);
-        setTarget(getPosition() + relativeTarget, true, powerLimit, event, timeout);        // set turret target to relativeTarget.
+        setTarget(getPosition() + relativeTarget, true, powerLimit, event, timeout);
     }   //autoAssistFindPole
 
     /**
@@ -379,12 +377,11 @@ public class Turret
                 funcName, "Zone=%d->%d, value=%.3f",
                 callbackContext.prevZone, callbackContext.currZone, callbackContext.sensorValue);
         }
-        // cancel the turret turn here.
-        if(getSensorState() && callbackContext.currZone == 0){
-            cancel();
-            sensorValue = getSensorValue();
-        }
 
+        if (getSensorState())
+        {
+            cancel();
+        }
     }   //analogTriggerEvent
 
 }   //class Turret
