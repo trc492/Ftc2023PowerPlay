@@ -364,7 +364,6 @@ public class Turret
             this.notifyEvent = event;
             this.timeout = timeout;
         }   //ScanParams
-
     }   //class ScanParams
 
     /**
@@ -481,6 +480,5 @@ public class Turret
             cancel();
         }
     }   //analogTriggerEvent
-
 
 }   //class Turret
