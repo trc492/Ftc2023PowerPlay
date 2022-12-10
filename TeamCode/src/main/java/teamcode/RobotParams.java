@@ -96,7 +96,6 @@ public class RobotParams
     public static final String HWNAME_RBSTEER_SERVO1            = "rbSteerServo1";
     public static final String HWNAME_RBSTEER_SERVO2            = "rbSteerServo2";
     public static final String HWNAME_TURRET                    = "turret";
-    public static final String HWNAME_TURRET_DIR_SWITCH         = "turretDirSwitch";
     public static final String HWNAME_ELEVATOR                  = "elevator";
     public static final String HWNAME_ARM                       = "arm";
     public static final String HWNAME_GRABBER                   = "grabber";
@@ -467,10 +466,8 @@ public class RobotParams
     static final double ARM_OFFSET                              = -7.0;
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098; //In inches
-    static final double JOINT_TO_SENSOR                         = 2.0f;
-    static final double JOINT_TO_MID_CLAW                       = 3.75;
     static final double ARM_ANGLE_OFFSET                        = -8.9;
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -2;
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -2.0;
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
