@@ -370,9 +370,10 @@ public class Turret
      * This method turns the turret in an attempt to find the pole. It turns the turret in the direction of the
      * specified relative target. The turret will stop either it has reached the target or the pole is found. If
      * the pole is found, it will terminate the turret turn.
-     *Preconditions: arm must be above a certain limit, elevator must be above a certain value
+     * Preconditions: arm must be above a certain position, elevator must be above a certain height, so the sensor has
+     * a clear view of the pole.
      *
-     * @param startTarget specifies the start turret target to go to before doing the slow scan.
+     * @param startTarget specifies the absolute start turret target to go to before doing the slow scan.
      * @param startPowerLimit specifies the turret power limit going to the startTarget.
      * @param relativeScanTarget specifies the relative target in degrees (negative to scan left, positive to scan
      *        right).
@@ -393,7 +394,8 @@ public class Turret
      * This method turns the turret in an attempt to find the pole. It turns the turret in the direction of the
      * specified relative target. The turret will stop either it has reached the target or the pole is found. If
      * the pole is found, it will terminate the turret turn.
-     *Preconditions: arm must be above a certain limit, elevator must be above a certain value
+     * Preconditions: arm must be above a certain position, elevator must be above a certain height, so the sensor has
+     * a clear view of the pole.
      *
      * @param relativeScanTarget specifies the relative target in degrees (negative to scan left, positive to scan
      *        right).
