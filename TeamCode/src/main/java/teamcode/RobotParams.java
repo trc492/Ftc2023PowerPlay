@@ -365,20 +365,19 @@ public class RobotParams
     //
     // Elevator Subsystem
     //
-    static final double ELEVATOR_KP                             = 0.5;
+    static final double ELEVATOR_KP                             = 0.35;
     static final double ELEVATOR_KI                             = 0;//0.5;
     static final double ELEVATOR_KD                             = 0.025;
     static final double ELEVATOR_TOLERANCE                      = 2.0;
     static final double ELEVATOR_IZONE                          = 10.0;
     static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_435_ENCODER_PPR;
-    static final double ELEVATOR_PULLEY_DIAMETER                = 1.5*1.06;         // in inches
+    static final double ELEVATOR_PULLEY_DIAMETER                = 1.5*1.0465;       // in inches
     static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
     static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
-    static final double ELEVATOR_OFFSET                         = 7.0;              // in inches
+    static final double ELEVATOR_OFFSET                         = 7.8;              // in inches
     static final double ELEVATOR_MIN_POS                        = 7.0;
     static final double ELEVATOR_MAX_POS                        = 36.0;
     static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
-    static final double ELEVATOR_POS_FOR_TURRET_TURN            = ELEVATOR_MIN_POS_FOR_TURRET + 2.0;
     static final boolean ELEVATOR_MOTOR_INVERTED                = false;
     static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH        = true;
     static final boolean ELEVATOR_LOWER_LIMIT_INVERTED          = false;
@@ -390,22 +389,18 @@ public class RobotParams
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
-    static final double ELEVATOR_CONE_GRAB_HEIGHT               = 3;//18.0;
+    static final double ELEVATOR_CONE_GRAB_HEIGHT               = ELEVATOR_MIN_POS;
     static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 33.0;
     public static final double CAPPING_OFFSET                   = -8.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
-        ELEVATOR_MIN_POS,                                       // Slot 0
-        ELEVATOR_CONE_GRAB_HEIGHT,                              // Slot 1
-//        STACKED_CONE_ADDITION + ELEVATOR_CONE_GRAB_HEIGHT,      // Slot 2
-//        STACKED_CONE_ADDITION * 2 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 3
-//        STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
-//        STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
-//        LOW_JUNCTION_HEIGHT,                                  // Slot 6
-//        MID_JUNCTION_HEIGHT,                                  // Slot 7
-        HIGH_JUNCTION_HEIGHT,                                   // Slot 8
-        ELEVATOR_MAX_POS                                        // Slot 9
+        ELEVATOR_MIN_POS,
+        12.0,
+        24.0,
+        30.0,
+        HIGH_JUNCTION_HEIGHT,
+        ELEVATOR_MAX_POS
     };
     // 0.0 for placeholder so 1 additional cone per index
     static final double[] ELEVATOR_PICKUP_PRESETS               = new double[] {
@@ -416,7 +411,7 @@ public class RobotParams
         STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
         STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
     };
-    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.6;
+    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.2;
     //
     // Arm subsystem.
     //
@@ -428,7 +423,7 @@ public class RobotParams
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
     static final double ARM_GEAR_RATIO                          = 28.0;
     static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
-    static final double ARM_OFFSET                              = 7.0;
+    static final double ARM_OFFSET                              = -7.0;
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098; //In inches
     static final double JOINT_TO_SENSOR                         = 0.0;
@@ -437,12 +432,11 @@ public class RobotParams
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
      */
-    static final double ARM_MIN_POS                             = 8.0;
+    static final double ARM_MIN_POS                             = ARM_OFFSET;
     static final double ARM_MAX_POS                             = 140.0;
 
     static final double ARM_MIN_POS_FOR_TURRET                  = 65.0;
-    static final double ARM_POS_FOR_TURRET_TURN                 = ARM_MIN_POS_FOR_TURRET - 5.0;
-    static final boolean ARM_MOTOR_INVERTED                     = true;
+    static final boolean ARM_MOTOR_INVERTED                     = false;
     static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
     static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
     static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = false;
@@ -498,7 +492,7 @@ public class RobotParams
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = 0.5;
+    static final double TURRET_CAL_POWER                        = 0.35;
     static final double TURRET_POWER_SCALE                      = 0.8;
     static final double TURRET_STALL_MIN_POWER                  = 0.3;
     static final double TURRET_STALL_TOLERANCE                  = 0.0;
