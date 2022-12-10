@@ -40,6 +40,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         DRIVE_TO_SCORE_POSITION,
         RAISE_ELEVATOR_TO_SCORE,
         TURN_TO_SCORE_PRELOAD,
+        ALIGN_TO_POLE,
         LOWER_ELEVATOR,
         SCORE_PRELOAD,
         RAISE_ELEVATOR_AFTER_SCORING,
@@ -229,22 +230,24 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
                     break;
                 //assumes robot is set up already right next to the pole
-                case DO_POLE_VISION_SETUP:
-                    robot.turret.setTarget(2.0, 93, 0.75, event, 2.0, 32.0, 30.0);
-                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
-                    break;
 
                 case TURN_TO_SCORE_PRELOAD:
+                    //during the turret turn we want it to stop whenever it sees the pole so we enable autoassist
+                    //robot.turret.enableAutoAssist(true);
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
-                        0.75, event, 5.0, null, null);
+                         0.75,true,  5.0, null, 5.0);
                     if(debugPreloadMode){
                         sm.waitForSingleEvent(event, State.DONE);
                     }
                     else{
                         sm.waitForSingleEvent(event, State.LOWER_ELEVATOR, 5.0);
                     }
+                    break;
+                case ALIGN_TO_POLE:
+//                  turret.autoAssistFindPole(5, 0.2, event, 0);
+                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
                 case LOWER_ELEVATOR:
                     robot.turret.cancel();
@@ -266,8 +269,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case PREP_FOR_TRAVEL:
-                    robot.turret.setTarget(
-                            RobotParams.TURRET_FRONT, 1.0, event, 3.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
                     sm.waitForSingleEvent(event, State.DO_CYCLE);
                     break;
                 case DO_CYCLE:
@@ -297,8 +299,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     else
                     {
                         robot.turret.setTarget(
-                            RobotParams.TURRET_BACK, 1.0, null, 0.0,
-                            RobotParams.ELEVATOR_MIN_POS, RobotParams.ARM_MIN_POS);
+                            RobotParams.TURRET_BACK, true, 1.0, null, 0.0);
                         // CodeReview: check if there are any obstacles in the path.
                         TrcPose2D parkPos =
                             autoChoices.parking == FtcAuto.Parking.NEAR_TILE?

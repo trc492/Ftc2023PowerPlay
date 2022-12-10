@@ -114,6 +114,10 @@ public class Turret
     {
         return analogTrigger != null && analogTrigger.getSensorValue() <= RobotParams.TURRET_SENSOR_THRESHOLD;
     }   //getSensorState
+    //same as getSensorState, easier name to remember
+    public boolean poleInRange(){
+        return getSensorState();
+    }
 
     /**
      * This method returns the current turret position in degrees.
@@ -360,6 +364,13 @@ public class Turret
         analogTrigger.setEnabled(true);
         setTarget(getPosition() + relativeTarget, true, powerLimit, event, timeout);
     }   //autoAssistFindPole
+    public void enableTurretAutoAssist(){
+        analogTrigger.setEnabled(true);
+    }
+    public double scoringArmAngle(double sensorDistance) {
+        return 90.0-Math.acos((sensorDistance + RobotParams.JOINT_TO_SENSOR +
+                RobotParams.POLE_RADIUS - RobotParams.JOINT_TO_MID_CLAW)/RobotParams.ARM_JOINT_LENGTH);
+    }
 
     /**
      * This method is called when an analog sensor threshold has been crossed.
@@ -383,5 +394,6 @@ public class Turret
             cancel();
         }
     }   //analogTriggerEvent
+
 
 }   //class Turret

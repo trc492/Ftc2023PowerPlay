@@ -73,8 +73,8 @@ public class Robot
     public RobotDrive robotDrive;
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
-    public TurretOld turret;
-//    public Turret turret;
+    //public TurretOld turret;
+    public Turret turret;
     public TrcIntake intake = null;
     public TrcServoGrabber grabber = null;
     public TaskCyclingCones cyclingTask;
@@ -189,7 +189,8 @@ public class Robot
 
                 if(RobotParams.Preferences.useTurret)
                 {
-                    turret = new TurretOld(this);
+                    //turret = new TurretOld(this);
+                    turret = new Turret(this.globalTracer, false);
                 }
 
                 if (RobotParams.Preferences.useGrabber)

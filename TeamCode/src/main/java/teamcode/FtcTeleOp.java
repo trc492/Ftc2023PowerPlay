@@ -302,7 +302,7 @@ public class FtcTeleOp extends FtcOpMode
 
                 if (poleAngle != null && Math.abs(poleAngle) >= 1.0)
                 {
-                    robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.2);
+                    robot.turret.setTarget(robot.turret.getPosition() - poleAngle, true);
                 }
                 else if(poleAngle == null){
                     robot.turret.setPower(-0.2);
@@ -499,8 +499,8 @@ public class FtcTeleOp extends FtcOpMode
                     TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
                     callbackEvent.setCallback(this::scoreCone, null);
                     robot.turret.setTarget(
-                            0, RobotParams.TURRET_LEFT, 0.75, callbackEvent, 0,
-                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS);
+                            0.0, RobotParams.TURRET_LEFT, true, 0.0,
+                            null, 0);
 
                 }
                 break;
@@ -568,8 +568,8 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
 //                    robot.arm.setTarget(RobotParams.ARM_MAX_POS);
                     robot.turret.setTarget(
-                        RobotParams.TURRET_FRONT, 1.0, null, 0.0,
-                        RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, RobotParams.ARM_PICKUP_POS);
+                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
+                            null, 0);
 //                    robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, true, 1.0, null, null, 0.0);
                 }
                 break;
@@ -580,8 +580,9 @@ public class FtcTeleOp extends FtcOpMode
                     robot.robotDrive.gridDrive != null)
                 {
                     robot.turret.setTarget(
-                       RobotParams.TURRET_LEFT, 1.0, null, 0.0,
-                       RobotParams.ELEVATOR_SCORING_HEIGHT, 33.0);
+                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
+                            null, 0);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true);
                 }
                 break;
             //use this button for scoring on medium or low poles
@@ -589,8 +590,8 @@ public class FtcTeleOp extends FtcOpMode
                 if(pressed){
                    //about 6 inches shorter than high pole scoring height
                     robot.turret.setTarget(
-                            RobotParams.TURRET_FRONT, 0.75, null, 0.0,
-                            RobotParams.ELEVATOR_SCORING_HEIGHT - 6, 33.0);
+                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
+                            null, 0);
                 }
                 break;
 
@@ -680,10 +681,10 @@ public class FtcTeleOp extends FtcOpMode
     private void scoreCone(Object context)
     {
         robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, null);
+        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_VISION, null);
     }
     private void doPoleAlignOnly(Object context){
-        robot.cyclingTask.doPoleAlignOnly(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION);
+        robot.cyclingTask.doPoleAlignOnly(TaskCyclingCones.VisionType.CONE_VISION);
     }
 
 }   //class FtcTeleOp

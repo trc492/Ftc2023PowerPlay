@@ -63,7 +63,6 @@ public class TaskCyclingCones
     {
         NO_VISION,
         CONE_VISION,//uses vision to horizontally align to target
-        CONE_AND_POLE_VISION
     }
 
     /*
@@ -144,7 +143,7 @@ public class TaskCyclingCones
         startCycling(CycleType.TELEOP_ALIGN_CONE_ONLY, VisionType.CONE_VISION, 1, null);
     }
     public void doPoleAlignOnly(VisionType visionType){
-        startCycling(CycleType.TELEOP_ALIGN_POLE_ONLY, VisionType.CONE_AND_POLE_VISION, 1, null);
+        startCycling(CycleType.TELEOP_ALIGN_POLE_ONLY, VisionType.CONE_VISION, 1, null);
 
     }
 
@@ -350,7 +349,12 @@ public class TaskCyclingCones
 
                 case PREPARE_PICKUP:
                     robot.grabber.open();
-                    robot.turret.setTarget(0, RobotParams.TURRET_FRONT, 0.8, event, 0, 9.5, RobotParams.ARM_PICKUP_POS);
+                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[conesRemaining]);
+                    robot.turret.setTarget(
+                            0.0, FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT ?
+                                    RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT, true, 0.0,
+                            null, 0);
                     sm.waitForSingleEvent(event, State.PICKUP_CONE);
                     break;
 
@@ -389,38 +393,20 @@ public class TaskCyclingCones
                                 event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -91, FtcAuto.autoChoices));
                         robot.turret.setTarget(
-                                FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT ?
-                                        RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT);
+                                0.0, FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT ?
+                                        RobotParams.TURRET_RIGHT : RobotParams.TURRET_LEFT, true, 0.0,
+                                null, 0);
                         robot.arm.setTarget(17, false, 1.0);
                         sm.waitForSingleEvent(event,
-                                visionType == VisionType.CONE_AND_POLE_VISION ? State.LOOK_FOR_POLE : State.ALIGN_TO_POLE);
-                    }
-                    break;
-
-                case LOOK_FOR_POLE:
-                    // Call vision to detect the junction pole
-                    if (visionType != VisionType.CONE_AND_POLE_VISION)
-                    {
-                        sm.setState(State.SCORE);
-                    }
-                    else
-                    {
-                        //Some method to the distance from the sensor
-                        sensorDistance = robot.distanceSensor.sensor.getDistance(DistanceUnit.INCH);
-                        if(sensorDistance == null) {
-                            //Turning left then right to check for pole in both directions
-                            robot.turret.setTarget(robot.turret.getPosition()-10.0);
-                            robot.turret.setTarget(robot.turret.getPosition()+20.0);
-                        }
-                        else
-                        {
-                            //Assuming that if the turret sees the pole, it is centered enough
-                            robot.turret.cancel();
-                        }
+                               State.ALIGN_TO_POLE);
                     }
                     break;
 
                 case ALIGN_TO_POLE:
+                    Turret turret = new Turret(null, false);
+                    if(turret.poleInRange()){
+
+                    }
                     // Call vision to detect the junction pole
 //                    if(poleAngle != null){
 //                        robot.turret.setTarget(robot.turret.getPosition() - poleAngle, 0.75, event, 0.0, null, null);
@@ -428,7 +414,7 @@ public class TaskCyclingCones
 //                    else{
 //                        robot.turret.setTarget(RobotParams.TURRET_RIGHT, 0.75, event, 2.0, null, null);
 //                    }
-                    robot.arm.setTarget(scoringArmAngle(sensorDistance),false,1.0,event);
+                    //robot.arm.setTarget(robot.turret.findScoringArmAngle(sensorDistance),false,1.0,event);
                     sm.waitForSingleEvent(event, State.SCORE);
                     break;
 
@@ -443,7 +429,8 @@ public class TaskCyclingCones
                     break;
                 case PREP_FOR_TRAVEL:
                     robot.turret.setTarget(
-                            RobotParams.TURRET_FRONT, 1.0, event, 3.0, RobotParams.ELEVATOR_MIN_POS_FOR_TURRET, null);
+                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
+                            event, 0);
                     sm.waitForSingleEvent(event, State.DONE);
                     break;
                 default:
@@ -465,9 +452,6 @@ public class TaskCyclingCones
         robot.robotDrive.purePursuitDrive.cancel();
     }
 
-    public double scoringArmAngle(double sensorDistance) {
-        return 90.0-Math.acos((sensorDistance + RobotParams.JOINT_TO_SENSOR +
-                RobotParams.POLE_RADIUS - RobotParams.JOINT_TO_MID_CLAW)/RobotParams.ARM_JOINT_LENGTH);
-    }
+
 
 }   //class TaskCyclingCones
