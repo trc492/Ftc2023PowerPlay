@@ -384,6 +384,26 @@ public class Robot
     }   //getElevatorPowerCompensation
 
     /**
+     * This method calculates the scoring arm angle from the reading of the distance sensor.
+     *
+     * @return arm angle for scoring the cone.
+     */
+    public double getScoringArmAngle()
+    {
+        double armAngle = 0.0;
+
+        if (turret != null)
+        {
+            double sensorDistance = turret.getSensorValue();
+            armAngle = 90.0 + RobotParams.ARM_ANGLE_OFFSET -
+                       Math.toDegrees(Math.acos(
+                           (sensorDistance + RobotParams.CLAW_DISTANCE_ADUSTMENT)/RobotParams.ARM_JOINT_LENGTH));
+        }
+
+        return armAngle;
+   }   //getScoringArmAngle
+
+    /**
      * This method starts auto-assist navigation to the pickup/scoring position according to the caller's selection.
      *
      * @param buttonIndex specifies the caller selection.

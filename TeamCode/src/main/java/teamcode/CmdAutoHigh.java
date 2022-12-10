@@ -233,11 +233,10 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case TURN_TO_SCORE_PRELOAD:
                     //during the turret turn we want it to stop whenever it sees the pole so we enable autoassist
-                    robot.turret.enableTurretAutoAssist();
-                    robot.turret.setTarget(
+                    robot.turret.autoAssistFindPole(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT + 5: RobotParams.TURRET_LEFT + 5,
-                        true, 0.75, event, 5.0);
+                            RobotParams.TURRET_RIGHT - 10: RobotParams.TURRET_LEFT - 10,
+                        0.75, 20.0, 0.5, event, 0.0);
                     if(debugPreloadMode){
                         sm.waitForSingleEvent(event, State.DONE);
                     }

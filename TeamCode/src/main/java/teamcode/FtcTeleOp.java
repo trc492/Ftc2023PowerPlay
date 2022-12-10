@@ -515,8 +515,7 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                 if (pressed && robot.turret != null)
                 {
-                    robot.turret.enableTurretAutoAssist();
-                    robot.turret.setTarget(0.0, RobotParams.TURRET_LEFT + 10, true, 0.8, null, 0);
+                    robot.turret.autoAssistFindPole(RobotParams.TURRET_LEFT - 10, 0.75, 20.0, 0.5, null, 0.0);
                 }
                 break;
 
@@ -532,7 +531,7 @@ public class FtcTeleOp extends FtcOpMode
 //                }
                 if (pressed && robot.arm != null)
                 {
-                    double armTarget = robot.turret.calculateArmAngle();
+                    double armTarget = robot.getScoringArmAngle();
                     robot.arm.setTarget(armTarget, false, 1.0, null);
                 }
                 break;
