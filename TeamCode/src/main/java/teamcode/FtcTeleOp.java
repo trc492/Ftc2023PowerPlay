@@ -339,7 +339,9 @@ public class FtcTeleOp extends FtcOpMode
         if (robot.grabber != null)
         {
             robot.dashboard.displayPrintf(
-                6, "Grabber: pos=%.2f, sensor=%.2f", robot.grabber.getPosition(), robot.grabber.getSensorValue());
+                    6, "Grabber: pos=%.2f, sensor=%.2f", robot.grabber.getPosition(), robot.grabber.getSensorValue());
+            robot.dashboard.displayPrintf(
+                    8, "PoleSensor: distToPole=%.2f, poleInRange=%s",robot.turret.getSensorValue(), robot.turret.poleInRange());
         }
     }   //slowPeriodic
 
@@ -559,30 +561,32 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_B:
                 // Prepare Pickup: Extend arm, turn turret to face front, lower elevator after half a second
-                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null &&
-                    robot.robotDrive.gridDrive!= null)
+                if (pressed && robot.arm != null && robot.turret != null && robot.elevator != null)
                 {
 //                    TrcPose2D endPoint = robot.robotDrive.gridDrive.gridCellToPose(
 //                                    robot.robotDrive.getAutoTargetCell(
 //                                            RobotParams.SCORE_LOCATION_RED_LEFT, FtcAuto.autoChoices));
 //                    robot.robotDrive.gridDrive.driveToEndPoint(endPoint);
 //                    robot.arm.setTarget(RobotParams.ARM_MAX_POS);
+                    robot.turret.enableTurretAutoAssist();
                     robot.turret.setTarget(
-                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
+                            0.0, RobotParams.TURRET_LEFT + 10, true, 0.8,
                             null, 0);
-//                    robot.elevator.setTarget(0.5, RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, true, 1.0, null, null, 0.0);
+                    //robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true, 1.0, null);
+//                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
-                //Prepares high pole scoring: raise elevator, turn turret to the left, set arm to parallel
-                if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null &&
-                    robot.robotDrive.gridDrive != null)
+                //Prepares high pole scoring: raise elevator, turn turret to the left, set arm to position above the pole
+                if (pressed && robot.arm != null && robot.elevator != null && robot.turret != null)
                 {
-                    robot.turret.setTarget(
-                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
-                            null, 0);
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true);
+                    double armTarget = robot.turret.calculateArmAngle();
+                    robot.arm.setTarget(armTarget, false, 1.0, null);
+//                    robot.turret.setTarget(
+//                            0.0, RobotParams.TURRET_FRONT, true, 0.0,
+//                            null, 0);
+//                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true);
                 }
                 break;
             //use this button for scoring on medium or low poles
@@ -647,6 +651,8 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_BACK:
                 if (pressed && robot.turret != null)
                 {
+                    robot.arm.zeroCalibrate();
+                    robot.elevator.zeroCalibrate();
                     robot.turret.zeroCalibrate();
                 }
                 break;

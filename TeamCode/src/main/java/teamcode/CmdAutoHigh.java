@@ -233,32 +233,22 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case TURN_TO_SCORE_PRELOAD:
                     //during the turret turn we want it to stop whenever it sees the pole so we enable autoassist
-                    //robot.turret.enableAutoAssist(true);
+                    robot.turret.enableTurretAutoAssist();
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT,
+                            RobotParams.TURRET_RIGHT + 5: RobotParams.TURRET_LEFT + 5,
                          0.75,true,  5.0, null, 5.0);
                     if(debugPreloadMode){
                         sm.waitForSingleEvent(event, State.DONE);
                     }
                     else{
-                        sm.waitForSingleEvent(event, State.LOWER_ELEVATOR, 5.0);
+                        sm.waitForSingleEvent(event, State.SCORE_PRELOAD, 5.0);
                     }
-                    break;
-                case ALIGN_TO_POLE:
-//                  turret.autoAssistFindPole(5, 0.2, event, 0);
-                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
-                    break;
-                case LOWER_ELEVATOR:
-                    robot.turret.cancel();
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT + RobotParams.CAPPING_OFFSET, true, 1.0, event);
-                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD);
                     break;
                 //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
-
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
                     if(preloadOnly){
                         sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);

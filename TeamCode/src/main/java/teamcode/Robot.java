@@ -36,7 +36,6 @@ import TrcCommonLib.trclib.TrcServo;
 import TrcCommonLib.trclib.TrcServoGrabber;
 import TrcFtcLib.ftclib.FtcAndroidTone;
 import TrcFtcLib.ftclib.FtcDashboard;
-import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcMotorActuator;
 import TrcFtcLib.ftclib.FtcOpMode;
@@ -66,7 +65,6 @@ public class Robot
     public FtcRevBlinkin blinkin;
     public FtcRobotBattery battery;
     public FtcAndroidTone androidTone;
-    public FtcDistanceSensor distanceSensor;
     //
     // Subsystems.
     //
@@ -130,7 +128,6 @@ public class Robot
 
 //            androidTone = new FtcAndroidTone("androidTone");
             androidTone = null;
-            distanceSensor = new FtcDistanceSensor("distanceSensor");
             //
             // Create and initialize RobotDrive.
             //

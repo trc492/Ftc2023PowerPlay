@@ -76,7 +76,7 @@ public class Turret
         {
             FtcDistanceSensor sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".poleSensor");
             analogTrigger = new TrcAnalogSensorTrigger<FtcDistanceSensor.DataType>(
-                RobotParams.HWNAME_TURRET + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
+                RobotParams.HWNAME_TURRET + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_INCH,
                 new double[]{RobotParams.TURRET_SENSOR_THRESHOLD}, false, this::analogTriggerEvent);
         }
         else
@@ -353,6 +353,7 @@ public class Turret
      * This method turns the turret in an attempt to find the pole. It turns the turret in the direction of the
      * specified relative target. The turret will stop either it has reached the target or the pole is found. If
      * the pole is found, it will terminate the turret turn.
+     *Preconditions: arm must be above a certain limit, elevator must be above a certain value
      *
      * @param relativeTarget specifies the relative target in degrees (negative to turn left, positive to turn right).
      * @param powerLimit specifies how fast the turret should turn.
@@ -365,11 +366,15 @@ public class Turret
         setTarget(getPosition() + relativeTarget, true, powerLimit, event, timeout);
     }   //autoAssistFindPole
     public void enableTurretAutoAssist(){
+
         analogTrigger.setEnabled(true);
     }
     public double scoringArmAngle(double sensorDistance) {
-        return 90.0-Math.acos((sensorDistance + RobotParams.JOINT_TO_SENSOR +
-                RobotParams.POLE_RADIUS - RobotParams.JOINT_TO_MID_CLAW)/RobotParams.ARM_JOINT_LENGTH);
+        return 90.0 + RobotParams.ARM_ANGLE_OFFSET - Math.toDegrees(Math.acos((sensorDistance + RobotParams.CLAW_DISTANCE_ADUSTMENT)/RobotParams.ARM_JOINT_LENGTH));
+    }
+    public double calculateArmAngle(){
+        double sensorDistance = analogTrigger.getSensorValue();
+        return scoringArmAngle(sensorDistance);
     }
 
     /**

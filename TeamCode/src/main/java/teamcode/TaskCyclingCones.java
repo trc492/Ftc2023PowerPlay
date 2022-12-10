@@ -86,8 +86,9 @@ public class TaskCyclingCones
         PICKUP_CONE,
         RAISE_ELEVATOR,
         DRIVE_TO_POLE,
-        LOOK_FOR_POLE,
         ALIGN_TO_POLE,
+        LOWER_ARM_ABOVE_POLE,
+        LOWER_ELEVATOR_ABOVE_POLE,
         SCORE,
         CLEAR_POLE,
         PREP_FOR_TRAVEL,
@@ -206,7 +207,7 @@ public class TaskCyclingCones
                 sm.start(State.START);
                 break;
             case SCORING_ONLY:
-                sm.start(State.LOOK_FOR_POLE);
+                sm.start(State.ALIGN_TO_POLE);
                 break;
             case PICKUP_ONLY_TELEOP:
                 sm.start(State.LOOK_FOR_CONE);
@@ -215,10 +216,10 @@ public class TaskCyclingCones
                 sm.start(State.LOOK_FOR_CONE);
                 break;
             case TELEOP_ALIGN_POLE_ONLY:
-                sm.start(State.LOOK_FOR_POLE);
+                sm.start(State.ALIGN_TO_POLE);
 
         }
-        sm.start(cycleType == CycleType.SCORING_ONLY? State.LOOK_FOR_POLE: State.START);
+        sm.start(cycleType == CycleType.SCORING_ONLY? State.ALIGN_TO_POLE: State.START);
     }   //startCycling
 
     //
@@ -403,9 +404,12 @@ public class TaskCyclingCones
                     break;
 
                 case ALIGN_TO_POLE:
-                    Turret turret = new Turret(null, false);
-                    if(turret.poleInRange()){
-
+                    if(robot.turret.poleInRange()){
+                        sm.setState(State.LOWER_ARM_ABOVE_POLE);
+                    }
+                    else{
+                        robot.turret.autoAssistFindPole(-10, 0.5, event, 2.0);
+                        sm.waitForSingleEvent(event, State.LOWER_ARM_ABOVE_POLE);
                     }
                     // Call vision to detect the junction pole
 //                    if(poleAngle != null){
@@ -415,6 +419,15 @@ public class TaskCyclingCones
 //                        robot.turret.setTarget(RobotParams.TURRET_RIGHT, 0.75, event, 2.0, null, null);
 //                    }
                     //robot.arm.setTarget(robot.turret.findScoringArmAngle(sensorDistance),false,1.0,event);
+                    sm.waitForSingleEvent(event, State.SCORE);
+                    break;
+                case LOWER_ARM_ABOVE_POLE:
+                    double armTarget = robot.turret.calculateArmAngle();
+                    robot.arm.setTarget(armTarget, false, 1.0, event);
+                    sm.waitForSingleEvent(event, State.LOWER_ELEVATOR_ABOVE_POLE);
+                    break;
+                case LOWER_ELEVATOR_ABOVE_POLE:
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT - 2.0, true, 0.0, event, 2.0);
                     sm.waitForSingleEvent(event, State.SCORE);
                     break;
 

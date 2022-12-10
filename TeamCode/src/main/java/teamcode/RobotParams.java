@@ -426,8 +426,10 @@ public class RobotParams
     static final double ARM_OFFSET                              = -7.0;
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098; //In inches
-    static final double JOINT_TO_SENSOR                         = 0.0;
-    static final double JOINT_TO_MID_CLAW                       = 0.0;
+    static final double JOINT_TO_SENSOR                         = 2.0f;
+    static final double JOINT_TO_MID_CLAW                       = 3.75;
+    static final double ARM_ANGLE_OFFSET                        = -8.9;
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -2;
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
@@ -484,7 +486,7 @@ public class RobotParams
     static final double TURRET_OFFSET                           = 0.0;
     static final double TURRET_MIN_POS                          = 0.0;
     static final double TURRET_MAX_POS                          = 320.0;
-    static final double TURRET_SENSOR_THRESHOLD                 = 15.0; //in inches
+    static final double TURRET_SENSOR_THRESHOLD                 = 8.0; //in inches
     // continuously?
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
