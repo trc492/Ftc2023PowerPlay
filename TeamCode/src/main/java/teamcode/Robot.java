@@ -26,7 +26,6 @@ import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
-import TrcCommonLib.trclib.TrcIntake;
 import TrcCommonLib.trclib.TrcMotor;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
@@ -34,7 +33,6 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
 import TrcCommonLib.trclib.TrcServoGrabber;
-import TrcFtcLib.ftclib.FtcAndroidTone;
 import TrcFtcLib.ftclib.FtcDashboard;
 import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcMotorActuator;
@@ -64,16 +62,13 @@ public class Robot
     //
     public FtcRevBlinkin blinkin;
     public FtcRobotBattery battery;
-    public FtcAndroidTone androidTone;
     //
     // Subsystems.
     //
     public RobotDrive robotDrive;
+    public Turret turret;
     public TrcPidActuator elevator = null;
     public TrcPidActuator arm = null;
-    //public TurretOld turret;
-    public Turret turret;
-    public TrcIntake intake = null;
     public TrcServoGrabber grabber = null;
     public TaskCyclingCones cyclingTask;
 
@@ -125,9 +120,6 @@ public class Robot
             {
                 battery = new FtcRobotBattery();
             }
-
-//            androidTone = new FtcAndroidTone("androidTone");
-            androidTone = null;
             //
             // Create and initialize RobotDrive.
             //
@@ -137,6 +129,11 @@ public class Robot
             //
             if (RobotParams.Preferences.initSubsystems)
             {
+                if(RobotParams.Preferences.useTurret)
+                {
+                    turret = new Turret(globalTracer, false);
+                }
+
                 if (RobotParams.Preferences.useElevator)
                 {
                     final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
@@ -182,12 +179,6 @@ public class Robot
                         .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);
-                }
-
-                if(RobotParams.Preferences.useTurret)
-                {
-                    //turret = new TurretOld(this);
-                    turret = new Turret(this.globalTracer, false);
                 }
 
                 if (RobotParams.Preferences.useGrabber)
@@ -360,6 +351,27 @@ public class Robot
     }   //stopMode
 
     /**
+     * This method zero calibrates all subsystems.
+     */
+    public void zeroCalibrate()
+    {
+        if (arm != null)
+        {
+            arm.zeroCalibrate();
+        }
+
+        if (elevator != null)
+        {
+            elevator.zeroCalibrate();
+        }
+
+        if (turret != null)
+        {
+            turret.zeroCalibrate();
+        }
+    }   //zeroCalibrate
+
+    /**
      * This method returns the power required to make the elevator gravity neutral.
      *
      * @param currPower specifies the current motor power.
@@ -395,6 +407,5 @@ public class Robot
     {
         opMode.telemetry.speak(sentence);
     }   //speak
-
 
 }   //class Robot

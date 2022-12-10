@@ -22,8 +22,6 @@
 
 package teamcode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
@@ -404,7 +402,7 @@ public class TaskCyclingCones
                     break;
 
                 case ALIGN_TO_POLE:
-                    if(robot.turret.poleInRange()){
+                    if(robot.turret.detectedPole()){
                         sm.setState(State.LOWER_ARM_ABOVE_POLE);
                     }
                     else{

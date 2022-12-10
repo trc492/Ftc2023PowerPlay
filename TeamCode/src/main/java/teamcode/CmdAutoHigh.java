@@ -237,7 +237,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT + 5: RobotParams.TURRET_LEFT + 5,
-                         0.75,true,  5.0, null, 5.0);
+                        true, 0.75, event, 5.0);
                     if(debugPreloadMode){
                         sm.waitForSingleEvent(event, State.DONE);
                     }

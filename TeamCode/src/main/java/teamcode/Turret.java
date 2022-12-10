@@ -53,7 +53,7 @@ public class Turret
         final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
             RobotParams.TURRET_MOTOR_INVERTED,
             RobotParams.TURRET_HAS_LOWER_LIMIT_SWITCH, RobotParams.TURRET_LOWER_LIMIT_INVERTED,
-            RobotParams.TURRET_HAS_UPPER_LIMIT_SWITCH, RobotParams.TURRET_UPPER_LIMIT_INVERTED);
+            RobotParams.TURRET_HAS_UPPER_LIMIT_SWITCH, RobotParams.TURRET_UPPER_LIMIT_INVERTED, true);
         final TrcPidActuator.Parameters turretParams = new TrcPidActuator.Parameters()
             .setPosRange(RobotParams.TURRET_MIN_POS, RobotParams.TURRET_MAX_POS)
             .setScaleOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
@@ -106,18 +106,14 @@ public class Turret
     }   //getSensorValue
 
     /**
-     * This method returns the analog trigger state.
+     * This method checks if the pole is detected.
      *
-     * @return true if analog sensor has triggered, false otherwise.
+     * @return true if pole is detected, false otherwise.
      */
-    public boolean getSensorState()
+    public boolean detectedPole()
     {
         return analogTrigger != null && analogTrigger.getSensorValue() <= RobotParams.TURRET_SENSOR_THRESHOLD;
-    }   //getSensorState
-    //same as getSensorState, easier name to remember
-    public boolean poleInRange(){
-        return getSensorState();
-    }
+    }   //detectedPole
 
     /**
      * This method returns the current turret position in degrees.
@@ -394,7 +390,7 @@ public class Turret
                 callbackContext.prevZone, callbackContext.currZone, callbackContext.sensorValue);
         }
 
-        if (getSensorState())
+        if (detectedPole())
         {
             cancel();
         }
