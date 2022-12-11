@@ -46,6 +46,7 @@ public class Turret
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger;
     private double prevTurretPower = 0.0;
+    private String currOwner = null;
 
     public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
     {
@@ -92,7 +93,14 @@ public class Turret
      */
     public boolean acquireExclusiveAccess(String owner)
     {
-        return pidTurret.acquireExclusiveAccess(owner);
+        boolean success = pidTurret.acquireExclusiveAccess(owner);
+
+        if (success)
+        {
+            currOwner = owner;
+        }
+
+        return success;
     }   //acquireExclusiveAccess
 
     /**
@@ -103,7 +111,14 @@ public class Turret
      */
     public boolean releaseExclusiveAccess(String owner)
     {
-        return pidTurret.releaseExclusiveAccess(owner);
+        boolean success = pidTurret.releaseExclusiveAccess(owner);
+
+        if (success)
+        {
+            currOwner = null;
+        }
+
+        return success;
     }   //releaseExclusiveAccess
 
     /**
@@ -183,8 +198,9 @@ public class Turret
      */
     public void zeroCalibrate(String owner)
     {
-        double calPower = Math.abs(RobotParams.TURRET_CAL_POWER);
-        pidTurret.zeroCalibrate(owner, calDirectionSwitch.isActive()? calPower: -calPower, null);
+        pidTurret.zeroCalibrate(owner, RobotParams.TURRET_CAL_POWER, null);
+//        double calPower = Math.abs(RobotParams.TURRET_CAL_POWER);
+//        pidTurret.zeroCalibrate(owner, calDirectionSwitch.isActive()? calPower: -calPower, null);
     }   //zeroCalibrate
 
     /**
@@ -202,8 +218,11 @@ public class Turret
      */
     public void cancel(String owner)
     {
-        pidTurret.cancel(owner);
-        analogTrigger.setEnabled(false);
+        if (owner == null || owner.equals(currOwner))
+        {
+            pidTurret.cancel(owner);
+            analogTrigger.setEnabled(false);
+        }
     }   //cancel
 
     /**
@@ -211,7 +230,7 @@ public class Turret
      */
     public void cancel()
     {
-        cancel(null);
+        cancel(currOwner);
     }   //cancel
 
     /**
@@ -422,7 +441,7 @@ public class Turret
 
         if (detectedPole())
         {
-            cancel();
+            cancel(currOwner);
         }
     }   //analogTriggerEvent
 

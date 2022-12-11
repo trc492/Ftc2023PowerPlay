@@ -108,7 +108,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             msgTracer.traceInfo(
                 funcName,
-                "startTarget=%.1f, startPowerLimit=%.1f, scoreHeight=%.1f, scanPower=%.1f, scanDuration=%.1f, " +
+                "startTarget=%.2f, startPowerLimit=%.2f, scoreHeight=%.2f, scanPower=%.2f, scanDuration=%.3f, " +
                 "event=%s, timeout=%.3f",
                 startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration, event, timeout);
         }
@@ -260,7 +260,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case RAISE_TO_SCORE_HEIGHT:
                 robot.elevator.setTarget(
                     moduleName, 0.0, taskParams.scoreHeight, true, 1.0, event, timeout);
-                sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
+                sm.waitForSingleEvent(event, State.FIND_POLE);
                 break;
 
             case FIND_POLE:
@@ -280,7 +280,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     {
                         msgTracer.traceInfo(funcName, "armTarget=%.1f", armTarget);
                     }
-                    robot.arm.setTarget(armTarget, false, 1.0, event);
+                    robot.arm.setTarget(moduleName, 0.0, armTarget, false, 1.0, event, 0.0);
                     sm.waitForSingleEvent(event, State.CAP_POLE);
                 }
                 else
@@ -291,7 +291,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
 
             case CAP_POLE:
                 robot.elevator.setTarget(
-                    moduleName, 0.0, robot.elevator.getPosition() - 12.0, true, 1.0, event, timeout);
+                    moduleName, 0.0, robot.elevator.getPosition() - 6.0, true, 1.0, event, timeout);
                 sm.waitForSingleEvent(event, State.SCORE_CONE);
                 break;
 
