@@ -284,7 +284,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 break;
             case PREPARE_PICKUP:
                 robot.grabber.open();
-                robot.arm.setTarget(moduleName, RobotParams.ARM_PICKUP_POS, false, 1.0, null, 0.0);
+                robot.arm.setTarget(moduleName, 20, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(
                     moduleName, RobotParams.ELEVATOR_PICKUP_PRESETS[taskParams.conesRemaining], true, 1.0, null, 0.0);
                 robot.turret.setTarget(moduleName, RobotParams.TURRET_FRONT, true, 0.0, null, 0);
@@ -295,10 +295,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 {
                     // Vision found the cone, drive to it with incremental pure pursuit.
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
-                    // ToDo(CodeReview): this heading only works on RED_LEFT or BLUE_RIGHT?!
                     robot.robotDrive.purePursuitDrive.start(
                             moduleName, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
-                            new TrcPose2D(targetLocation.x, 5,270 - robot.robotDrive.driveBase.getHeading()));
+                            new TrcPose2D(targetLocation.x, 5, FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                                    270 - robot.robotDrive.driveBase.getHeading() : 90 - robot.robotDrive.driveBase.getHeading()));
                 }
                 else if(runMode != TrcRobot.RunMode.TELEOP_MODE)
                 {
@@ -308,35 +308,30 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     robot.robotDrive.purePursuitDrive.start(
                             moduleName, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
+                    sm.waitForSingleEvent(event, State.PICKUP_CONE);
                 }
                 else{
-                    // ToDo(CodeReview): You are setting DONE state but then wait for event in the next statement?!
                     sm.setState(State.DONE);
                 }
-                sm.waitForSingleEvent(event, State.PICKUP_CONE);
                 break;
             //use drivebase to align because we can't turn turret for lower cone stacks (might hit the motor)
             //use turret/grabber sensor value to check if there is a cone in front
             //if we can't see it strave left for 2 seconds. if we still can't find it strafe the other way for 2 seconds(not implemented)
             //todo: replace this logic with something in turret to cancel pure pursuit when sensor sees cone
             case ALIGN_TO_CONE:
-                //ToDo(CodeReview): Your arm angle is blocking the distance sensor?!
-                if (robot.turret.detectedPole())
+                if (robot.turret.getSensorValue() <= RobotParams.TURRET_SENSOR_PICKUP_THRESHOLD)
                 {
                     robot.robotDrive.cancel();
                     sm.setState(State.PICKUP_CONE);
                 }
                 //ran out of time, couldn't find pole stack
-                //ToDo(CodeReview): expireTime is NULL here?!
+                else if(expireTime == null){
+                    expireTime = TrcUtil.getCurrentTime() + 2;
+                    robot.robotDrive.driveBase.holonomicDrive(moduleName, -0.1, 0, 0, 2, event);
+                }
                 else if(TrcUtil.getCurrentTime() == expireTime){
                     expireTime = null;
-                    sm.setState(State.DONE);
-                }
-                else{
-                    if(expireTime == null){
-                        expireTime = TrcUtil.getCurrentTime() + 2;
-                    }
-                    robot.robotDrive.driveBase.holonomicDrive(moduleName, -0.1, 0, 0, 2, event);
+                    sm.setState(State.PICKUP_CONE);
                 }
                 break;
 

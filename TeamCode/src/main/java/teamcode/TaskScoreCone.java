@@ -165,6 +165,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             msgTracer.traceInfo(funcName, "Canceling auto-assist score cone.");
         }
+
         stopAutoTask(false);
     }   //autoAssistCancel
 
@@ -253,13 +254,13 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case TURN_TO_START_TARGET:
                 robot.turret.setTarget(
                     moduleName, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit,
-                    event, timeout);
+                    event, 5.0);
                 sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
                 break;
 
             case RAISE_TO_SCORE_HEIGHT:
                 robot.elevator.setTarget(
-                    moduleName, 0.0, taskParams.scoreHeight, true, 1.0, event, timeout);
+                    moduleName, 0.0, taskParams.scoreHeight, true, 1.0, event, 3);
                 sm.waitForSingleEvent(event, State.FIND_POLE);
                 break;
 
@@ -285,13 +286,17 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 }
                 else
                 {
+                    if (msgTracer != null)
+                    {
+                        msgTracer.traceInfo(
+                            funcName, "Failed to find pole (sensor=%.2f).", robot.turret.getSensorValue());
+                    }
                     sm.setState(State.DONE);
                 }
                 break;
 
             case CAP_POLE:
-                robot.elevator.setTarget(
-                    moduleName, 0.0, robot.elevator.getPosition() - 6.0, true, 1.0, event, timeout);
+                robot.elevator.setPower(moduleName, -0.2, 0.5, event);
                 sm.waitForSingleEvent(event, State.SCORE_CONE);
                 break;
 
