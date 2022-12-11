@@ -198,7 +198,7 @@ public class Robot
                 //
                 // Create and initialize auto-assist tasks.
                 //
-                scoreConeTask = new TaskScoreCone(this, globalTracer);
+                scoreConeTask = new TaskScoreCone("ScoreConeTask", this, globalTracer);
                 cyclingTask = new TaskCyclingCones(this);
                 this.cyclingTask.setMsgTracer(globalTracer);
             }
