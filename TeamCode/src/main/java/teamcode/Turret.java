@@ -88,6 +88,28 @@ public class Turret
     }   //Turret
 
     /**
+     * This method acquires exclusive ownership of the subsystem if it's not already owned by somebody else.
+     *
+     * @param owner specifies the ID string of the caller requesting ownership.
+     * @return true if successfully acquired ownership, false otherwise.
+     */
+    public boolean acquireExclusiveAccess(String owner)
+    {
+        return pidTurret.acquireExclusiveAccess(owner);
+    }   //acquireExclusiveAccess
+
+    /**
+     * This method release exclusive ownership of the subsystem if the caller is indeed the owner.
+     *
+     * @param owner specifies the ID string of the caller releasing ownership.
+     * @return true if successfully releasing ownership, false otherwise.
+     */
+    public boolean releaseExclusiveAccess(String owner)
+    {
+        return pidTurret.releaseExclusiveAccess(owner);
+    }   //releaseExclusiveAccess
+
+    /**
      * This method returns the PID actuator object.
      *
      * @return PID Actuator.
@@ -106,6 +128,16 @@ public class Turret
     {
         return analogTrigger != null? analogTrigger.getSensorValue(): 0.0;
     }   //getSensorValue
+
+    /**
+     * This method enables/disable the sensor trigger.
+     *
+     * @param enabled specifies true to enable, false to disable.
+     */
+    public void setTriggerEnabled(boolean enabled)
+    {
+        analogTrigger.setEnabled(enabled);
+    }   //setTriggerEnabled
 
     /**
      * This method checks if the pole is detected.
@@ -168,11 +200,21 @@ public class Turret
 
     /**
      * This method stops the turret if it was in motion.
+     *
+     * @param owner specifies the owner ID to check if the caller has ownership of the subsystem.
+     */
+    public void cancel(String owner)
+    {
+        pidTurret.cancel(owner);
+        analogTrigger.setEnabled(false);
+    }   //cancel
+
+    /**
+     * This method stops the turret if it was in motion.
      */
     public void cancel()
     {
-        pidTurret.cancel();
-        analogTrigger.setEnabled(false);
+        cancel(null);
     }   //cancel
 
     /**
@@ -346,119 +388,6 @@ public class Turret
     {
         setPower(null, power, true);
     }   //setPower
-
-    /**
-     * This class encapsulate the parameters for doing a turret scan for the target.
-     */
-    private static class ScanParams
-    {
-        double relativeScanTarget;
-        double scanPowerLimit;
-        TrcEvent notifyEvent;
-        double timeout;
-
-        ScanParams(double relativeScanTarget, double scanPowerLimit, TrcEvent event, double timeout)
-        {
-            this.relativeScanTarget = relativeScanTarget;
-            this.scanPowerLimit = scanPowerLimit;
-            this.notifyEvent = event;
-            this.timeout = timeout;
-        }   //ScanParams
-    }   //class ScanParams
-
-    /**
-     * This method turns the turret in an attempt to find the pole. It turns the turret in the direction of the
-     * specified relative target. The turret will stop either it has reached the target or the pole is found. If
-     * the pole is found, it will terminate the turret turn.
-     * Preconditions: arm must be above a certain position, elevator must be above a certain height, so the sensor has
-     * a clear view of the pole.
-     *
-     * @param startTarget specifies the absolute start turret target to go to before doing the slow scan.
-     * @param startPowerLimit specifies the turret power limit going to the startTarget.
-     * @param relativeScanTarget specifies the relative target in degrees (negative to scan left, positive to scan
-     *        right).
-     * @param scanPowerLimit specifies how fast the turret should scan.
-     * @param event specifies the event to signal when done, can be null if none provided.
-     * @param timeout specifies the maximum amount of time for the completion of this operation in seconds.
-     */
-    public void autoAssistFindPole(
-        double startTarget, double startPowerLimit, double relativeScanTarget, double scanPowerLimit, TrcEvent event,
-        double timeout)
-    {
-        callbackEvent.setCallback(
-            this::doScanTarget, new ScanParams(relativeScanTarget, scanPowerLimit, event, timeout));
-        setTarget(startTarget, false, startPowerLimit, callbackEvent, timeout);
-    }   //autoAssistFindPole
-
-    /**
-     * This method turns the turret in an attempt to find the pole. It turns the turret in the direction of the
-     * specified relative target. The turret will stop either it has reached the target or the pole is found. If
-     * the pole is found, it will terminate the turret turn.
-     * Preconditions: arm must be above a certain position, elevator must be above a certain height, so the sensor has
-     * a clear view of the pole.
-     *
-     * @param relativeScanTarget specifies the relative target in degrees (negative to scan left, positive to scan
-     *        right).
-     * @param scanPowerLimit specifies how fast the turret should scan.
-     * @param event specifies the event to signal when done, can be null if none provided.
-     * @param timeout specifies the maximum amount of time for the completion of this operation in seconds.
-     */
-    public void autoAssistFindPole(double relativeScanTarget, double scanPowerLimit, TrcEvent event, double timeout)
-    {
-        callbackEvent.signal();
-        doScanTarget(new ScanParams(relativeScanTarget, scanPowerLimit, event, timeout));
-    }   //autoAssistFindPole
-
-    /**
-     * This method is called after the turret reaches the startTarget so it can start doing the relative scan target.
-     *
-     * @param context specifies the ScanParams object.
-     */
-    private void doScanTarget(Object context)
-    {
-        ScanParams scanParams = (ScanParams) context;
-
-        if (callbackEvent.isSignaled())
-        {
-            // We either reached startTarget or we timed out. Either way, we will do the scanning.
-            analogTrigger.setEnabled(true);
-            callbackEvent.setCallback(this::finishScanTarget, scanParams);
-            setTarget(
-                getPosition() + scanParams.relativeScanTarget, true, scanParams.scanPowerLimit, callbackEvent,
-                scanParams.timeout);
-        }
-        else if (callbackEvent.isCanceled() && scanParams.notifyEvent != null)
-        {
-            // Somebody has canceled the operation, so abort and signal canceled.
-            scanParams.notifyEvent.cancel();
-        }
-    }   //doScanTarget
-
-    /**
-     * This method is called when scan target is done. Scan target is done when either the target is detected or
-     * relative scan target has been reached without detecting the target. The caller can find out if the target
-     * has been detected by calling the detectedPole method.
-     *
-     * @param context specifies the ScanParams object.
-     */
-    private void finishScanTarget(Object context)
-    {
-        ScanParams scanParams = (ScanParams) context;
-        analogTrigger.setEnabled(false);
-        if (scanParams.notifyEvent != null)
-        {
-            if (callbackEvent.isSignaled())
-            {
-                // We either detected the target or we timed out. Either way, signal the caller.
-                scanParams.notifyEvent.signal();
-            }
-            else if (callbackEvent.isCanceled())
-            {
-                // Somebody has canceled the operation, so signal canceled.
-                scanParams.notifyEvent.cancel();
-            }
-        }
-    }   //finishScanTarget
 
     /**
      * This method is called when an analog sensor threshold has been crossed.

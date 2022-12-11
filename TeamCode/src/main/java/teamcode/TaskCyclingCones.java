@@ -406,7 +406,7 @@ public class TaskCyclingCones
                         sm.setState(State.LOWER_ARM_ABOVE_POLE);
                     }
                     else{
-                        robot.turret.autoAssistFindPole(-20, 0.5, event, 2.0);
+                        robot.scoreConeTask.autoAssistScoreCone(0.5, 2.0, event);
                         sm.waitForSingleEvent(event, State.LOWER_ARM_ABOVE_POLE);
                     }
                     // Call vision to detect the junction pole

@@ -521,7 +521,7 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                 if (pressed && robot.turret != null)
                 {
-//                    robot.turret.autoAssistFindPole(0.0, 40, 0.75, null, 0.0);
+                    robot.scoreConeTask.autoAssistScoreCone(75.0, 0.75, 30.0, 0.5, 2.0, null, 0.0);
                 }
                 break;
 
