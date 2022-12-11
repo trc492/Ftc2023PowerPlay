@@ -204,8 +204,8 @@ public class FtcAuto extends FtcOpMode
 
         if (robot.elevator != null && robot.arm != null && robot.turret != null)
         {
-            robot.turret.zeroCalibrate();
-            robot.turret.getPidActuator().setTarget(2.0, 40, false, 0.8, null, 0.0);
+            robot.zeroCalibrate();
+            //robot.turret.getPidActuator().setTarget(2.0, 40, false, 0.8, null, 0.0);
 
         }
 
@@ -214,10 +214,7 @@ public class FtcAuto extends FtcOpMode
             robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
         }
     }   //initRobot
-    public void afterZeroTurnTurret(Object context){
-        robot.globalTracer.traceInfo("funcName", "afterZeroTurn called");
-        robot.turret.getPidActuator().setTarget(40);
-    }
+
     //
     // Overrides TrcRobot.RobotMode methods.
     //

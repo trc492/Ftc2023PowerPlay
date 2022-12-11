@@ -61,8 +61,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int conesRemaining = 5;
     private final boolean debugPoleVision = false;
     private final boolean debugCycleTask = false;
-    private final boolean preloadOnly = true;
-    private final boolean debugPreloadMode = false;
+    private final boolean preloadOnly = false;
+    private final boolean debugPreloadMode = true;
 
 
     /**
@@ -233,23 +233,23 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case TURN_TO_SCORE_PRELOAD:
                     //during the turret turn we want it to stop whenever it sees the pole so we enable autoassist
-                    robot.turret.autoAssistFindPole(
-                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT - 10: RobotParams.TURRET_LEFT - 10,
-                        0.75, 20.0, 0.5, event, 0.0);
-                    if(debugPreloadMode){
-                        sm.waitForSingleEvent(event, State.DONE);
-                    }
-                    else{
-                        sm.waitForSingleEvent(event, State.SCORE_PRELOAD, 5.0);
-                    }
+//                    robot.turret.autoAssistFindPole(
+//                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
+//                            RobotParams.TURRET_RIGHT - 10: RobotParams.TURRET_LEFT - 10,
+//                        0.75, 20.0, 0.3, event, 0.0);
+
+                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD, 5.0);
+
                     break;
                 //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
                 //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
                 //dump the cone with auto-assist
                 case SCORE_PRELOAD:
                     robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
-                    if(preloadOnly){
+                    if(debugPreloadMode){
+                        sm.waitForSingleEvent(event, State.DONE);
+                    }
+                    else if(preloadOnly){
                         sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
                     }
                     else{

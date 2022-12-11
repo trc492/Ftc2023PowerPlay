@@ -122,6 +122,7 @@ public class FtcTeleOp extends FtcOpMode
 
         if (robot.vision != null && robot.vision.frontEocvVision != null)
         {
+            robot.globalTracer.traceInfo("Vision enabled", "vision is enabled");
             robot.vision.frontEocvVision.setDetectObjectType(
                 FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                     EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
@@ -212,6 +213,7 @@ public class FtcTeleOp extends FtcOpMode
             }
             else if (robot.robotDrive.driveBase.supportsHolonomicDrive())
             {
+                robot.dashboard.displayPrintf(10, "xPower:%.1f,yPower:%.1f,turnPower:%.1f", inputs[0], inputs[1], inputs[2]);
                 robot.robotDrive.driveBase.holonomicDrive(
                     null, inputs[0], inputs[1], inputs[2],
                     robot.robotDrive.driveBase.getDriveGyroAngle(driveOrientation));
@@ -223,6 +225,7 @@ public class FtcTeleOp extends FtcOpMode
             }
 
             robot.dashboard.displayPrintf(2, "Pose:%s", robot.robotDrive.driveBase.getFieldPosition());
+
         }
         //
         // Other subsystems.
@@ -334,10 +337,13 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
-                if (pressed && robot.robotDrive.gridDrive != null)
-                {
-                    robot.robotDrive.gridDrive.cancel();
+                if(pressed){
+                    robot.robotDrive.cancel();
                 }
+//                if (pressed && robot.robotDrive.gridDrive != null)
+//                {
+//                    robot.robotDrive.gridDrive.cancel();
+//                }
                 break;
 
             case FtcGamepad.GAMEPAD_B:
@@ -436,17 +442,17 @@ public class FtcTeleOp extends FtcOpMode
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
                 //aligning to cone or pole version
-                if(!robot.grabber.hasObject()){
-                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-                    robot.cyclingTask.doConeAlignOnly(TaskCyclingCones.VisionType.CONE_VISION);
-                }
-                else {
-                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
-                    callbackEvent.setCallback(this::scoreCone, null);
-                    robot.turret.setTarget(
-                            0.0, RobotParams.TURRET_LEFT, true, 0.0,
-                            null, 0);
-                }
+//                if(!robot.grabber.hasObject()){
+//                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
+//                    robot.cyclingTask.doConeAlignOnly(TaskCyclingCones.VisionType.CONE_VISION);
+//                }
+//                else {
+//                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
+//                    callbackEvent.setCallback(this::scoreCone, null);
+//                    robot.turret.setTarget(
+//                            0.0, RobotParams.TURRET_LEFT, true, 0.0,
+//                            null, 0);
+//                }
                 break;
         }
     }   //driverButtonEvent
@@ -515,7 +521,7 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                 if (pressed && robot.turret != null)
                 {
-                    robot.turret.autoAssistFindPole(RobotParams.TURRET_LEFT - 10, 0.75, 20.0, 0.5, null, 0.0);
+                    robot.turret.autoAssistFindPole(0.0, 40, 0.75, null, 0.0);
                 }
                 break;
 
