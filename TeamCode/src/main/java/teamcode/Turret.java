@@ -42,11 +42,9 @@ public class Turret
     private static final TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
     private static final boolean debugEnabled = false;
 
-    private static final String moduleName = "Turret";
     private final TrcPidActuator pidTurret;
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger;
-    private final TrcEvent callbackEvent;
     private double prevTurretPower = 0.0;
 
     public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
@@ -76,7 +74,7 @@ public class Turret
         if (RobotParams.Preferences.hasTurretSensor)
         {
             FtcDistanceSensor sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".poleSensor");
-            analogTrigger = new TrcAnalogSensorTrigger<FtcDistanceSensor.DataType>(
+            analogTrigger = new TrcAnalogSensorTrigger<>(
                 RobotParams.HWNAME_TURRET + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_INCH,
                 new double[]{RobotParams.TURRET_SENSOR_THRESHOLD}, false, this::analogTriggerEvent);
         }
@@ -84,7 +82,6 @@ public class Turret
         {
             analogTrigger = null;
         }
-        callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
     }   //Turret
 
     /**
@@ -233,6 +230,23 @@ public class Turret
         double timeout)
     {
         pidTurret.setTarget(owner, delay, target, holdTarget, powerLimit, event, timeout);
+    }   //setTarget
+
+    /**
+     * This method sets the turret target position.
+     *
+     * @param owner specifies the owner ID to check if the caller has ownership of the subsystem.
+     * @param target specifies the target position of the turret in degrees.
+     * @param holdTarget specifies true to hold target, false otherwise.
+     * @param powerLimit specifies the maximum power the turret will turn.
+     * @param event specifies the event to signal when the turret is on target, can be null if not provided.
+     * @param timeout specifies timeout in seconds for the operation.
+     */
+    public void setTarget(
+        String owner, double target, boolean holdTarget, double powerLimit, TrcEvent event,
+        double timeout)
+    {
+        pidTurret.setTarget(owner, 0.0, target, holdTarget, powerLimit, event, timeout);
     }   //setTarget
 
     /**
