@@ -521,7 +521,10 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
                 if (pressed && robot.turret != null)
                 {
-                    robot.scoreConeTask.autoAssistScoreCone(75.0, 0.75, 30.0, 0.35, 2.0, null, 0.0);
+                    robot.scoreConeTask.autoAssistScoreCone(75.0, 0.75, 30.0, 0.35, 5.0, null, 0.0);
+                }
+                else if(!pressed && robot.turret != null && ! turretSlowModeOn){
+//                    robot.scoreConeTask.autoAssistCancel();
                 }
                 break;
 
@@ -535,17 +538,26 @@ public class FtcTeleOp extends FtcOpMode
 //                            null, 0);
 //                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true);
 //                }
-                if (pressed && robot.arm != null)
+                if (pressed && robot.turret != null && !turretSlowModeOn)
                 {
-                    double armTarget = robot.getScoringArmAngle();
-                    robot.arm.setTarget(armTarget, false, 1.0, null);
+                    robot.scoreConeTask.autoAssistScoreCone(RobotParams.TURRET_LEFT - 20, 0.75, 32.0, 0.35, 2.0, null, 0.0);
                 }
+//fd
+                //if right bumper is held, kyle needs elevator to the right height first
+                else if(pressed && robot.turret != null && turretSlowModeOn){
+                    robot.scoreConeTask.autoAssistScoreCone(0.3, 3, null);
+                }
+
                 break;
             //use this button for scoring on medium or low poles
             case FtcGamepad.GAMEPAD_Y:
                 if(pressed){
                    //about 6 inches shorter than high pole scoring height
                     robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
+                    robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
+                    robot.grabber.open();
+                    robot.grabber.enableAutoAssist(null, 0, null, 0);
                 }
                 break;
 
@@ -558,6 +570,8 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_RBUMPER:
                 if(pressed)
                 {
+                    robot.scoreConeTask.autoAssistCancel();
+
                     turretSlowModeOn = !turretSlowModeOn;
                     if(turretSlowModeOn)
                     {
