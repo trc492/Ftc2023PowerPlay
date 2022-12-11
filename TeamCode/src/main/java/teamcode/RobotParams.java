@@ -376,6 +376,7 @@ public class RobotParams
     static final double TURRET_MIN_POS                          = 0.0;
     static final double TURRET_MAX_POS                          = 320.0;
     static final double TURRET_SENSOR_THRESHOLD                 = 8.0; //in inches
+    static final double TURRET_SENSOR_PICKUP_THRESHOLD          = 12;
     // continuously?
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
