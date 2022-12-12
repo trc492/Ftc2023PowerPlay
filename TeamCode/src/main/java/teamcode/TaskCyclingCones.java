@@ -430,6 +430,7 @@ public class TaskCyclingCones
                     break;
 
                 case SCORE: //7. spin intake backwards
+                    // Todo: This is wrong, there is no event object on cancelAutoAssist.
                     robot.grabber.cancelAutoAssist(event);
                     sm.waitForSingleEvent(event, State.CLEAR_POLE);
                     break;

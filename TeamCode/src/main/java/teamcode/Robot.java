@@ -133,7 +133,7 @@ public class Robot
             {
                 if(RobotParams.Preferences.useTurret)
                 {
-                    turret = new Turret(this, globalTracer, false);
+                    turret = new Turret(globalTracer, false);
                 }
 
                 if (RobotParams.Preferences.useElevator)
@@ -190,7 +190,7 @@ public class Robot
                             RobotParams.GRABBER_MAX_STEPRATE, RobotParams.GRABBER_MIN_POS, RobotParams.GRABBER_MAX_POS)
                         .setServoInverted(RobotParams.GRABBER_LSERVO_INVERTED, RobotParams.GRABBER_RSERVO_INVERTED)
                         .setTriggerInverted(RobotParams.GRABBER_TRIGGER_INVERTED)
-                        .setAnalogThreshold(RobotParams.GRABBER_SENSOR_THRESHOLD)
+                        .setThresholds(RobotParams.GRABBER_TRIGGER_THRESHOLD, RobotParams.GRABBER_HAS_OBJECT_THRESHOLD)
                         .setOpenParams(RobotParams.GRABBER_OPEN_POS, RobotParams.GRABBER_OPEN_TIME)
                         .setCloseParams(RobotParams.GRABBER_CLOSE_POS, RobotParams.GRABBER_CLOSE_TIME)
                         .setMsgTracer(globalTracer);
@@ -430,16 +430,22 @@ public class Robot
      *
      * @return arm angle for scoring the cone.
      */
-    public double getScoringArmAngle()
+    public Double getScoringArmAngle()
     {
-        double armAngle = 0.0;
+        final String funcName = "getScoringArmAngle";
+        Double armAngle = null;
 
         if (turret != null)
         {
             double sensorDistance = turret.getSensorValue();
-            armAngle = 90.0 + RobotParams.ARM_ANGLE_OFFSET -
-                       Math.toDegrees(Math.acos(
-                           (sensorDistance + RobotParams.CLAW_DISTANCE_ADUSTMENT)/RobotParams.ARM_JOINT_LENGTH));
+            double poleDistance =  sensorDistance + RobotParams.CLAW_DISTANCE_ADUSTMENT;
+            if (poleDistance < RobotParams.ARM_JOINT_LENGTH)
+            {
+                armAngle = 90.0 + RobotParams.ARM_ANGLE_OFFSET -
+                           Math.toDegrees(Math.acos(poleDistance/RobotParams.ARM_JOINT_LENGTH));
+            }
+            globalTracer.traceInfo(
+                funcName, "sensorDist=%.2f, poleDist=%.2f, armAngle=%s", sensorDistance, poleDistance, armAngle);
         }
 
         return armAngle;

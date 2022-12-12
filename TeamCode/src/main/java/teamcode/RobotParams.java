@@ -375,9 +375,9 @@ public class RobotParams
     static final double TURRET_OFFSET                           = 0.0;
     static final double TURRET_MIN_POS                          = 0.0;
     static final double TURRET_MAX_POS                          = 325.0;
-    static final double TURRET_SENSOR_THRESHOLD                 = 12.0; //in inches
-    static final double TURRET_SENSOR_PICKUP_THRESHOLD          = 12;
-    // continuously?
+    static final double TURRET_SENSOR_LOWER_THRESHOLD           = 4.0;  // in inches
+    static final double TURRET_SENSOR_UPPER_THRESHOLD           = 12.0; // in inches
+    static final double TURRET_SENSOR_SETTLING_PERIOD           = 0.20; // in seconds
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
     static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
@@ -467,7 +467,7 @@ public class RobotParams
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
     static final double ARM_GEAR_RATIO                          = 28.0;
     static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
-    static final double ARM_OFFSET                              = -7.0;
+    static final double ARM_OFFSET                              = -11.0;
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
     static final double ARM_ANGLE_OFFSET                        = -11.90;   // in degrees
@@ -478,6 +478,7 @@ public class RobotParams
      */
     static final double ARM_MIN_POS                             = ARM_OFFSET;
     static final double ARM_MAX_POS                             = 140.0;
+    static final double ARM_UP_POS                              = 0.0;
 
     static final double ARM_MIN_POS_FOR_TURRET                  = 65.0;
     static final boolean ARM_MOTOR_INVERTED                     = false;
@@ -523,7 +524,8 @@ public class RobotParams
     static final boolean GRABBER_LSERVO_INVERTED                = false;
     static final boolean GRABBER_RSERVO_INVERTED                = true;
     static final boolean GRABBER_TRIGGER_INVERTED               = true;
-    static final double GRABBER_SENSOR_THRESHOLD                = 3.0;
+    static final double GRABBER_TRIGGER_THRESHOLD               = 4.0;
+    static final double GRABBER_HAS_OBJECT_THRESHOLD            = 6.0;
     static final double GRABBER_OPEN_POS                        = GRABBER_MAX_POS;
     static final double GRABBER_OPEN_TIME                       = 0.5;
     static final double GRABBER_CLOSE_POS                       = GRABBER_MIN_POS;

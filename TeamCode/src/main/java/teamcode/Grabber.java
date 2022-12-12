@@ -50,7 +50,7 @@ public class Grabber
             FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcAnalogSensorTrigger<>(
                 instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
-                new double[]{params.analogThreshold}, false, this::analogTriggerEvent);
+                new double[]{params.triggerThreshold}, false, this::analogTriggerEvent);
         }
 
         grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, params, analogTrigger);

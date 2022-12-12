@@ -22,34 +22,35 @@
 
 package teamcode;
 
-import TrcCommonLib.trclib.TrcAnalogSensorTrigger;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
+import TrcCommonLib.trclib.TrcSensor;
+import TrcCommonLib.trclib.TrcThresholdTrigger;
 import TrcFtcLib.ftclib.FtcDigitalInput;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcFtcLib.ftclib.FtcMotorActuator;
 
 /**
  * This class encapsulates a PID Actuator as the Turret. The turret has additional capabilities over a PID actuator.
- * It contains a REV 2m distance sensor that will detect the proximity of the pole. It provides an auto-assist method
- * to allow the turret to turn and find the pole. Once it's found it calculates the distance from the grabber to the
- * pole so that it will move the grabber towards the pole for scoring the cone.
+ * It contains a REV 2m distance sensor that will detect the proximity of the pole.
  */
 public class Turret
 {
     private static final TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
     private static final boolean debugEnabled = false;
 
-    private final Robot robot;
     private final TrcPidActuator pidTurret;
     private final FtcDigitalInput calDirectionSwitch;
-    private final TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger;
+    private final FtcDistanceSensor sensor;
+    private final TrcThresholdTrigger thresholdTrigger;
     private double prevTurretPower = 0.0;
     private String currOwner = null;
 
-    public Turret(Robot robot, TrcDbgTrace msgTracer, boolean tracePidInfo)
+    public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
     {
         final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
             RobotParams.TURRET_MOTOR_INVERTED,
@@ -65,7 +66,6 @@ public class Turret
             .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
 
-        this.robot = robot;
         pidTurret = new FtcMotorActuator(RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
         if (msgTracer != null)
         {
@@ -76,14 +76,17 @@ public class Turret
             RobotParams.HWNAME_TURRET + ".dirSwitch", RobotParams.TURRET_DIR_SWITCH_INVERTED);
         if (RobotParams.Preferences.hasTurretSensor)
         {
-            FtcDistanceSensor sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".poleSensor");
-            analogTrigger = new TrcAnalogSensorTrigger<>(
-                RobotParams.HWNAME_TURRET + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_INCH,
-                new double[]{RobotParams.TURRET_SENSOR_THRESHOLD}, false, this::analogTriggerEvent);
+            sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".poleSensor");
+            thresholdTrigger = new TrcThresholdTrigger(
+                RobotParams.HWNAME_TURRET + ".thresholdTrigger", this::getSensorValue, this::thresholdTriggerEvent);
+            thresholdTrigger.setTrigger(
+                RobotParams.TURRET_SENSOR_LOWER_THRESHOLD, RobotParams.TURRET_SENSOR_UPPER_THRESHOLD,
+                RobotParams.TURRET_SENSOR_SETTLING_PERIOD);
         }
         else
         {
-            analogTrigger = null;
+            sensor = null;
+            thresholdTrigger = null;
         }
     }   //Turret
 
@@ -140,17 +143,25 @@ public class Turret
      */
     public double getSensorValue()
     {
-        return analogTrigger != null? analogTrigger.getSensorValue(): 0.0;
+        double value = 0.0;
+
+        if (sensor != null)
+        {
+            TrcSensor.SensorData<Double> data = sensor.getProcessedData(0, FtcDistanceSensor.DataType.DISTANCE_INCH);
+            value = data.value;
+        }
+
+        return value;
     }   //getSensorValue
 
     /**
-     * This method enables/disable the sensor trigger.
+     * This method enables/disables the threshold trigger.
      *
      * @param enabled specifies true to enable, false to disable.
      */
     public void setTriggerEnabled(boolean enabled)
     {
-        analogTrigger.setEnabled(enabled);
+        thresholdTrigger.setEnabled(enabled);
     }   //setTriggerEnabled
 
     /**
@@ -160,7 +171,10 @@ public class Turret
      */
     public boolean detectedPole()
     {
-        return analogTrigger != null && analogTrigger.getSensorValue() <= RobotParams.TURRET_SENSOR_THRESHOLD;
+        double value = getSensorValue();
+
+        return value >= RobotParams.TURRET_SENSOR_LOWER_THRESHOLD &&
+               value <= RobotParams.TURRET_SENSOR_UPPER_THRESHOLD;
     }   //detectedPole
 
     /**
@@ -201,8 +215,6 @@ public class Turret
     public void zeroCalibrate(String owner)
     {
         pidTurret.zeroCalibrate(owner, RobotParams.TURRET_CAL_POWER, null);
-//        double calPower = Math.abs(RobotParams.TURRET_CAL_POWER);
-//        pidTurret.zeroCalibrate(owner, calDirectionSwitch.isActive()? calPower: -calPower, null);
     }   //zeroCalibrate
 
     /**
@@ -223,7 +235,7 @@ public class Turret
         if (owner == null || owner.equals(currOwner))
         {
             pidTurret.cancel(owner);
-            analogTrigger.setEnabled(false);
+            thresholdTrigger.setEnabled(false);
         }
     }   //cancel
 
@@ -425,26 +437,24 @@ public class Turret
     }   //setPower
 
     /**
-     * This method is called when an analog sensor threshold has been crossed.
+     * This method is called when the sensor value falls in the threshold range for at least the settling period.
      *
      * @param context specifies the callback context.
      */
-    private void analogTriggerEvent(Object context)
+    private void thresholdTriggerEvent(Object context)
     {
-        final String funcName = "analogTriggerEvent";
-        TrcAnalogSensorTrigger.CallbackContext callbackContext = (TrcAnalogSensorTrigger.CallbackContext) context;
+        final String funcName = "sensorTriggerEvent";
+        boolean isActive = ((AtomicBoolean) context).get();
 
         if (debugEnabled)
         {
-            globalTracer.traceInfo(
-                funcName, "Zone=%d->%d, value=%.3f",
-                callbackContext.prevZone, callbackContext.currZone, callbackContext.sensorValue);
+            globalTracer.traceInfo(funcName, "value=%.3f, state=%s", getSensorValue(), isActive);
         }
 
-        if (detectedPole())
+        if (isActive)
         {
             cancel(currOwner);
         }
-    }   //analogTriggerEvent
+    }   //thresholdTriggerEvent
 
 }   //class Turret

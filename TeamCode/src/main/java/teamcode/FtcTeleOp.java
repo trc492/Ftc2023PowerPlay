@@ -79,7 +79,6 @@ public class FtcTeleOp extends FtcOpMode
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
     private boolean autoNavigate = false;
-    private boolean autoAssistGrabberOn = false;
 
     //
     // Implements FtcOpMode abstract method.
@@ -485,8 +484,9 @@ public class FtcTeleOp extends FtcOpMode
                     }
                     else if (pressed)
                     {
-                        autoAssistGrabberOn = !autoAssistGrabberOn;
-                        robot.setGrabberAutoAssistOn(autoAssistGrabberOn);
+                        boolean grabberAutoAssistOn = robot.grabber.isAutoAssistActive();
+                        grabberAutoAssistOn = !grabberAutoAssistOn;
+                        robot.setGrabberAutoAssistOn(grabberAutoAssistOn);
                     }
                 }
                 break;
@@ -551,8 +551,7 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
                     robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
-                    autoAssistGrabberOn = true;
-                    robot.setGrabberAutoAssistOn(autoAssistGrabberOn);
+                    robot.setGrabberAutoAssistOn(true);
                 }
                 break;
 

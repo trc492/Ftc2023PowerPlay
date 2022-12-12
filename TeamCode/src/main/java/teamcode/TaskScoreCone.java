@@ -256,7 +256,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         switch (state)
         {
             case START:
-                robot.arm.setTarget(currOwner, 0.0, RobotParams.ARM_MIN_POS, false, 1.0, event, 5.0);
+                robot.arm.setTarget(currOwner, 0.0, RobotParams.ARM_UP_POS, false, 1.0, event, 5.0);
                 sm.waitForSingleEvent(event, State.TURN_TO_START_TARGET);
                 break;
 
@@ -300,10 +300,15 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     {
                         robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, true);
                     }
-                    double armTarget = robot.getScoringArmAngle();
-                    if (msgTracer != null)
+                    Double armTarget = robot.getScoringArmAngle();
+                    if (armTarget == null || armTarget > 30.0)
                     {
-                        msgTracer.traceInfo(funcName, "armTarget=%.1f", armTarget);
+                        if (msgTracer != null)
+                        {
+                            msgTracer.traceInfo(
+                                funcName, "Failed to determine valid arm angle (angle %f).", armTarget);
+                        }
+                        armTarget = 24.0;
                     }
                     robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.CAP_POLE);
@@ -325,7 +330,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 break;
 
             case SCORE_CONE:
-                robot.grabber.cancelAutoAssist();
+                robot.setGrabberAutoAssistOn(false);
                 robot.arm.setTarget(currOwner, RobotParams.ARM_MIN_POS, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 //

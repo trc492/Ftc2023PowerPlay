@@ -317,7 +317,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
             //if we can't see it strave left for 2 seconds. if we still can't find it strafe the other way for 2 seconds(not implemented)
             //todo: replace this logic with something in turret to cancel pure pursuit when sensor sees cone
             case ALIGN_TO_CONE:
-                if (robot.turret.getSensorValue() <= RobotParams.TURRET_SENSOR_PICKUP_THRESHOLD)
+                if (robot.turret.detectedPole())
                 {
                     robot.robotDrive.cancel();
                     sm.setState(State.PICKUP_CONE);

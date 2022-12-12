@@ -211,7 +211,7 @@ public class FtcAuto extends FtcOpMode
 
         if (robot.grabber != null)
         {
-            robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
+            robot.setGrabberAutoAssistOn(true);
         }
     }   //initRobot
 
