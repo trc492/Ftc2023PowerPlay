@@ -26,6 +26,7 @@ import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
+import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcMotor;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
@@ -357,21 +358,35 @@ public class Robot
      */
     public void zeroCalibrate()
     {
-        if (arm != null)
-        {
-            arm.zeroCalibrate();
-        }
-
         if (elevator != null)
         {
             elevator.zeroCalibrate();
         }
 
+        if (arm != null)
+        {
+            TrcEvent callbackEvent = new TrcEvent("zeroCalEvent");
+            callbackEvent.setCallback(this::zeroCalTurret, null);
+            arm.zeroCalibrate(callbackEvent);
+        }
+        else
+        {
+            zeroCalTurret(null);
+        }
+    }   //zeroCalibrate
+
+    /**
+     * This method zero calibrate the turret only if it's safe to do so (the arm is zero calibrated).
+     *
+     * @param context not used.
+     */
+    private void zeroCalTurret(Object context)
+    {
         if (turret != null)
         {
             turret.zeroCalibrate();
         }
-    }   //zeroCalibrate
+    }   //zeroCalTurret
 
     /**
      * This method returns the power required to make the elevator gravity neutral.

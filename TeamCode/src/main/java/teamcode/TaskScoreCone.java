@@ -38,6 +38,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
 
     public enum State
     {
+        START,
         TURN_TO_START_TARGET,
         RAISE_TO_SCORE_HEIGHT,
         FIND_POLE,
@@ -70,6 +71,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     private final Robot robot;
     private final TrcDbgTrace msgTracer;
     private final TrcEvent event;
+    private String currOwner = null;
 
     /**
      * Constructor: Create an instance of the object.
@@ -99,11 +101,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      * @param scanPower specifies how fast to scan for target, positive to scan left and negative to scan right.
      * @param scanDuration specifies how long to scan for target in seconds, scan will stop early if detected target.
      * @param event specifies the event to signal when done, can be null if none provided.
-     * @param timeout specifies the maximum amount of time for the completion of this operation in seconds.
      */
     public void autoAssistScoreCone(
         double startTarget, double startPowerLimit, double scoreHeight, double scanPower, double scanDuration,
-        TrcEvent event, double timeout)
+        TrcEvent event)
     {
         final String funcName = "autoAssistScoreCone";
 
@@ -111,17 +112,12 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             msgTracer.traceInfo(
                 funcName,
-                "startTarget=%.2f, startPowerLimit=%.2f, scoreHeight=%.2f, scanPower=%.2f, scanDuration=%.3f, " +
-                "event=%s, timeout=%.3f",
-                startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration, event, timeout);
+                "startTarget=%.2f, startPowerLimit=%.2f, scoreHeight=%.2f, scanPower=%.2f, scanDuration=%.3f, event=%s",
+                startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration, event);
         }
 
         startAutoTask(
-            startPowerLimit != 0.0?
-                State.TURN_TO_START_TARGET:
-                scoreHeight > 0.0? State.RAISE_TO_SCORE_HEIGHT: State.FIND_POLE,
-            new TaskParams(startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration),
-            event, timeout);
+            State.START, new TaskParams(startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration), event);
     }   //autoAssistScoreCone
 
     /**
@@ -134,12 +130,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      * @param scanPower specifies how fast to scan for target, positive to scan left and negative to scan right.
      * @param scanDuration specifies how long to scan for target in seconds, scan will stop early if detected target.
      * @param event specifies the event to signal when done, can be null if none provided.
-     * @param timeout specifies the maximum amount of time for the completion of this operation in seconds.
      */
-    public void autoAssistScoreCone(
-        double scoreHeight, double scanPower, double scanDuration, TrcEvent event, double timeout)
+    public void autoAssistScoreCone(double scoreHeight, double scanPower, double scanDuration, TrcEvent event)
     {
-        autoAssistScoreCone(0.0, 0.0, scoreHeight, scanPower, scanDuration, event, timeout);
+        autoAssistScoreCone(0.0, 0.0, scoreHeight, scanPower, scanDuration, event);
     }   //autoAssistScoreCone
 
     /**
@@ -154,7 +148,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      */
     public void autoAssistScoreCone(double scanPower, double scanDuration, TrcEvent event)
     {
-        autoAssistScoreCone(0.0, 0.0, 0.0, scanPower, scanDuration, event, 0.0);
+        autoAssistScoreCone(0.0, 0.0, 0.0, scanPower, scanDuration, event);
     }   //autoAssistScoreCone
 
     /**
@@ -192,7 +186,11 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                            robot.elevator.acquireExclusiveAccess(owner) &&
                            robot.arm.acquireExclusiveAccess(owner));
 
-        if (!success)
+        if (success)
+        {
+            currOwner = owner;
+        }
+        else
         {
             if (msgTracer != null)
             {
@@ -223,9 +221,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     ownershipMgr.getOwner(robot.turret.getPidActuator()), ownershipMgr.getOwner(robot.elevator),
                     ownershipMgr.getOwner(robot.arm));
             }
-            robot.turret.releaseExclusiveAccess(owner);
-            robot.elevator.releaseExclusiveAccess(owner);
-            robot.arm.releaseExclusiveAccess(owner);
+            robot.turret.releaseExclusiveAccess(currOwner);
+            robot.elevator.releaseExclusiveAccess(currOwner);
+            robot.arm.releaseExclusiveAccess(currOwner);
+            currOwner = null;
         }
     }   //releaseSubsystemsOwnership
 
@@ -235,9 +234,9 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     @Override
     protected void stopSubsystems()
     {
-        robot.turret.cancel(owner);
-        robot.elevator.cancel(owner);
-        robot.arm.cancel(owner);
+        robot.turret.cancel(currOwner);
+        robot.elevator.cancel(currOwner);
+        robot.arm.cancel(currOwner);
     }   //stopSubsystems.
 
     /**
@@ -245,41 +244,55 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      *
      * @param params specifies the task parameters.
      * @param state specifies the current state of the task.
-     * @param timeout specifies the timeout for executing the current state, can be zero if no timeout.
      * @param taskType specifies the type of task being run.
      * @param runMode specifies the competition mode (e.g. Autonomous, TeleOp, Test).
      */
     @Override
-    protected void runTaskState(
-        Object params, State state, double timeout, TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
+    protected void runTaskState(Object params, State state, TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
     {
         final String funcName = "runTaskState";
         TaskParams taskParams = (TaskParams) params;
 
         switch (state)
         {
+            case START:
+                robot.arm.setTarget(currOwner, 0.0, RobotParams.ARM_MIN_POS, false, 1.0, event, 5.0);
+                sm.waitForSingleEvent(event, State.TURN_TO_START_TARGET);
+                break;
+
             case TURN_TO_START_TARGET:
-                robot.turret.setTarget(
-                    owner, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit,
-                    event, timeout);
-                sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
+                if (taskParams.startPowerLimit != 0.0)
+                {
+                    robot.turret.setTarget(
+                        currOwner, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit, event, 5.0);
+                    sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
+                }
+                else
+                {
+                    sm.setState(State.RAISE_TO_SCORE_HEIGHT);
+                }
                 break;
 
             case RAISE_TO_SCORE_HEIGHT:
-                robot.elevator.setTarget(
-                    owner, 0.0, taskParams.scoreHeight, true, 1.0, event, timeout);
-                sm.waitForSingleEvent(event, State.FIND_POLE);
+                if (taskParams.scoreHeight > 0.0)
+                {
+                    robot.elevator.setTarget(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
+                    sm.waitForSingleEvent(event, State.FIND_POLE);
+                }
+                else
+                {
+                    sm.setState(State.FIND_POLE);
+                }
                 break;
 
             case FIND_POLE:
                 robot.turret.setTriggerEnabled(true);
-                robot.turret.getPidActuator().setPower(
-                    owner, taskParams.scanPower, taskParams.scanDuration, event);
+                robot.turret.getPidActuator().setPower(currOwner, taskParams.scanPower, taskParams.scanDuration, event);
                 sm.waitForSingleEvent(event, State.EXTEND_ARM);
                 break;
 
             case EXTEND_ARM:
-                robot.turret.getPidActuator().setPower(owner, 0.0);
+                robot.turret.getPidActuator().setPower(currOwner, 0.0);
                 robot.turret.setTriggerEnabled(false);
                 if (robot.turret.detectedPole())
                 {
@@ -288,7 +301,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     {
                         msgTracer.traceInfo(funcName, "armTarget=%.1f", armTarget);
                     }
-                    robot.arm.setTarget(owner, 0.0, armTarget, false, 1.0, event, 0.0);
+                    robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.CAP_POLE);
                 }
                 else
@@ -303,14 +316,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 break;
 
             case CAP_POLE:
-                robot.elevator.setPower(owner, -0.2, 0.5, event);
+                robot.elevator.setPower(currOwner, -0.2, 0.5, event);
                 sm.waitForSingleEvent(event, State.SCORE_CONE);
                 break;
 
             case SCORE_CONE:
                 robot.grabber.cancelAutoAssist();
-                robot.arm.setTarget(owner, RobotParams.ARM_MIN_POS, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(owner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
+                robot.arm.setTarget(currOwner, RobotParams.ARM_MIN_POS, false, 1.0, null, 0.0);
+                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.
                 //

@@ -374,7 +374,7 @@ public class RobotParams
     static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
     static final double TURRET_OFFSET                           = 0.0;
     static final double TURRET_MIN_POS                          = 0.0;
-    static final double TURRET_MAX_POS                          = 320.0;
+    static final double TURRET_MAX_POS                          = 325.0;
     static final double TURRET_SENSOR_THRESHOLD                 = 12.0; //in inches
     static final double TURRET_SENSOR_PICKUP_THRESHOLD          = 12;
     // continuously?
@@ -386,8 +386,8 @@ public class RobotParams
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
     static final double TURRET_CAL_POWER                        = -0.35;
     static final double TURRET_POWER_SCALE                      = 0.8;
-    static final double TURRET_STALL_MIN_POWER                  = 0.3;
-    static final double TURRET_STALL_TOLERANCE                  = 0.0;
+    static final double TURRET_STALL_MIN_POWER                  = 0.5;
+    static final double TURRET_STALL_TOLERANCE                  = 1.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
     static final double TURRET_RESET_TIMEOUT                    = 0.5;
     static final double TURRET_BACK                             = 0.0;
@@ -395,6 +395,9 @@ public class RobotParams
     static final double TURRET_FRONT                            = 180.0;
     static final double TURRET_LEFT                             = 270.0;
     static final double TURRET_PRESET_TOLERANCE                 = 10.0;
+    static final double TURRET_SCAN_OFFSET                      = 20.0;
+    static final double TURRET_SCAN_POWER                       = 0.35;
+    static final double TURRET_SCAN_DURATION                    = 5.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
         TURRET_BACK,    // Slot 0
         TURRET_RIGHT,   // Slot 1
@@ -433,7 +436,7 @@ public class RobotParams
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = ELEVATOR_MIN_POS;
     static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
-    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 33.0;
+    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 30.0;
     public static final double CAPPING_OFFSET                   = -8.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
         ELEVATOR_MIN_POS,
@@ -482,7 +485,7 @@ public class RobotParams
     static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
     static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = false;
     static final boolean ARM_UPPER_LIMIT_INVERTED               = false;
-    static final double ARM_CAL_POWER                           = -0.3;
+    static final double ARM_CAL_POWER                           = -1.0;
     static final double ARM_STALL_MIN_POWER                     = 0.3;
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;

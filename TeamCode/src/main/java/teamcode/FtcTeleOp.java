@@ -522,11 +522,10 @@ public class FtcTeleOp extends FtcOpMode
                 {
                     if (pressed)
                     {
-                        robot.scoreConeTask.autoAssistScoreCone(75.0, 0.75, 30.0, 0.35, 5.0, null, 5.0);
-                    }
-                    else
-                    {
-                        robot.scoreConeTask.autoAssistCancel();
+                        robot.scoreConeTask.autoAssistScoreCone(
+                            RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                            RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
                 break;
@@ -553,12 +552,10 @@ public class FtcTeleOp extends FtcOpMode
                         else
                         {
                             robot.scoreConeTask.autoAssistScoreCone(
-                                RobotParams.TURRET_LEFT - 20, 0.75, 32.0, 0.35, 2.0, null, 5.0);
+                                RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                                RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                                RobotParams.TURRET_SCAN_DURATION, null);
                         }
-                    }
-                    else
-                    {
-                        robot.scoreConeTask.autoAssistCancel();
                     }
                 }
                 break;
@@ -569,7 +566,6 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
                     robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
-                    robot.grabber.open();
                     robot.grabber.enableAutoAssist(null, 0, null, 0);
                 }
                 break;
@@ -584,16 +580,16 @@ public class FtcTeleOp extends FtcOpMode
                 if(pressed)
                 {
                     robot.scoreConeTask.autoAssistCancel();
+                }
 
-                    turretSlowModeOn = !turretSlowModeOn;
-                    if(turretSlowModeOn)
-                    {
-                        robot.turret.getPidActuator().getPidController().setOutputLimit(0.5);
-                    }
-                    else
-                    {
-                        robot.turret.getPidActuator().getPidController().setOutputLimit(1.0);
-                    }
+                turretSlowModeOn = pressed;
+                if (turretSlowModeOn)
+                {
+                    robot.turret.getPidActuator().getPidController().setOutputLimit(0.5);
+                }
+                else
+                {
+                    robot.turret.getPidActuator().getPidController().setOutputLimit(1.0);
                 }
                 break;
 
