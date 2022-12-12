@@ -296,6 +296,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 robot.turret.setTriggerEnabled(false);
                 if (robot.turret.detectedPole())
                 {
+                    if (robot.blinkin != null)
+                    {
+                        robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, true);
+                    }
                     double armTarget = robot.getScoringArmAngle();
                     if (msgTracer != null)
                     {
@@ -329,6 +333,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 //
             default:
             case DONE:
+                if (robot.blinkin != null)
+                {
+                    robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, false);
+                }
                 stopAutoTask(true);
                 break;
         }

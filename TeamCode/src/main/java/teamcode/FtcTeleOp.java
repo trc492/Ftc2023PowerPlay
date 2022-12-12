@@ -486,22 +486,7 @@ public class FtcTeleOp extends FtcOpMode
                     else if (pressed)
                     {
                         autoAssistGrabberOn = !autoAssistGrabberOn;
-                        if (autoAssistGrabberOn)
-                        {
-                            robot.grabber.enableAutoAssist(null, 0.0, null, 0.0);
-                            if (robot.blinkin != null)
-                            {
-                                robot.blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, true);
-                            }
-                        }
-                        else
-                        {
-                            robot.grabber.cancelAutoAssist();
-                            if (robot.blinkin != null)
-                            {
-                                robot.blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, false);
-                            }
-                        }
+                        robot.setGrabberAutoAssistOn(autoAssistGrabberOn);
                     }
                 }
                 break;
@@ -566,7 +551,8 @@ public class FtcTeleOp extends FtcOpMode
                     robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
                     robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
-                    robot.grabber.enableAutoAssist(null, 0, null, 0);
+                    autoAssistGrabberOn = true;
+                    robot.setGrabberAutoAssistOn(autoAssistGrabberOn);
                 }
                 break;
 

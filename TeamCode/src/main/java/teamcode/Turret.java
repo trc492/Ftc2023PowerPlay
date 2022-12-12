@@ -42,13 +42,14 @@ public class Turret
     private static final TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
     private static final boolean debugEnabled = false;
 
+    private final Robot robot;
     private final TrcPidActuator pidTurret;
     private final FtcDigitalInput calDirectionSwitch;
     private final TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger;
     private double prevTurretPower = 0.0;
     private String currOwner = null;
 
-    public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
+    public Turret(Robot robot, TrcDbgTrace msgTracer, boolean tracePidInfo)
     {
         final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
             RobotParams.TURRET_MOTOR_INVERTED,
@@ -64,6 +65,7 @@ public class Turret
             .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
 
+        this.robot = robot;
         pidTurret = new FtcMotorActuator(RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
         if (msgTracer != null)
         {

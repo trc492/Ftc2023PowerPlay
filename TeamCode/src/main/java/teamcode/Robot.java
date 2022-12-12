@@ -133,7 +133,7 @@ public class Robot
             {
                 if(RobotParams.Preferences.useTurret)
                 {
-                    turret = new Turret(globalTracer, false);
+                    turret = new Turret(this, globalTracer, false);
                 }
 
                 if (RobotParams.Preferences.useElevator)
@@ -387,6 +387,31 @@ public class Robot
             turret.zeroCalibrate();
         }
     }   //zeroCalTurret
+
+    /**
+     * This method enables/disables grabber auto-assist and updated the LED state.
+     *
+     * @param enabled specifies true to enable grabber auto-assist, false to disable.
+     */
+    public void setGrabberAutoAssistOn(boolean enabled)
+    {
+        if (enabled)
+        {
+            grabber.enableAutoAssist(null, 0.0, null, 0.0);
+            if (blinkin != null)
+            {
+                blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, true);
+            }
+        }
+        else
+        {
+            grabber.cancelAutoAssist();
+            if (blinkin != null)
+            {
+                blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, false);
+            }
+        }
+    }   //setGrabberAutoAssistOn
 
     /**
      * This method returns the power required to make the elevator gravity neutral.
