@@ -225,9 +225,12 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         // 4. Use the elevator sensor and/or grabber sensor to fine adjust the robot position and/or turret position
         //    to better aligned and grab the cone.
         // 5. Raise elevator.
-        //
+        //todo: for simplicity, this task is only tailored to auto, will adjust it to teleop if this works reliably for auto
+
         switch (state)
         {
+            //prepares robot for using vision to pick up: turret to front, elevator down,
+            //arm retracted, drive closer to conestack (auto only)
             case START:
                 if (taskParams.useVision)
                 {
@@ -235,19 +238,16 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                             EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                 }
-                //drive robot, orient turret, elevator arm so it can see the cone stack
                 targetLocation = null;
-                robot.arm.setTarget(currOwner, RobotParams.ARM_PICKUP_POS, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_CONE_GRAB_HEIGHT, true, 1.0, null, 0.0);
-                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
-                robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
+                robot.arm.setTarget(owner, 20, false, 1.0, null, 0.0);
+                robot.elevator.setTarget(owner, RobotParams.ELEVATOR_PICKUP_PRESETS[taskParams.conesRemaining], true, 1.0, null, 0.0);
+                robot.turret.setTarget(owner, RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
                 robot.robotDrive.purePursuitDrive.start(
                     currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                     robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
                 sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
                 break;
             //if using vision, finds the cone
-            //if teleop, rotate counterclockwise until it sees the cone
             case LOOK_FOR_CONE:
                 if (taskParams.useVision)
                 {
@@ -258,19 +258,16 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     {
                         robot.robotDrive.driveBase.stop(currOwner);
                         targetLocation = new TrcPose2D(
-                            coneInfo.distanceFromCamera.x - 1.0, 10,
+                            coneInfo.distanceFromCamera.x - 1.0, 0,
                             coneInfo.horizontalAngle);
                     }
                 }
-
+                //if we found a target with vision, go to the nexxt state
                 if (targetLocation != null)
                 {
-                    //use pure pursuit to align to the cone
-                    robot.robotDrive.purePursuitDrive.start(
-                        currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
-                        new TrcPose2D(0 , 0, targetLocation.angle));
-                    sm.waitForSingleEvent(event, State.PREPARE_PICKUP);
+                    sm.setState(State.DRIVE_TO_CONE);
                 }
+                //set expiretime if we are using vision but can't find the target
                 else if (taskParams.useVision)
                 {
                     // Vision did not detect anything, try again with timeout.
@@ -283,22 +280,17 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     {
                         // Times up, reset expireTime, go to next state.
                         expireTime = null;
-                        sm.setState(State.PREPARE_PICKUP);
+                        sm.setState(State.DRIVE_TO_CONE);
                     }
                 }
+                //if we are not using vision, go to next state
                 else
                 {
-                    sm.setState(State.PREPARE_PICKUP);
+                    sm.setState(State.DRIVE_TO_CONE);
                 }
                 break;
-            case PREPARE_PICKUP:
-                robot.grabber.open();
-                robot.arm.setTarget(currOwner, 20, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(
-                    currOwner, RobotParams.ELEVATOR_PICKUP_PRESETS[taskParams.conesRemaining], true, 1.0, null, 0.0);
-                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.0, null, 0);
-                sm.waitForSingleEvent(event, State.DRIVE_TO_CONE);
-                break;
+
+            //Drive so the center of the robot is aligned with the cone
             case DRIVE_TO_CONE:
                 if (targetLocation != null)
                 {
@@ -318,9 +310,6 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                             robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                     sm.waitForSingleEvent(event, State.PICKUP_CONE);
-                }
-                else{
-                    sm.setState(State.DONE);
                 }
                 break;
             //use drivebase to align because we can't turn turret for lower cone stacks (might hit the motor)
