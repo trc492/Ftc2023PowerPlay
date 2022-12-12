@@ -27,7 +27,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.util.Locale;
 
 import TrcCommonLib.trclib.TrcDriveBase;
-import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcGameController;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcFtcLib.ftclib.FtcGamepad;
@@ -519,12 +518,16 @@ public class FtcTeleOp extends FtcOpMode
 //                    robot.arm.setTarget(RobotParams.ARM_MAX_POS);
 //                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true, 1.0, null);
 //                    robot.arm.setTarget(RobotParams.ARM_PICKUP_POS);
-                if (pressed && robot.turret != null)
+                if (robot.turret != null)
                 {
-                    robot.scoreConeTask.autoAssistScoreCone(75.0, 0.75, 30.0, 0.35, 5.0, null, 0.0);
-                }
-                else if(!pressed && robot.turret != null && ! turretSlowModeOn){
-//                    robot.scoreConeTask.autoAssistCancel();
+                    if (pressed)
+                    {
+                        robot.scoreConeTask.autoAssistScoreCone(75.0, 0.75, 30.0, 0.35, 5.0, null, 5.0);
+                    }
+                    else
+                    {
+                        robot.scoreConeTask.autoAssistCancel();
+                    }
                 }
                 break;
 
@@ -538,16 +541,26 @@ public class FtcTeleOp extends FtcOpMode
 //                            null, 0);
 //                    robot.elevator.setTarget(RobotParams.ELEVATOR_SCORING_HEIGHT, true);
 //                }
-                if (pressed && robot.turret != null && !turretSlowModeOn)
+                if (robot.turret != null)
                 {
-                    robot.scoreConeTask.autoAssistScoreCone(RobotParams.TURRET_LEFT - 20, 0.75, 32.0, 0.35, 2.0, null, 0.0);
+                    if (pressed)
+                    {
+                        //if right bumper is held, kyle needs elevator to the right height first
+                        if (turretSlowModeOn)
+                        {
+                            robot.scoreConeTask.autoAssistScoreCone(0.3, 3, null);
+                        }
+                        else
+                        {
+                            robot.scoreConeTask.autoAssistScoreCone(
+                                RobotParams.TURRET_LEFT - 20, 0.75, 32.0, 0.35, 2.0, null, 5.0);
+                        }
+                    }
+                    else
+                    {
+                        robot.scoreConeTask.autoAssistCancel();
+                    }
                 }
-//fd
-                //if right bumper is held, kyle needs elevator to the right height first
-                else if(pressed && robot.turret != null && turretSlowModeOn){
-                    robot.scoreConeTask.autoAssistScoreCone(0.3, 3, null);
-                }
-
                 break;
             //use this button for scoring on medium or low poles
             case FtcGamepad.GAMEPAD_Y:
