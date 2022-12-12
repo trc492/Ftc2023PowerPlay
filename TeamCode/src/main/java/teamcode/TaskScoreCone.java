@@ -66,6 +66,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         }   //TaskParams
     }   //class TaskParams
 
+    private final String owner;
     private final Robot robot;
     private final TrcDbgTrace msgTracer;
     private final TrcEvent event;
@@ -73,12 +74,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     /**
      * Constructor: Create an instance of the object.
      *
+     * @param owner specifies the owner ID to take subsystem ownership, can be null if no ownership required.
      * @param robot specifies the robot object that contains all the necessary subsystems.
      * @param msgTracer specifies the tracer to use to log events, can be null if not provided.
      */
-    public TaskScoreCone(Robot robot, TrcDbgTrace msgTracer)
+    public TaskScoreCone(String owner, Robot robot, TrcDbgTrace msgTracer)
     {
-        super(moduleName, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
+        super(moduleName, owner, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
+        this.owner = owner;
         this.robot = robot;
         this.msgTracer = msgTracer;
         event = new TrcEvent(moduleName);
@@ -184,9 +187,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     protected boolean acquireSubsystemsOwnership()
     {
         final String funcName = "acquireSubsystemsOwnership";
-        boolean success = robot.turret.acquireExclusiveAccess(moduleName) &&
-                          robot.elevator.acquireExclusiveAccess(moduleName) &&
-                          robot.arm.acquireExclusiveAccess(moduleName);
+        boolean success = owner == null ||
+                          (robot.turret.acquireExclusiveAccess(owner) &&
+                           robot.elevator.acquireExclusiveAccess(owner) &&
+                           robot.arm.acquireExclusiveAccess(owner));
 
         if (!success)
         {
@@ -209,17 +213,20 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     {
         final String funcName = "releaseSubsystemsOwnership";
 
-        if (msgTracer != null)
+        if (owner != null)
         {
-            TrcOwnershipMgr ownershipMgr = TrcOwnershipMgr.getInstance();
-            msgTracer.traceInfo(
-                funcName, "Releasing subsystem ownership (turret=%s, elevator=%s, arm=%s).",
-                ownershipMgr.getOwner(robot.turret.getPidActuator()), ownershipMgr.getOwner(robot.elevator),
-                ownershipMgr.getOwner(robot.arm));
+            if (msgTracer != null)
+            {
+                TrcOwnershipMgr ownershipMgr = TrcOwnershipMgr.getInstance();
+                msgTracer.traceInfo(
+                    funcName, "Releasing subsystem ownership (turret=%s, elevator=%s, arm=%s).",
+                    ownershipMgr.getOwner(robot.turret.getPidActuator()), ownershipMgr.getOwner(robot.elevator),
+                    ownershipMgr.getOwner(robot.arm));
+            }
+            robot.turret.releaseExclusiveAccess(owner);
+            robot.elevator.releaseExclusiveAccess(owner);
+            robot.arm.releaseExclusiveAccess(owner);
         }
-        robot.turret.releaseExclusiveAccess(moduleName);
-        robot.elevator.releaseExclusiveAccess(moduleName);
-        robot.arm.releaseExclusiveAccess(moduleName);
     }   //releaseSubsystemsOwnership
 
     /**
@@ -228,9 +235,9 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     @Override
     protected void stopSubsystems()
     {
-        robot.turret.cancel(moduleName);
-        robot.elevator.cancel(moduleName);
-        robot.arm.cancel(moduleName);
+        robot.turret.cancel(owner);
+        robot.elevator.cancel(owner);
+        robot.arm.cancel(owner);
     }   //stopSubsystems.
 
     /**
@@ -253,26 +260,26 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             case TURN_TO_START_TARGET:
                 robot.turret.setTarget(
-                    moduleName, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit,
-                    event, 5.0);
+                    owner, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit,
+                    event, timeout);
                 sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
                 break;
 
             case RAISE_TO_SCORE_HEIGHT:
                 robot.elevator.setTarget(
-                    moduleName, 0.0, taskParams.scoreHeight, true, 1.0, event, 3);
+                    owner, 0.0, taskParams.scoreHeight, true, 1.0, event, timeout);
                 sm.waitForSingleEvent(event, State.FIND_POLE);
                 break;
 
             case FIND_POLE:
                 robot.turret.setTriggerEnabled(true);
                 robot.turret.getPidActuator().setPower(
-                    moduleName, taskParams.scanPower, taskParams.scanDuration, event);
+                    owner, taskParams.scanPower, taskParams.scanDuration, event);
                 sm.waitForSingleEvent(event, State.EXTEND_ARM);
                 break;
 
             case EXTEND_ARM:
-                robot.turret.getPidActuator().setPower(moduleName, 0.0);
+                robot.turret.getPidActuator().setPower(owner, 0.0);
                 robot.turret.setTriggerEnabled(false);
                 if (robot.turret.detectedPole())
                 {
@@ -281,7 +288,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     {
                         msgTracer.traceInfo(funcName, "armTarget=%.1f", armTarget);
                     }
-                    robot.arm.setTarget(moduleName, 0.0, armTarget, false, 1.0, event, 0.0);
+                    robot.arm.setTarget(owner, 0.0, armTarget, false, 1.0, event, 0.0);
                     sm.waitForSingleEvent(event, State.CAP_POLE);
                 }
                 else
@@ -296,14 +303,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 break;
 
             case CAP_POLE:
-                robot.elevator.setPower(moduleName, -0.2, 0.5, event);
+                robot.elevator.setPower(owner, -0.2, 0.5, event);
                 sm.waitForSingleEvent(event, State.SCORE_CONE);
                 break;
 
             case SCORE_CONE:
                 robot.grabber.cancelAutoAssist();
-                robot.arm.setTarget(moduleName, RobotParams.ARM_MIN_POS, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(moduleName, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
+                robot.arm.setTarget(owner, RobotParams.ARM_MIN_POS, false, 1.0, null, 0.0);
+                robot.elevator.setTarget(owner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.
                 //
