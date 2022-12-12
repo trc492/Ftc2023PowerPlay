@@ -38,6 +38,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         START_DELAY,
         DO_POLE_VISION_SETUP,
         DRIVE_TO_SCORE_POSITION,
+        AUTO_SCORE_PRELOAD,
         RAISE_ELEVATOR_TO_SCORE,
         TURN_TO_SCORE_PRELOAD,
         ALIGN_TO_POLE,
@@ -214,9 +215,19 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                         sm.waitForSingleEvent(
                                 event,
-                                autoChoices.strategy != FtcAuto.AutoStrategy.PARKING_ONLY ?
-                                        State.RAISE_ELEVATOR_TO_SCORE : State.PARK);
+                                autoChoices.strategy == FtcAuto.AutoStrategy.PARKING_ONLY ?
+                                        State.PARK: State.AUTO_SCORE_PRELOAD);//RAISE_ELEVATOR_TO_SCORE);
                     }
+                    break;
+
+                case AUTO_SCORE_PRELOAD:
+                    double turretStartPos =
+                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
+                    robot.scoreConeTask.autoAssistScoreCone(
+                        turretStartPos - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.ELEVATOR_SCORING_HEIGHT,
+                        RobotParams.TURRET_SCAN_POWER, RobotParams.TURRET_SCAN_DURATION, event);
+                    sm.waitForSingleEvent(event, State.PARK);
                     break;
 
                 case RAISE_ELEVATOR_TO_SCORE:
