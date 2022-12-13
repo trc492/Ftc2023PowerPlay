@@ -65,7 +65,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         }   //TaskParams
     }   //class TaskParams
 
-    private final String owner;
+    private final String ownerName;
     private final Robot robot;
     private final TrcDbgTrace msgTracer;
     private final TrcEvent event;
@@ -74,14 +74,14 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     /**
      * Constructor: Create an instance of the object.
      *
-     * @param owner specifies the owner ID to take subsystem ownership, can be null if no ownership required.
+     * @param ownerName specifies the owner name to take subsystem ownership, can be null if no ownership required.
      * @param robot specifies the robot object that contains all the necessary subsystems.
      * @param msgTracer specifies the tracer to use to log events, can be null if not provided.
      */
-    public TaskPickupCone(String owner, Robot robot, TrcDbgTrace msgTracer)
+    public TaskPickupCone(String ownerName, Robot robot, TrcDbgTrace msgTracer)
     {
-        super(moduleName, owner, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
-        this.owner = owner;
+        super(moduleName, ownerName, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
+        this.ownerName = ownerName;
         this.robot = robot;
         this.msgTracer = msgTracer;
         event = new TrcEvent(moduleName);
@@ -139,15 +139,15 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     protected boolean acquireSubsystemsOwnership()
     {
         final String funcName = "acquireSubsystemsOwnership";
-        boolean success = owner == null ||
-                          (robot.robotDrive.driveBase.acquireExclusiveAccess(owner) &&
-                           robot.turret.acquireExclusiveAccess(owner) &&
-                           robot.elevator.acquireExclusiveAccess(owner) &&
-                           robot.arm.acquireExclusiveAccess(owner));
+        boolean success = ownerName == null ||
+                          (robot.robotDrive.driveBase.acquireExclusiveAccess(ownerName) &&
+                           robot.turret.acquireExclusiveAccess(ownerName) &&
+                           robot.elevator.acquireExclusiveAccess(ownerName) &&
+                           robot.arm.acquireExclusiveAccess(ownerName));
 
         if (success)
         {
-            currOwner = owner;
+            currOwner = ownerName;
         }
         else
         {
@@ -170,7 +170,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     {
         final String funcName = "releaseSubsystemsOwnership";
 
-        if (owner != null)
+        if (ownerName != null)
         {
             if (msgTracer != null)
             {
@@ -239,9 +239,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                 }
                 targetLocation = null;
-                robot.arm.setTarget(owner, 20, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(owner, RobotParams.ELEVATOR_PICKUP_PRESETS[taskParams.conesRemaining], true, 1.0, null, 0.0);
-                robot.turret.setTarget(owner, RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
+                robot.arm.setTarget(currOwner, 20, false, 1.0, null, 0.0);
+                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_PICKUP_PRESETS[taskParams.conesRemaining],
+                                         true, 1.0, null, 0.0);
+                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
                 robot.robotDrive.purePursuitDrive.start(
                     currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                     robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));

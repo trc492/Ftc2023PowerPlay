@@ -67,7 +67,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         }   //TaskParams
     }   //class TaskParams
 
-    private final String owner;
+    private final String ownerName;
     private final Robot robot;
     private final TrcDbgTrace msgTracer;
     private final TrcEvent event;
@@ -76,14 +76,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     /**
      * Constructor: Create an instance of the object.
      *
-     * @param owner specifies the owner ID to take subsystem ownership, can be null if no ownership required.
+     * @param ownerName specifies the owner name to take subsystem ownership, can be null if no ownership required.
      * @param robot specifies the robot object that contains all the necessary subsystems.
      * @param msgTracer specifies the tracer to use to log events, can be null if not provided.
      */
-    public TaskScoreCone(String owner, Robot robot, TrcDbgTrace msgTracer)
+    public TaskScoreCone(String ownerName, Robot robot, TrcDbgTrace msgTracer)
     {
-        super(moduleName, owner, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
-        this.owner = owner;
+        super(moduleName, ownerName, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
+        this.ownerName = ownerName;
         this.robot = robot;
         this.msgTracer = msgTracer;
         event = new TrcEvent(moduleName);
@@ -162,7 +162,6 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             msgTracer.traceInfo(funcName, "Canceling auto-assist score cone.");
         }
-
         stopAutoTask(false);
     }   //autoAssistCancel
 
@@ -181,14 +180,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     protected boolean acquireSubsystemsOwnership()
     {
         final String funcName = "acquireSubsystemsOwnership";
-        boolean success = owner == null ||
-                          (robot.turret.acquireExclusiveAccess(owner) &&
-                           robot.elevator.acquireExclusiveAccess(owner) &&
-                           robot.arm.acquireExclusiveAccess(owner));
+        boolean success = ownerName == null ||
+                          (robot.turret.acquireExclusiveAccess(ownerName) &&
+                           robot.elevator.acquireExclusiveAccess(ownerName) &&
+                           robot.arm.acquireExclusiveAccess(ownerName));
 
         if (success)
         {
-            currOwner = owner;
+            currOwner = ownerName;
         }
         else
         {
@@ -211,7 +210,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     {
         final String funcName = "releaseSubsystemsOwnership";
 
-        if (owner != null)
+        if (ownerName != null)
         {
             if (msgTracer != null)
             {
@@ -256,6 +255,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         switch (state)
         {
             case START:
+                // Bring the arm up so it doesn't hit anything when turning the turret.
                 robot.arm.setTarget(currOwner, 0.0, RobotParams.ARM_UP_POS, false, 1.0, event, 5.0);
                 sm.waitForSingleEvent(event, State.TURN_TO_START_TARGET);
                 break;
@@ -263,6 +263,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case TURN_TO_START_TARGET:
                 if (taskParams.startPowerLimit != 0.0)
                 {
+                    // Turn the turret to the position for starting the scan.
                     robot.turret.setTarget(
                         currOwner, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit, event, 5.0);
                     sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
@@ -276,6 +277,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case RAISE_TO_SCORE_HEIGHT:
                 if (taskParams.scoreHeight > 0.0)
                 {
+                    // Set the proper elevator height for scoring.
                     robot.elevator.setTarget(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.FIND_POLE);
                 }
@@ -286,58 +288,66 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 break;
 
             case FIND_POLE:
+                // Enable the sensor trigger and start scanning for the pole.
                 robot.turret.setTriggerEnabled(true);
                 robot.turret.getPidActuator().setPower(currOwner, taskParams.scanPower, taskParams.scanDuration, event);
                 sm.waitForSingleEvent(event, State.EXTEND_ARM);
                 break;
 
             case EXTEND_ARM:
+                // Either found the pole or reached timeout. Either way, stop the turret.
                 robot.turret.getPidActuator().setPower(currOwner, 0.0);
                 robot.turret.setTriggerEnabled(false);
+
+                Double armTarget = null;
                 if (robot.turret.detectedPole())
                 {
+                    // Found the pole, set the LEDs to indicate so.
                     if (robot.blinkin != null)
                     {
                         robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, true);
                     }
-                    Double armTarget = robot.getScoringArmAngle();
-                    if (armTarget == null || armTarget > 30.0)
-                    {
-                        if (msgTracer != null)
-                        {
-                            msgTracer.traceInfo(
-                                funcName, "Failed to determine valid arm angle (angle %f).", armTarget);
-                        }
-                        armTarget = 24.0;
-                    }
-                    robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
-                    sm.waitForSingleEvent(event, State.CAP_POLE);
-                }
-                else
-                {
+                    armTarget = robot.getScoringArmAngle();
+
                     if (msgTracer != null)
                     {
-                        msgTracer.traceInfo(
-                            funcName, "Failed to find pole (sensor=%.2f).", robot.turret.getSensorValue());
+                        msgTracer.traceInfo(funcName, "Found the pole (armAngle=%f).", armTarget);
                     }
-                    sm.setState(State.DONE);
                 }
+
+                if (armTarget == null || armTarget > 30.0)
+                {
+                    // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
+                    // picking up a erroneous distance. In this case, just use the known good arm angle and hope it
+                    // will work.
+                    if (msgTracer != null)
+                    {
+                        msgTracer.traceInfo(funcName, "Failed to determine valid arm angle (armAngle=%f).", armTarget);
+                    }
+                    armTarget = 24.0;
+                }
+
+                robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
+                sm.waitForSingleEvent(event, State.CAP_POLE);
                 break;
 
             case CAP_POLE:
-                robot.elevator.setPower(currOwner, -0.2, 0.5, event);
+                // Slowly set the elevator down to cap the pole to ensure secured scoring.
+                robot.elevator.setPower(currOwner, -0.3, 0.2, event);
                 sm.waitForSingleEvent(event, State.SCORE_CONE);
                 break;
 
             case SCORE_CONE:
+                // Release the cone to score it and retract the elevator and arm.
                 robot.setGrabberAutoAssistOn(false);
-                robot.arm.setTarget(currOwner, RobotParams.ARM_MIN_POS, false, 1.0, null, 0.0);
+                robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.
                 //
             default:
             case DONE:
+                // Done, turn off the LEDs.
                 if (robot.blinkin != null)
                 {
                     robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, false);
