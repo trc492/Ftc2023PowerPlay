@@ -509,7 +509,7 @@ public class FtcTeleOp extends FtcOpMode
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
                             RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
-                            RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                             RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
@@ -538,7 +538,7 @@ public class FtcTeleOp extends FtcOpMode
                         {
                             robot.scoreConeTask.autoAssistScoreCone(
                                 RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
-                                RobotParams.ELEVATOR_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                                RobotParams.HIGH_JUNCTION_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                                 RobotParams.TURRET_SCAN_DURATION, null);
                         }
                     }

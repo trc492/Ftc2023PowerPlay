@@ -434,10 +434,8 @@ public class RobotParams
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = ELEVATOR_MIN_POS;
-    static final double ELEVATOR_SCORING_HEIGHT                 = 33.0;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
-    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 30.0;
-    public static final double CAPPING_OFFSET                   = -8.0;
+    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 30.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
         ELEVATOR_MIN_POS,
         12.0,
