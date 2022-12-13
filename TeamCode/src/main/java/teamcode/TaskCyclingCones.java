@@ -402,7 +402,7 @@ public class TaskCyclingCones
                     break;
 
                 case ALIGN_TO_POLE:
-                    if(robot.turret.detectedPole()){
+                    if(robot.turret.detectedTarget()){
                         sm.setState(State.LOWER_ARM_ABOVE_POLE);
                     }
                     else{

@@ -32,7 +32,7 @@ SOFTWARE.
             <DigitalDevice name="elevator.lowerLimit" port="2" />
             <DigitalDevice name="arm.lowerLimit" port="3" />
             <RevColorSensorV3 name="grabber.sensor" port="0" bus="1"/>
-            <REV_VL53L0X_RANGE_SENSOR name="turret.poleSensor" port="0" buse="2"/>
+            <REV_VL53L0X_RANGE_SENSOR name="turret.sensor" port="0" buse="2"/>
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
         <LynxModule name="Expansion Hub 2" port="2">

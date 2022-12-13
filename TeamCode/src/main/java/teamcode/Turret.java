@@ -36,7 +36,7 @@ import TrcFtcLib.ftclib.FtcMotorActuator;
 
 /**
  * This class encapsulates a PID Actuator as the Turret. The turret has additional capabilities over a PID actuator.
- * It contains a REV 2m distance sensor that will detect the proximity of the pole.
+ * It contains a REV 2m distance sensor that will detect the proximity of the target (e.g. pole or cone).
  */
 public class Turret
 {
@@ -76,7 +76,7 @@ public class Turret
             RobotParams.HWNAME_TURRET + ".dirSwitch", RobotParams.TURRET_DIR_SWITCH_INVERTED);
         if (RobotParams.Preferences.hasTurretSensor)
         {
-            sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".poleSensor");
+            sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".sensor");
             thresholdTrigger = new TrcThresholdTrigger(
                 RobotParams.HWNAME_TURRET + ".thresholdTrigger", this::getSensorValue, this::thresholdTriggerEvent);
             thresholdTrigger.setTrigger(
@@ -165,17 +165,17 @@ public class Turret
     }   //setTriggerEnabled
 
     /**
-     * This method checks if the pole is detected.
+     * This method checks if the target is detected.
      *
-     * @return true if pole is detected, false otherwise.
+     * @return true if target is detected, false otherwise.
      */
-    public boolean detectedPole()
+    public boolean detectedTarget()
     {
         double value = getSensorValue();
 
         return value >= RobotParams.TURRET_SENSOR_LOWER_THRESHOLD &&
                value <= RobotParams.TURRET_SENSOR_UPPER_THRESHOLD;
-    }   //detectedPole
+    }   //detectedTarget
 
     /**
      * This method returns the current turret position in degrees.

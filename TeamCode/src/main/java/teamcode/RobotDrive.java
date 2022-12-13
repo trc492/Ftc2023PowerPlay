@@ -216,6 +216,19 @@ public class RobotDrive
     }   //getAutoTargetCell
 
     /**
+     * This method adjusts the target heading according to the alliance and startPos in autoChoices.
+     *
+     * @param heading specifies heading for RED LEFT.
+     * @param autoChoices specifies auto choices.
+     * @return adjusted target heading.
+     */
+    public double getAutoTargetHeading(double heading, FtcAuto.AutoChoices autoChoices)
+    {
+        TrcPose2D adjPose = getAutoTargetCell(0.0, 0.0, heading, autoChoices);
+        return adjPose.angle;
+    }   //getAutoTargetHeading
+
+    /**
      * This method adjusts the target cell according to the alliance and startPos in autoChoices.
      *
      * @param targetPos specifies the target position in tile units.

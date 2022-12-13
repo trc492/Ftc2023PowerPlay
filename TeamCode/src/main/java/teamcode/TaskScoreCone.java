@@ -300,7 +300,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 robot.turret.setTriggerEnabled(false);
 
                 Double armTarget = null;
-                if (robot.turret.detectedPole())
+                if (robot.turret.detectedTarget())
                 {
                     // Found the pole, set the LEDs to indicate so.
                     if (robot.blinkin != null)
