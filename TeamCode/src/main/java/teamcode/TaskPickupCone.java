@@ -300,6 +300,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
                             new TrcPose2D(targetLocation.x, 5, FtcAuto.autoChoices.startPos == FtcAuto.StartPos.LEFT?
                                     270 - robot.robotDrive.driveBase.getHeading() : 90 - robot.robotDrive.driveBase.getHeading()));
+                    sm.waitForSingleEvent(event, State.ALIGN_TO_CONE);
                 }
                 else if(runMode != TrcRobot.RunMode.TELEOP_MODE)
                 {
@@ -315,7 +316,6 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
             //use drivebase to align because we can't turn turret for lower cone stacks (might hit the motor)
             //use turret/grabber sensor value to check if there is a cone in front
             //if we can't see it strave left for 2 seconds. if we still can't find it strafe the other way for 2 seconds(not implemented)
-            //todo: replace this logic with something in turret to cancel pure pursuit when sensor sees cone
             case ALIGN_TO_CONE:
                 if (robot.turret.detectedPole())
                 {
