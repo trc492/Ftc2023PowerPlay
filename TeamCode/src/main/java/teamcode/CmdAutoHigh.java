@@ -53,6 +53,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int conesRemaining;
 
     private final boolean debugCycleTask = false;
+    private final boolean visionAssist = true;
 
     /**
      * Constructor: Create an instance of the object.
@@ -233,7 +234,10 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        robot.pickupConeTask.autoAssistPickupCone(5, true, event);
+                        robot.pickupConeTask.autoAssistPickupCone(
+                            conesRemaining,
+                            visionAssist && robot.vision != null && robot.vision.frontEocvVision != null,
+                            event);
                         conesRemaining--;
                         sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
                     }
