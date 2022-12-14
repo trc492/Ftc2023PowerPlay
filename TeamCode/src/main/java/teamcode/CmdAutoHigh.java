@@ -36,19 +36,11 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private enum State
     {
         START_DELAY,
-        DO_POLE_VISION_SETUP,
         DRIVE_TO_SCORE_POSITION,
         AUTO_SCORE_PRELOAD,
-        RAISE_ELEVATOR_TO_SCORE,
-        TURN_TO_SCORE_PRELOAD,
-        ALIGN_TO_POLE,
-        LOWER_ELEVATOR,
-        SCORE_PRELOAD,
-        RAISE_ELEVATOR_AFTER_SCORING,
         PREP_FOR_TRAVEL,
         DO_CYCLE,
         PARK,
-        DRIVE_ELEVATOR_DOWN,
         DONE
     }   //enum State
 
@@ -58,13 +50,9 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private final TrcEvent event;
     private final TrcStateMachine<State> sm;
     private int signalPos = 0;
-    // Tells us number cones left on the conestack.
-    private int conesRemaining = 5;
-    private final boolean debugPoleVision = false;
-    private final boolean debugCycleTask = false;
-    private final boolean preloadOnly = false;
-    private final boolean debugPreloadMode = false;
+    private int conesRemaining;
 
+    private final boolean debugCycleTask = false;
 
     /**
      * Constructor: Create an instance of the object.
@@ -82,10 +70,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         event = new TrcEvent(moduleName);
         sm = new TrcStateMachine<>(moduleName);
         robot.robotDrive.purePursuitDrive.setFastModeEnabled(true);
-
-        sm.start(debugPoleVision? State.DO_POLE_VISION_SETUP : State.START_DELAY);
-
-
+        sm.start(State.START_DELAY);
     }   //CmdAutoFarCarousel
 
     //
@@ -139,10 +124,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     //
                     // Set robot starting position in the field.
                     //
-                    if(debugCycleTask){
-                        robot.robotDrive.driveBase.setFieldPosition(new TrcPose2D(-1 * RobotParams.FULL_TILE_INCHES, -0.5 * RobotParams.FULL_TILE_INCHES, 270));
+                    if (debugCycleTask)
+                    {
+                        robot.robotDrive.driveBase.setFieldPosition(
+                            new TrcPose2D(-1 * RobotParams.FULL_TILE_INCHES, -0.5 * RobotParams.FULL_TILE_INCHES, 270));
                     }
-                    else{
+                    else
+                    {
                         robot.robotDrive.setAutoStartPosition(autoChoices);
                     }
                     // Call vision at the beginning to figure out the signal position.
@@ -185,38 +173,35 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
 
                 case DRIVE_TO_SCORE_POSITION:
-                    if(debugCycleTask){
+                    if (debugCycleTask)
+                    {
                         sm.setState(State.DO_CYCLE);
                     }
-                    else {
-                        //drive to score position
-                        //raise elevator to scoring height
-                        //turn turret to score position
-                        //wait for pure pursuit to finish
+                    else
+                    {
                         // Todo: add option to do center high poles
-                        //Points are 6 inches from the high junction, on the line drawn from the the high junction to the
-                        //corresponding cone stack, facing the cone stack
-                        //robot.turret.setTarget(0.5, RobotParams.TURRET_BACK, 0.8, null, 1.0, null, null);
-                        //robot.turret.zeroCalibrate();
-                        if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE && autoChoices.startPos == FtcAuto.StartPos.LEFT){
+                        if (autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE &&
+                            autoChoices.startPos == FtcAuto.StartPos.LEFT)
+                        {
                             robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
-                                    robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
-                                    robot.robotDrive.pathPoint(1.00, 0.6, 91));
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
+                                robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
+                                robot.robotDrive.pathPoint(1.00, 0.6, 91));
                         }
-                        else{
+                        else
+                        {
                             robot.robotDrive.purePursuitDrive.start(
-                                    event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                    robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
-                                    robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
                         }
 
                         sm.waitForSingleEvent(
-                                event,
-                                autoChoices.strategy == FtcAuto.AutoStrategy.PARKING_ONLY ?
-                                        State.PARK: State.AUTO_SCORE_PRELOAD);//RAISE_ELEVATOR_TO_SCORE);
+                            event,
+                            autoChoices.strategy == FtcAuto.AutoStrategy.PARKING_ONLY ?
+                                State.PARK: State.AUTO_SCORE_PRELOAD);
                     }
                     break;
 
@@ -230,16 +215,15 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
                     break;
 
-
-
                 case PREP_FOR_TRAVEL:
+                    conesRemaining = 5;
                     robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
+                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
                     sm.waitForSingleEvent(event, State.DO_CYCLE);
                     break;
-                case DO_CYCLE:
 
+                case DO_CYCLE:
                     //if time >= 26 or no more cones on the conestack, go to park
                     //otherwise call the doCycle method for each cone on the stack
                     //if driveOnly, just drive back and forth to simulate it
@@ -250,8 +234,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     else
                     {
                         robot.pickupConeTask.autoAssistPickupCone(5, true, event);
-//                        robot.cyclingTask.doFullAutoCycle(
-//                            TaskCyclingCones.VisionType.CONE_VISION, conesRemaining, event);
                         conesRemaining--;
                         sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
                     }
@@ -265,35 +247,28 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        robot.turret.setTarget(
-                            RobotParams.TURRET_BACK, true, 1.0, null, 0.0);
-                        // CodeReview: check if there are any obstacles in the path.
+                        robot.turret.setTarget(RobotParams.TURRET_BACK, true, 1.0, null, 0.0);
+                        // Todo(CodeReview): PurePursuitDrive may hit obstacles especially parking at NEAR_TILE.
+                        // Calling "driveToEndPoint" will avoid that. Please debug this to make sure it works.
                         TrcPose2D parkPos =
                             autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
                                 RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
                                 RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
-                        robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90.0, autoChoices));
-                        sm.waitForSingleEvent(event, State.DRIVE_ELEVATOR_DOWN);
+                        robot.robotDrive.gridDrive.driveToEndPoint(
+                            robot.robotDrive.getAutoTargetPoint(parkPos, autoChoices));
+                        sm.waitForSingleEvent(event, State.DONE);
                     }
-                    break;
-                case DRIVE_ELEVATOR_DOWN:
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS_FOR_TURRET + 5, true, 1.0, event);
-                    sm.waitForSingleEvent(event, State.DONE);
                     break;
 
                 case DONE:
                 default:
-                    //
-                    // We are done, zero calibrate the arm will lower it.
-                    //
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
                     cancel();
                     break;
             }
 
             robot.globalTracer.traceStateInfo(
-                sm.toString(), state, robot.robotDrive.driveBase, robot.robotDrive.pidDrive,
+                sm.toString(), sm.getState(), robot.robotDrive.driveBase, robot.robotDrive.pidDrive,
                 robot.robotDrive.purePursuitDrive, null);
         }
 

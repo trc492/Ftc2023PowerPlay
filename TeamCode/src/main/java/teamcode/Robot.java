@@ -73,7 +73,6 @@ public class Robot
     public TrcServoGrabber grabber = null;
     public TaskScoreCone scoreConeTask;
     public TaskPickupCone pickupConeTask;
-    public TaskCyclingCones cyclingTask;
 
     /**
      * Constructor: Create an instance of the object.
@@ -202,8 +201,6 @@ public class Robot
                 //
                 scoreConeTask = new TaskScoreCone("ScoreConeTask", this, globalTracer);
                 pickupConeTask = new TaskPickupCone("PickupConeTask", this, globalTracer);
-                cyclingTask = new TaskCyclingCones(this);
-                this.cyclingTask.setMsgTracer(globalTracer);
             }
         }
 
@@ -303,7 +300,7 @@ public class Robot
         //
         // Stop all auto-assists tasks if any.
         //
-        cyclingTask.cancel();
+
         //
         // Disable vision.
         //

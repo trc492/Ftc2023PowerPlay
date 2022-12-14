@@ -634,19 +634,4 @@ public class FtcTeleOp extends FtcOpMode
         }
     }   //operatorButtonEvent
 
-//    private Double findConeAlignAngle()
-//    {
-//        return coneAngle != null? coneAngle : 0.0;
-//    }
-//
-    private void scoreCone(Object context)
-    {
-        robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-        robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.CONE_VISION, null);
-    }
-
-    private void doPoleAlignOnly(Object context){
-        robot.cyclingTask.doPoleAlignOnly(TaskCyclingCones.VisionType.CONE_VISION);
-    }
-
 }   //class FtcTeleOp
