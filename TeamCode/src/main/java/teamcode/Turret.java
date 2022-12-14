@@ -165,6 +165,16 @@ public class Turret
     }   //setTriggerEnabled
 
     /**
+     * This method returns the data recorded during the trigger settling period.
+     *
+     * @return trigger settling data.
+     */
+    public Double[] getTriggerSettlingData()
+    {
+        return thresholdTrigger.getTriggerSettlingData();
+    }   //getTriggerSettlingData
+
+    /**
      * This method checks if the target is detected.
      *
      * @return true if target is detected, false otherwise.
