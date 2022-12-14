@@ -24,6 +24,8 @@ package teamcode;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
+import java.util.Arrays;
+
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcDigitalInput;
 import TrcCommonLib.trclib.TrcEvent;
@@ -425,7 +427,7 @@ public class Robot
     }   //getElevatorPowerCompensation
 
     /**
-     * This method calculates the scoring arm angle from the reading of the distance sensor.
+     * This method calculates the scoring arm angle from the distance sensor value.
      *
      * @return arm angle for scoring the cone.
      */
@@ -436,15 +438,34 @@ public class Robot
 
         if (turret != null)
         {
-            double sensorDistance = turret.getSensorValue();
-            double poleDistance =  sensorDistance + RobotParams.CLAW_DISTANCE_ADUSTMENT;
+            // Compare the current sensor value to the settling data and get the minimum value. That's the most
+            // accurate pole distance.
+            double sensorValue = turret.getSensorValue();
+            double poleDistance = sensorValue;
+            Double[] triggerSettlingData = turret.getTriggerSettlingData();
+
+            if (triggerSettlingData != null)
+            {
+                for (double value: triggerSettlingData)
+                {
+                    if (value < poleDistance)
+                    {
+                        poleDistance = value;
+                    }
+                }
+                globalTracer.traceInfo(
+                    funcName, "sensorValue=%.2f, poleDistance=%.2f, triggerSettlingData=%s",
+                    sensorValue, poleDistance, Arrays.toString(triggerSettlingData));
+            }
+
+            poleDistance += RobotParams.CLAW_DISTANCE_ADUSTMENT;
             if (poleDistance < RobotParams.ARM_JOINT_LENGTH)
             {
                 armAngle = 90.0 + RobotParams.ARM_ANGLE_OFFSET -
                            Math.toDegrees(Math.acos(poleDistance/RobotParams.ARM_JOINT_LENGTH));
             }
             globalTracer.traceInfo(
-                funcName, "sensorDist=%.2f, poleDist=%.2f, armAngle=%s", sensorDistance, poleDistance, armAngle);
+                funcName, "sensorValue=%.2f, poleDist=%.2f, armAngle=%s", sensorValue, poleDistance, armAngle);
         }
 
         return armAngle;
