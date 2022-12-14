@@ -340,6 +340,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case SCORE_CONE:
                 // Release the cone to score it and retract the elevator and arm.
                 robot.setGrabberAutoAssistOn(false);
+                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 //

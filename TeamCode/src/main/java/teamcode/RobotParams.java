@@ -331,7 +331,7 @@ public class RobotParams
     public static final Double Y_RAMP_RATE                      = null;//10.0;
 
     public static final TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.022, 0.02, 0.000, 0.0, 30.0);
+        new TrcPidController.PidCoefficients(0.022, 0.04, 0.000, 0.0, 30.0);
     public static final double TURN_SETTLING                    = TrcPidController.DEF_SETTLING_TIME;
     public static final double TURN_TOLERANCE                   = 1.0;
     public static final double TURN_STEADY_STATE_ERR            = 2.0;
@@ -377,7 +377,7 @@ public class RobotParams
     static final double TURRET_MAX_POS                          = 325.0;
     static final double TURRET_SENSOR_LOWER_THRESHOLD           = 4.0;  // in inches
     static final double TURRET_SENSOR_UPPER_THRESHOLD           = 12.0; // in inches
-    static final double TURRET_SENSOR_SETTLING_PERIOD           = 0.20; // in seconds
+    static final double TURRET_SENSOR_SETTLING_PERIOD           = 0.15; // in seconds
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
     static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
@@ -435,7 +435,7 @@ public class RobotParams
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = ELEVATOR_MIN_POS;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
-    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 30.0;
+    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 31.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
         ELEVATOR_MIN_POS,
         12.0,

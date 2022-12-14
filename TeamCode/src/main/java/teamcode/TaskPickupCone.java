@@ -46,10 +46,13 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         LOOK_FOR_CONE,
         DRIVE_TO_CONE,
         PREPARE_PICKUP,
+        SET_TURRET_SCAN_POS,
+
+
         ALIGN_TO_CONE,
         ALIGN_OTHER_WAY,
         PICKUP_CONE,
-        RAISE_ELEVATOR,
+        RAISE_ARM,
         DONE
     }   //enum State
 
@@ -101,7 +104,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         if (msgTracer != null)
         {
             msgTracer.traceInfo(
-                funcName, "conesRemaining=%d, useVision=%s, event=%s, timeout=%.3f", conesRemaining, useVision, event);
+                funcName, "conesRemaining=%d, useVision=%s, event=%s", conesRemaining, useVision, event);
         }
 
         startAutoTask(
@@ -240,10 +243,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 }
                 targetLocation = null;
                 //Todo(CodeReview): set arm to an angle that will let the distance sensor to see the cone stack.
-                robot.arm.setTarget(currOwner, 20.0, false, 1.0, null, 0.0);
+                //robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 //Todo(CodeReview): set elevator to min position so the distance sensor can see the cone stack.
                 robot.elevator.setTarget(
-                    currOwner, RobotParams.ELEVATOR_PICKUP_PRESETS[taskParams.conesRemaining], true, 1.0, null, 0.0);
+                    currOwner, RobotParams.ELEVATOR_MIN_POS, true, 1.0, null, 0.0);
                 robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
                 // Todo(CodeReview): precondition should be that the robot is already at the position to look for cone.
                 // This will allow both autonomous and teleop to call it. The caller is responsible to get to this
@@ -262,6 +265,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         robot.vision.getDetectedConeInfo();
                     if (coneInfo != null)
                     {
+                        robot.globalTracer.traceInfo(funcName, "coneInfo=%s", coneInfo);
                         targetLocation = new TrcPose2D(
                             coneInfo.distanceFromCamera.x, coneInfo.distanceFromCamera.y, coneInfo.horizontalAngle);
                     }
@@ -269,7 +273,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 //if we found a target with vision, go to the next state
                 if (targetLocation != null)
                 {
-                    sm.setState(State.DRIVE_TO_CONE);
+                    sm.setState(State.PREPARE_PICKUP);
                 }
                 //set expiretime if we are using vision but can't find the target
                 else if (taskParams.useVision)
@@ -283,19 +287,24 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     else if (TrcUtil.getCurrentTime() >= expireTime)
                     {
                         // Times up, reset expireTime, go to next state.
+                        robot.globalTracer.traceInfo(funcName, "Ran out of time to look for cone, move on");
                         expireTime = null;
-                        sm.setState(State.DRIVE_TO_CONE);
+                        sm.setState(State.PREPARE_PICKUP);
                     }
                 }
                 //if we are not using vision, go to next state
                 else
                 {
-                    sm.setState(State.DRIVE_TO_CONE);
+                    sm.setState(State.PREPARE_PICKUP);
                 }
                 break;
-
+            case PREPARE_PICKUP:
+                sm.setState(State.DRIVE_TO_CONE);
+                break;
             //Drive so the center of the robot is aligned with the cone
             case DRIVE_TO_CONE:
+                robot.grabber.open();
+                robot.arm.setTarget(110, false, 1.0, null);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                 if (targetLocation != null)
                 {
@@ -307,7 +316,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             targetLocation.x - 1.0, 5.0,
                             robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
                             robot.robotDrive.driveBase.getHeading()));
-                    sm.waitForSingleEvent(event, State.ALIGN_TO_CONE);
+                    sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
                 }
                 else
                 {
@@ -319,54 +328,62 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     sm.waitForSingleEvent(event, State.PICKUP_CONE);
                 }
                 break;
-            //Todo(CodeReview): why turning the drivebase? If using distance sensor, you have to raise the arm anyway.
-            //I would use the distance sensor and the turret to scan for the cone and then lower the arm and elevator
-            //to the correct position according to the sensor.
-            //
-            //And raising the arm will most likely clear the turret. You could use it to find the cones.
-            //use drivebase to align because we can't turn turret for lower cone stacks (might hit the motor)
-            //use turret/grabber sensor value to check if there is a cone in front
-            //if we can't see it strave left for 2 seconds. if we still can't find it strafe the other way for 2 seconds(not implemented)
-            case ALIGN_TO_CONE:
-                //Todo(CodeReview):
-                // 1. set turret to startScan position.
-                // 2. start the scan.
-                // 3. while distance is decreasing, keep scanning.
-                // 4. stop scanning.
-                // 5. lower arm and elevator to pickup position.
-                // 6. turn on autoAssist grabber.
-                // 7. go forward to grab it.
-                if (robot.turret.detectedTarget())
-                {
-                    robot.robotDrive.cancel();
-                    sm.setState(State.PICKUP_CONE);
-                }
-                //ran out of time, couldn't find pole stack
-                else if(expireTime == null){
-                    expireTime = TrcUtil.getCurrentTime() + 2;
-                    robot.robotDrive.driveBase.holonomicDrive(currOwner, -0.1, 0, 0, 2, event);
-                }
-                else if(TrcUtil.getCurrentTime() == expireTime){
-                    expireTime = null;
-                    sm.setState(State.PICKUP_CONE);
-                }
-                break;
+//            case SET_TURRET_SCAN_POS:
+//                if(targetLocation.x < 0 ){
+//                    //scan left with
+//                    robot.turret.setTriggerEnabled(true);
+//                    robot.turret.getPidActuator().setPower(currOwner, RobotParams.TURRET_SCAN_POWER, RobotParams.TURRET_SCAN_DURATION, event);
+//                }
+//                break;
+//            //Todo(CodeReview): why turning the drivebase? If using distance sensor, you have to raise the arm anyway.
+//            //I would use the distance sensor and the turret to scan for the cone and then lower the arm and elevator
+//            //to the correct position according to the sensor.
+//            //
+//            //And raising the arm will most likely clear the turret. You could use it to find the cones.
+//            //use drivebase to align because we can't turn turret for lower cone stacks (might hit the motor)
+//            //use turret/grabber sensor value to check if there is a cone in front
+//            //if we can't see it strave left for 2 seconds. if we still can't find it strafe the other way for 2 seconds(not implemented)
+//            case ALIGN_TO_CONE:
+//                //set two angles of possibiliy
+//                //Todo(CodeReview):
+//                // 1. set turret to startScan position.
+//                // 2. start the scan.
+//                // 3. while distance is decreasing, keep scanning.
+//                // 4. stop scanning.
+//                // 5. lower arm and elevator to pickup position.
+//                // 6. turn on autoAssist grabber.
+//                // 7. go forward to grab it.
+//                if (robot.turret.detectedTarget())
+//                {
+//                    robot.robotDrive.cancel();
+//                    sm.setState(State.PICKUP_CONE);
+//                }
+//                //ran out of time, couldn't find pole stack
+//                else if(expireTime == null){
+//                    expireTime = TrcUtil.getCurrentTime() + 2;
+//                    robot.robotDrive.driveBase.holonomicDrive(currOwner, -0.1, 0, 0, 2, event);
+//                }
+//                else if(TrcUtil.getCurrentTime() == expireTime){
+//                    expireTime = null;
+//                    sm.setState(State.PICKUP_CONE);
+//                }
+//                break;
 
             case PICKUP_CONE: //2. lower elevator to the cone, wait for intake autoAssist
                 robot.grabber.cancelAutoAssist();
+
                 robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.2, 0.0);
                 robot.grabber.enableAutoAssist(null, 0, event, 5);
-                sm.waitForSingleEvent(event, State.RAISE_ELEVATOR);
+                sm.waitForSingleEvent(event, State.RAISE_ARM);
                 break;
 
-            case RAISE_ELEVATOR: //3 raise the elevator up higher than the pole
+            case RAISE_ARM: //3 raise the elevator up higher than the pole
                 robot.robotDrive.driveBase.stop(currOwner);
                 robot.grabber.cancelAutoAssist();
                 robot.grabber.close();
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                 robot.robotDrive.driveBase.stop(currOwner);
-                robot.elevator.setTarget(
-                    currOwner, 0.5, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, true, 1.0, event, 4.0);
+                robot.arm.setTarget(0, false, 1.0, event);
                 sm.waitForSingleEvent(event, State.DONE);
                 break;
 

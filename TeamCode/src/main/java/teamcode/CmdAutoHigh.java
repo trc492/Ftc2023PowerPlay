@@ -63,7 +63,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private final boolean debugPoleVision = false;
     private final boolean debugCycleTask = false;
     private final boolean preloadOnly = false;
-    private final boolean debugPreloadMode = true;
+    private final boolean debugPreloadMode = false;
 
 
     /**
@@ -227,49 +227,15 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.scoreConeTask.autoAssistScoreCone(
                         turretStartPos - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT,
                         RobotParams.TURRET_SCAN_POWER, RobotParams.TURRET_SCAN_DURATION, event);
-                    sm.waitForSingleEvent(event, State.PARK);
+                    sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
                     break;
 
-                case RAISE_ELEVATOR_TO_SCORE:
-                    if(autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE){
-                        robot.arm.setTarget(16);
-                    }
-                    else{
-                        robot.arm.setTarget(17);//5.0);
-                    }
-                    robot.elevator.setTarget(33, true, 1.0, event, 6.0);
-                    sm.waitForSingleEvent(event, State.TURN_TO_SCORE_PRELOAD);
-                    break;
-                //assumes robot is set up already right next to the pole
 
-                case TURN_TO_SCORE_PRELOAD:
-                    //during the turret turn we want it to stop whenever it sees the pole so we enable autoassist
-//                    robot.turret.autoAssistFindPole(
-//                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
-//                            RobotParams.TURRET_RIGHT - 10: RobotParams.TURRET_LEFT - 10,
-//                        0.75, 20.0, 0.3, event, 0.0);
-
-                    sm.waitForSingleEvent(event, State.SCORE_PRELOAD, 5.0);
-
-                    break;
-                //todo: tune drivebase, turret pid, iZone. turn everything to 0 with kP,
-                //tune so never oscillate, tune kI so start oscillating, tune iZone, add kD at the end to suppress oscillation
-                //dump the cone with auto-assist
-                case SCORE_PRELOAD:
-                    robot.cyclingTask.scoreCone(TaskCyclingCones.VisionType.NO_VISION, event);
-                    if(debugPreloadMode){
-                        sm.waitForSingleEvent(event, State.DONE);
-                    }
-                    else if(preloadOnly){
-                        sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
-                    }
-                    else{
-                        sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
-                    }
-                    break;
 
                 case PREP_FOR_TRAVEL:
-                    robot.turret.setTarget(RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
+                    robot.robotDrive.purePursuitDrive.start(
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
                     sm.waitForSingleEvent(event, State.DO_CYCLE);
                     break;
                 case DO_CYCLE:
@@ -283,10 +249,11 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        robot.cyclingTask.doFullAutoCycle(
-                            TaskCyclingCones.VisionType.CONE_VISION, conesRemaining, event);
+                        robot.pickupConeTask.autoAssistPickupCone(5, true, event);
+//                        robot.cyclingTask.doFullAutoCycle(
+//                            TaskCyclingCones.VisionType.CONE_VISION, conesRemaining, event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.PARK);//DO_CYCLE);
+                        sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
                     }
                     break;
 

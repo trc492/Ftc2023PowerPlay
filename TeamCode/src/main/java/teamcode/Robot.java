@@ -72,6 +72,7 @@ public class Robot
     public TrcPidActuator arm = null;
     public TrcServoGrabber grabber = null;
     public TaskScoreCone scoreConeTask;
+    public TaskPickupCone pickupConeTask;
     public TaskCyclingCones cyclingTask;
 
     /**
@@ -200,6 +201,7 @@ public class Robot
                 // Create and initialize auto-assist tasks.
                 //
                 scoreConeTask = new TaskScoreCone("ScoreConeTask", this, globalTracer);
+                pickupConeTask = new TaskPickupCone("PickupConeTask", this, globalTracer);
                 cyclingTask = new TaskCyclingCones(this);
                 this.cyclingTask.setMsgTracer(globalTracer);
             }
