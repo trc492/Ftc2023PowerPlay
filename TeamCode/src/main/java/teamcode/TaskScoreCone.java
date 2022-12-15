@@ -40,8 +40,8 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     {
         START,
         TURN_TO_START_TARGET,
-        RAISE_TO_SCORE_HEIGHT,
         FIND_POLE,
+        RAISE_TO_SCORE_HEIGHT,
         EXTEND_ARM,
         CAP_POLE,
         SCORE_CONE,
@@ -266,19 +266,6 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     // Turn the turret to the position for starting the scan.
                     robot.turret.setTarget(
                         currOwner, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit, event, 5.0);
-                    sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
-                }
-                else
-                {
-                    sm.setState(State.RAISE_TO_SCORE_HEIGHT);
-                }
-                break;
-
-            case RAISE_TO_SCORE_HEIGHT:
-                if (taskParams.scoreHeight > 0.0)
-                {
-                    // Set the proper elevator height for scoring.
-                    robot.elevator.setTarget(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.FIND_POLE);
                 }
                 else
@@ -291,14 +278,27 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 // Enable the sensor trigger and start scanning for the pole.
                 robot.turret.setTriggerEnabled(true);
                 robot.turret.getPidActuator().setPower(currOwner, taskParams.scanPower, taskParams.scanDuration, event);
-                sm.waitForSingleEvent(event, State.EXTEND_ARM);
+                sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
                 break;
 
-            case EXTEND_ARM:
+            case RAISE_TO_SCORE_HEIGHT:
                 // Either found the pole or reached timeout. Either way, stop the turret.
                 robot.turret.getPidActuator().setPower(currOwner, 0.0);
                 robot.turret.setTriggerEnabled(false);
 
+                if (taskParams.scoreHeight > 0.0)
+                {
+                    // Set the proper elevator height for scoring.
+                    robot.elevator.setTarget(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
+                    sm.waitForSingleEvent(event, State.EXTEND_ARM);
+                }
+                else
+                {
+                    sm.setState(State.EXTEND_ARM);
+                }
+                break;
+
+            case EXTEND_ARM:
                 Double armTarget = null;
                 if (robot.turret.detectedTarget())
                 {
@@ -315,7 +315,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     }
                 }
 
-                if (armTarget == null || armTarget > 30.0)
+                if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 30.0)
                 {
                     // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
                     // picking up a erroneous distance. In this case, just use the known good arm angle and hope it

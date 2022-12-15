@@ -377,7 +377,7 @@ public class RobotParams
     static final double TURRET_MAX_POS                          = 325.0;
     static final double TURRET_SENSOR_LOWER_THRESHOLD           = 4.0;  // in inches
     static final double TURRET_SENSOR_UPPER_THRESHOLD           = 12.0; // in inches
-    static final double TURRET_SENSOR_SETTLING_PERIOD           = 0.15; // in seconds
+    static final double TURRET_SENSOR_SETTLING_PERIOD           = 0.20; // in seconds
     static final boolean TURRET_MOTOR_INVERTED                  = true;
     static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
     static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
@@ -396,7 +396,7 @@ public class RobotParams
     static final double TURRET_LEFT                             = 270.0;
     static final double TURRET_PRESET_TOLERANCE                 = 10.0;
     static final double TURRET_SCAN_OFFSET                      = 20.0;
-    static final double TURRET_SCAN_POWER                       = 0.35;
+    static final double TURRET_SCAN_POWER                       = 0.30;
     static final double TURRET_SCAN_DURATION                    = 5.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
         TURRET_BACK,    // Slot 0
@@ -465,11 +465,11 @@ public class RobotParams
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
     static final double ARM_GEAR_RATIO                          = 28.0;
     static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
-    static final double ARM_OFFSET                              = -11.0;
+    static final double ARM_OFFSET                              = -8.0;
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
-    static final double ARM_ANGLE_OFFSET                        = -11.90;   // in degrees
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -2.0;     // in inches
+    static final double ARM_ANGLE_OFFSET                        = -11.94;   // in degrees
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.20;    // in inches
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
@@ -491,10 +491,10 @@ public class RobotParams
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_SCORE_POS                           = 20;
     static final double ARM_SINGLE_CONE_POS                     = ARM_MAX_POS;
-    static final double ARM_STACK_2_POS                         = ARM_MAX_POS;
-    static final double ARM_STACK_3_CONES_POS                   = ARM_MAX_POS;
-    static final double ARM_STACK_4_CONES_POS                   = ARM_MAX_POS;
-    static final double ARM_STACK_5_CONES_POS                   = ARM_MAX_POS;
+    static final double ARM_STACK_2_POS                         = 135.0;
+    static final double ARM_STACK_3_CONES_POS                   = 110.0;
+    static final double ARM_STACK_4_CONES_POS                   = 100.0;
+    static final double ARM_STACK_5_CONES_POS                   = 90.0;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {

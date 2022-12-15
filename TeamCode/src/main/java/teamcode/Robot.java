@@ -454,7 +454,7 @@ public class Robot
                     }
                 }
                 globalTracer.traceInfo(
-                    funcName, "sensorValue=%.2f, poleDistance=%.2f, triggerSettlingData=%s",
+                    funcName, "sensorValue=%.2f, minDistance=%.2f, triggerSettlingData=%s",
                     sensorValue, poleDistance, Arrays.toString(triggerSettlingData));
             }
 

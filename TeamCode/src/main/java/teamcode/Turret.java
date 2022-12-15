@@ -43,6 +43,7 @@ public class Turret
     private static final TrcDbgTrace globalTracer = TrcDbgTrace.getGlobalTracer();
     private static final boolean debugEnabled = false;
 
+    private final TrcDbgTrace msgTracer;
     private final TrcPidActuator pidTurret;
     private final FtcDigitalInput calDirectionSwitch;
     private final FtcDistanceSensor sensor;
@@ -66,6 +67,7 @@ public class Turret
             .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
 
+        this.msgTracer = msgTracer;
         pidTurret = new FtcMotorActuator(RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
         if (msgTracer != null)
         {
@@ -181,10 +183,17 @@ public class Turret
      */
     public boolean detectedTarget()
     {
+        final String funcName = "detectedTarget";
         double value = getSensorValue();
+        boolean detected = value >= RobotParams.TURRET_SENSOR_LOWER_THRESHOLD &&
+                           value <= RobotParams.TURRET_SENSOR_UPPER_THRESHOLD;
 
-        return value >= RobotParams.TURRET_SENSOR_LOWER_THRESHOLD &&
-               value <= RobotParams.TURRET_SENSOR_UPPER_THRESHOLD;
+        if (msgTracer != null)
+        {
+            msgTracer.traceInfo(funcName, "sensorValue=%.2f, detected=%s", value, detected);
+        }
+
+        return detected;
     }   //detectedTarget
 
     /**
@@ -456,9 +465,9 @@ public class Turret
         final String funcName = "sensorTriggerEvent";
         boolean isActive = ((AtomicBoolean) context).get();
 
-        if (debugEnabled)
+        if (msgTracer != null)
         {
-            globalTracer.traceInfo(funcName, "value=%.3f, state=%s", getSensorValue(), isActive);
+            msgTracer.traceInfo(funcName, "value=%.3f, state=%s", getSensorValue(), isActive);
         }
 
         if (isActive)
