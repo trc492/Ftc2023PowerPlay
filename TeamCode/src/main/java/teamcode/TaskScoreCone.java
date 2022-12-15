@@ -39,7 +39,6 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     public enum State
     {
         START,
-        TURN_TO_START_TARGET,
         FIND_POLE,
         RAISE_TO_SCORE_HEIGHT,
         EXTEND_ARM,
@@ -251,16 +250,13 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     {
         final String funcName = "runTaskState";
         TaskParams taskParams = (TaskParams) params;
-
+        //
+        // Preconditions:
+        // Arm is at up position, elevator is at min position, turret is optionally at start scan position.
+        //
         switch (state)
         {
             case START:
-                // Bring the arm up so it doesn't hit anything when turning the turret.
-                robot.arm.setTarget(currOwner, 0.0, RobotParams.ARM_UP_POS, false, 1.0, event, 5.0);
-                sm.waitForSingleEvent(event, State.TURN_TO_START_TARGET);
-                break;
-
-            case TURN_TO_START_TARGET:
                 if (taskParams.startPowerLimit != 0.0)
                 {
                     // Turn the turret to the position for starting the scan.
@@ -340,9 +336,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case SCORE_CONE:
                 // Release the cone to score it and retract the elevator and arm.
                 robot.setGrabberAutoAssistOn(false);
-                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
+                // Delay a little to wait for the arm to retract before turning the turret.
+                robot.turret.setTarget(currOwner, 0.5, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.
                 //

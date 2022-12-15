@@ -45,7 +45,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         START,
         LOOK_FOR_CONE,
         DRIVE_TO_CONE,
-        APPROACH_CONE,
+//        APPROACH_CONE,
         PICKUP_CONE,
         DONE
     }   //enum State
@@ -213,7 +213,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     {
         final String funcName = "runTaskState";
         TaskParams taskParams = (TaskParams) params;
-
+        //
+        // Preconditions:
+        // Arm is at up position, elevator is at min position, turret is at front position.
+        //
         switch (state)
         {
             case START:
@@ -224,15 +227,12 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                 }
                 targetLocation = null;
-                // Prepares robot for using vision to pick up: turret to front, elevator down, arm set to cone level.
+                // Cancel grabber auto-assist just in case it was ON.
                 robot.grabber.cancelAutoAssist();
-                robot.arm.setTarget(
-                    currOwner, RobotParams.ARM_PICKUP_PRESETS[taskParams.conesRemaining], false, 1.0, null, 0.0);
-                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
-                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, event, 0.0);
-                sm.waitForSingleEvent(event, State.LOOK_FOR_CONE);
-                break;
-
+                sm.setState(State.LOOK_FOR_CONE);
+                //
+                // Intentionally falling through to the next state (LOOK_FOR_CONE).
+                //
             case LOOK_FOR_CONE:
                 if (taskParams.useVision)
                 {
@@ -276,6 +276,11 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 break;
 
             case DRIVE_TO_CONE:
+                // Note: both grabber and PurePursuit are signaling the same event, so either one will move us to the
+                // next state.
+                robot.arm.setTarget(
+                    currOwner, RobotParams.ARM_PICKUP_PRESETS[taskParams.conesRemaining], false, 1.0, null, 0.0);
+                robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                 if (targetLocation != null)
                 {
@@ -284,7 +289,8 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     robot.robotDrive.purePursuitDrive.start(
                         currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
                         new TrcPose2D(
-                            targetLocation.x - 1.0, 5.0,
+//                            targetLocation.x - 1.0, 5.0,
+                            targetLocation.x, targetLocation.y - 6.0,
                             robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
                             robot.robotDrive.driveBase.getHeading()));
                 }
@@ -296,21 +302,22 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                 }
-                sm.waitForSingleEvent(event, State.DONE);//APPROACH_CONE);
+                sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
                 break;
 
-            case APPROACH_CONE:
-                // Note: both the grabber and holonomicDrive signal the same event. We will go to the next state if
-                // either of them signaled.
-                robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
-                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.2, 0.0, false, 2.0, event);
-                break;
+//            case APPROACH_CONE:
+//                // Note: both the grabber and holonomicDrive signal the same event. We will go to the next state if
+//                // either of them signaled.
+//                robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
+//                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.2, 0.0, false, 2.0, event);
+//                break;
 
             case PICKUP_CONE:
-                // Have the cone or not, we will clean up: stop drive base, stop grabber, raise elevator, retract arm.
-                robot.robotDrive.driveBase.stop(currOwner);
+                // Have the cone or not, we will clean up: stop PurePursuit, stop grabber, raise elevator, retract arm.
+//                robot.robotDrive.driveBase.stop(currOwner);
+                robot.robotDrive.purePursuitDrive.cancel();
                 robot.grabber.cancelAutoAssist();
-                robot.elevator.setTarget(currOwner, 0.0, true, 1.0, event, 0.0);
+                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS + 6.0, false, 1.0, event, 0.0);
                 robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 if (!robot.grabber.hasObject())
                 {

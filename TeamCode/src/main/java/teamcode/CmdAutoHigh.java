@@ -32,14 +32,17 @@ import TrcCommonLib.trclib.TrcUtil;
 class CmdAutoHigh implements TrcRobot.RobotCommand
 {
     private static final String moduleName = "CmdAutoHigh";
+    private static final boolean visionAssist = true;
+    private static final boolean debugCycleTask = false;
 
     private enum State
     {
         START_DELAY,
         DRIVE_TO_SCORE_POSITION,
-        AUTO_SCORE_PRELOAD,
-        PREP_FOR_TRAVEL,
-        DO_CYCLE,
+        AUTO_SCORE_CONE,
+        GO_TO_CONE_STACK,
+        AUTO_PICKUP_CONE,
+        BACK_TO_SCORE_POSTIION,
         PARK,
         DONE
     }   //enum State
@@ -50,10 +53,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private final TrcEvent event;
     private final TrcStateMachine<State> sm;
     private int signalPos = 0;
-    private int conesRemaining;
-
-    private final boolean debugCycleTask = false;
-    private final boolean visionAssist = true;
+    private int conesRemaining = 5;
+    private double scanPower = RobotParams.TURRET_SCAN_POWER;
 
     /**
      * Constructor: Create an instance of the object.
@@ -117,6 +118,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         else
         {
             String msg;
+            double turretStartPos;
 
             robot.dashboard.displayPrintf(1, "State: %s", state);
             switch (state)
@@ -176,11 +178,18 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case DRIVE_TO_SCORE_POSITION:
                     if (debugCycleTask)
                     {
-                        sm.setState(State.DO_CYCLE);
+                        sm.setState(State.AUTO_PICKUP_CONE);
                     }
                     else
                     {
                         // Todo: add option to do center high poles
+                        // Prepare all subsystems for pre-conditions of autoScoreCone: arm up, turret at start scan
+                        // position.
+                        robot.arm.setTarget(RobotParams.ARM_UP_POS, false);
+                        turretStartPos =
+                            autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                                RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
+                        robot.turret.setTarget(turretStartPos - RobotParams.TURRET_SCAN_OFFSET, true, 0.8, null, 0.0);
                         if (autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE &&
                             autoChoices.startPos == FtcAuto.StartPos.LEFT)
                         {
@@ -198,36 +207,30 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                                 robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
                         }
-
                         sm.waitForSingleEvent(
                             event,
                             autoChoices.strategy == FtcAuto.AutoStrategy.PARKING_ONLY ?
-                                State.PARK: State.AUTO_SCORE_PRELOAD);
+                                State.PARK: State.AUTO_SCORE_CONE);
                     }
                     break;
 
-                case AUTO_SCORE_PRELOAD:
-                    double turretStartPos =
-                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
+                case AUTO_SCORE_CONE:
                     robot.scoreConeTask.autoAssistScoreCone(
-                        turretStartPos - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT,
-                        RobotParams.TURRET_SCAN_POWER, RobotParams.TURRET_SCAN_DURATION, event);
-                    sm.waitForSingleEvent(event, State.PREP_FOR_TRAVEL);
+                        0.0, 0.0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, scanPower,
+                        RobotParams.TURRET_SCAN_DURATION, event);
+                    sm.waitForSingleEvent(event, State.GO_TO_CONE_STACK);
                     break;
 
-                case PREP_FOR_TRAVEL:
-                    conesRemaining = 5;
+                case GO_TO_CONE_STACK:
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
-                    sm.waitForSingleEvent(event, State.DO_CYCLE);
+                    sm.waitForSingleEvent(event, State.AUTO_PICKUP_CONE);
                     break;
 
-                case DO_CYCLE:
-                    //if time >= 26 or no more cones on the conestack, go to park
-                    //otherwise call the doCycle method for each cone on the stack
-                    //if driveOnly, just drive back and forth to simulate it
+                case AUTO_PICKUP_CONE:
+                    // Scan in the opposition direction when cycling.
+                    scanPower = -RobotParams.TURRET_SCAN_POWER;
                     if (TrcUtil.getModeElapsedTime() >= 25 || conesRemaining == 0)
                     {
                         sm.setState(State.PARK);
@@ -239,8 +242,19 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                             visionAssist && robot.vision != null && robot.vision.frontEocvVision != null,
                             event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.DONE);//DO_CYCLE);
+                        sm.waitForSingleEvent(event, State.DONE);//BACK_TO_SCORE_POSITION);
                     }
+                    break;
+
+                case BACK_TO_SCORE_POSTIION:
+                    turretStartPos =
+                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
+                    robot.turret.setTarget(turretStartPos + RobotParams.TURRET_SCAN_OFFSET, true, 0.8, null, 0.0);
+                    robot.robotDrive.purePursuitDrive.start(
+                        event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                        robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
+                    sm.waitForSingleEvent(event, State.AUTO_SCORE_CONE);
                     break;
 
                 case PARK:
@@ -251,9 +265,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        robot.turret.setTarget(RobotParams.TURRET_BACK, true, 1.0, null, 0.0);
-                        // Todo(CodeReview): PurePursuitDrive may hit obstacles especially parking at NEAR_TILE.
-                        // Calling "driveToEndPoint" will avoid that. Please debug this to make sure it works.
+                        // PurePursuitDrive may hit obstacles especially parking at NEAR_TILE, so call
+                        // gridDrive.driveToEndPoint instead. It will avoid obstacles.
                         TrcPose2D parkPos =
                             autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
                                 RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
@@ -266,6 +279,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case DONE:
                 default:
+                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
                     cancel();
                     break;
