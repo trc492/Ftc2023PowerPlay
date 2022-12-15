@@ -78,7 +78,7 @@ public class FtcTeleOp extends FtcOpMode
     private boolean turretSlowModeOn = false;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
-    private boolean autoNavigate = false;
+    private boolean autoNavigate = true;
 
     //
     // Implements FtcOpMode abstract method.
