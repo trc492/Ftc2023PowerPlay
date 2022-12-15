@@ -202,12 +202,7 @@ public class FtcAuto extends FtcOpMode
             }
         }
 
-        if (robot.elevator != null && robot.arm != null && robot.turret != null)
-        {
-            robot.zeroCalibrate();
-            //robot.turret.getPidActuator().setTarget(2.0, 40, false, 0.8, null, 0.0);
-
-        }
+        robot.zeroCalibrate();
 
         if (robot.grabber != null)
         {

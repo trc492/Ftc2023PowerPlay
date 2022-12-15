@@ -556,9 +556,7 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LBUMPER:
-                if(pressed){
-                    manualOverride = !manualOverride;
-                }
+                manualOverride = pressed;
                 break;
 
             case FtcGamepad.GAMEPAD_RBUMPER:

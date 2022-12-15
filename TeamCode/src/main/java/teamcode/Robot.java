@@ -151,9 +151,9 @@ public class Robot
                             RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
                             RobotParams.ELEVATOR_TOLERANCE))
                         .setPowerCompensation(this::getElevatorPowerCompensation)
-//                        .setStallProtectionParams(
-//                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
-//                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
+                        .setStallProtectionParams(
+                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
+                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
                         .setPresetTolerance(RobotParams.ELEVATOR_PRESET_TOLERANCE)
                         .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
@@ -175,9 +175,9 @@ public class Robot
                         .setPidParams(new TrcPidController.PidParameters(
                             RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
                         .resetPositionOnLowerLimit(true)
-//                        .setStallProtectionParams(
-//                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
-//                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
+                        .setStallProtectionParams(
+                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
+                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
                         .setPresetTolerance(RobotParams.ARM_PRESET_TOLERANCE)
                         .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
@@ -198,6 +198,8 @@ public class Robot
                         .setMsgTracer(globalTracer);
                     grabber = new Grabber(RobotParams.HWNAME_GRABBER, grabberParams).getServoGrabber();
                 }
+
+//                zeroCalibrate();
                 //
                 // Create and initialize auto-assist tasks.
                 //
@@ -359,8 +361,11 @@ public class Robot
      */
     public void zeroCalibrate()
     {
+        final String funcName = "zeroCalibrate";
+
         if (elevator != null)
         {
+            globalTracer.traceInfo(funcName, "Zero calibrating elevator.");
             elevator.zeroCalibrate();
         }
 
@@ -368,6 +373,7 @@ public class Robot
         {
             TrcEvent callbackEvent = new TrcEvent("zeroCalEvent");
             callbackEvent.setCallback(this::zeroCalTurret, null);
+            globalTracer.traceInfo(funcName, "Zero calibrating arm.");
             arm.zeroCalibrate(callbackEvent);
         }
         else
@@ -383,8 +389,11 @@ public class Robot
      */
     private void zeroCalTurret(Object context)
     {
+        final String funcName = "zeroCalTurret";
+
         if (turret != null)
         {
+            globalTracer.traceInfo(funcName, "Zero calibrating turret.");
             turret.zeroCalibrate();
         }
     }   //zeroCalTurret

@@ -420,7 +420,7 @@ public class RobotParams
     static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
     static final double ELEVATOR_OFFSET                         = 7.8;              // in inches
     static final double ELEVATOR_MIN_POS                        = 7.0;
-    static final double ELEVATOR_MAX_POS                        = 36.0;
+    static final double ELEVATOR_MAX_POS                        = 34.0;
     static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
     static final boolean ELEVATOR_MOTOR_INVERTED                = false;
     static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH        = true;
@@ -429,7 +429,7 @@ public class RobotParams
     static final boolean ELEVATOR_UPPER_LIMIT_INVERTED          = false;
     static final double ELEVATOR_CAL_POWER                      = -0.1;
     static final double ELEVATOR_POWER_COMPENSATION             = 0.1;
-    static final double ELEVATOR_STALL_MIN_POWER                = 0.3;
+    static final double ELEVATOR_STALL_MIN_POWER                = 0.75;
     static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
     static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
@@ -485,7 +485,7 @@ public class RobotParams
     static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = false;
     static final boolean ARM_UPPER_LIMIT_INVERTED               = false;
     static final double ARM_CAL_POWER                           = -1.0;
-    static final double ARM_STALL_MIN_POWER                     = 0.3;
+    static final double ARM_STALL_MIN_POWER                     = 0.75;
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
