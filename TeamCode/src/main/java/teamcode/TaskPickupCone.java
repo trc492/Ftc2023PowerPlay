@@ -98,7 +98,8 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         if (msgTracer != null)
         {
             msgTracer.traceInfo(
-                funcName, "conesRemaining=%d, useVision=%s, event=%s", conesRemaining, useVision, event);
+                funcName, "%s: conesRemaining=%d, useVision=%s, event=%s",
+                moduleName, conesRemaining, useVision, event);
         }
 
         startAutoTask(
@@ -116,7 +117,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
         if (msgTracer != null)
         {
-            msgTracer.traceInfo(funcName, "Canceling auto-assist pick up cone.");
+            msgTracer.traceInfo(funcName, "%s: Canceling auto-assist pick up cone.", moduleName);
         }
         stopAutoTask(false);
     }   //autoAssistCancel
@@ -150,7 +151,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         {
             if (msgTracer != null)
             {
-                msgTracer.traceInfo(funcName, "Failed to acquire subsystem ownership.");
+                msgTracer.traceInfo(funcName, "%s: Failed to acquire subsystem ownership.", moduleName);
             }
             releaseSubsystemsOwnership();
         }
@@ -169,14 +170,15 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
         if (ownerName != null)
         {
-            TrcDbgTrace.printThreadStack();
             if (msgTracer != null)
             {
                 TrcOwnershipMgr ownershipMgr = TrcOwnershipMgr.getInstance();
                 msgTracer.traceInfo(
-                    funcName, "Releasing subsystem ownership (driveBase=%s, turret=%s, elevator=%s, arm=%s).",
-                    ownershipMgr.getOwner(robot.robotDrive.driveBase), ownershipMgr.getOwner(robot.turret.getPidActuator()),
-                    ownershipMgr.getOwner(robot.elevator), ownershipMgr.getOwner(robot.arm));
+                    funcName,
+                    "%s: Releasing subsystem ownership (currOwner=%s, driveBase=%s, turret=%s, elevator=%s, arm=%s).",
+                    moduleName, currOwner, ownershipMgr.getOwner(robot.robotDrive.driveBase),
+                    ownershipMgr.getOwner(robot.turret.getPidActuator()), ownershipMgr.getOwner(robot.elevator),
+                    ownershipMgr.getOwner(robot.arm));
             }
             robot.robotDrive.driveBase.releaseExclusiveAccess(currOwner);
             robot.turret.releaseExclusiveAccess(currOwner);
@@ -192,7 +194,12 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     @Override
     protected void stopSubsystems()
     {
-        msgTracer.traceInfo("stopSubsystems", "Stopping subsystems.");
+        final String funcName = "stopSubsystems";
+
+        if (msgTracer != null)
+        {
+            msgTracer.traceInfo(funcName, "%s: Stopping subsystems.", moduleName);
+        }
         robot.robotDrive.driveBase.stop(currOwner);
         robot.turret.cancel(currOwner);
         robot.elevator.cancel(currOwner);
@@ -306,16 +313,18 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 }
                 sm.waitForSingleEvent(event, State.APPROACH_CONE);
                 break;
+
             case APPROACH_CONE:
                 robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
-                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0, 0.2, 0, 2, event);
-                sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
+                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.15, 0.0, 2.5, event);
+                sm.waitForSingleEvent(event, State.PICKUP_CONE);
                 break;
+
             case PICKUP_CONE:
                 // Have the cone or not, we will clean up: stop PurePursuit, stop grabber, raise elevator, retract arm.
                 robot.robotDrive.driveBase.stop(currOwner);
                 robot.robotDrive.purePursuitDrive.cancel();
-                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS + 6.0, false, 1.0, event, 0.0);
+                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS + 12.0, false, 1.0, event, 0.0);
                 robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 if (!robot.grabber.hasObject())
                 {

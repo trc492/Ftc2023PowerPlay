@@ -248,7 +248,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                             visionAssist && robot.vision != null && robot.vision.frontEocvVision != null,
                             event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.DONE);//BACK_TO_SCORE_POSITION);
+                        sm.waitForSingleEvent(event, State.BACK_TO_SCORE_POSITION);
                     }
                     break;
 

@@ -112,8 +112,9 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             msgTracer.traceInfo(
                 funcName,
-                "startTarget=%.2f, startPowerLimit=%.2f, scoreHeight=%.2f, scanPower=%.2f, scanDuration=%.3f, event=%s",
-                startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration, event);
+                "%s: startTarget=%.2f, startPowerLimit=%.2f, scoreHeight=%.2f, scanPower=%.2f, scanDuration=%.3f, " +
+                "event=%s",
+                moduleName, startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration, event);
         }
 
         startAutoTask(
@@ -160,7 +161,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
 
         if (msgTracer != null)
         {
-            msgTracer.traceInfo(funcName, "Canceling auto-assist score cone.");
+            msgTracer.traceInfo(funcName, "%s: Canceling auto-assist score cone.", moduleName);
         }
         stopAutoTask(false);
     }   //autoAssistCancel
@@ -193,7 +194,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             if (msgTracer != null)
             {
-                msgTracer.traceInfo(funcName, "Failed to acquire subsystem ownership.");
+                msgTracer.traceInfo(funcName, "%s: Failed to acquire subsystem ownership.", moduleName);
             }
             releaseSubsystemsOwnership();
         }
@@ -216,9 +217,9 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             {
                 TrcOwnershipMgr ownershipMgr = TrcOwnershipMgr.getInstance();
                 msgTracer.traceInfo(
-                    funcName, "Releasing subsystem ownership (turret=%s, elevator=%s, arm=%s).",
-                    ownershipMgr.getOwner(robot.turret.getPidActuator()), ownershipMgr.getOwner(robot.elevator),
-                    ownershipMgr.getOwner(robot.arm));
+                    funcName, "%s: Releasing subsystem ownership (currOwner=%s, turret=%s, elevator=%s, arm=%s).",
+                    moduleName, currOwner, ownershipMgr.getOwner(robot.turret.getPidActuator()),
+                    ownershipMgr.getOwner(robot.elevator), ownershipMgr.getOwner(robot.arm));
             }
             robot.turret.releaseExclusiveAccess(currOwner);
             robot.elevator.releaseExclusiveAccess(currOwner);

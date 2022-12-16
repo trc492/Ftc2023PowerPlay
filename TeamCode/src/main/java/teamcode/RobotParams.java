@@ -490,11 +490,11 @@ public class RobotParams
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
     static final double ARM_SAFE_POS                            = 10.0;
-    static final double ARM_SINGLE_CONE_POS                     = ARM_MAX_POS;
-    static final double ARM_STACK_2_POS                         = 135.0;
-    static final double ARM_STACK_3_CONES_POS                   = 110.0;
-    static final double ARM_STACK_4_CONES_POS                   = 100.0;
-    static final double ARM_STACK_5_CONES_POS                   = 90.0;
+    static final double ARM_SINGLE_CONE_POS                     = 135.0;
+    static final double ARM_STACK_2_POS                         = 120.0;
+    static final double ARM_STACK_3_CONES_POS                   = 100.0;
+    static final double ARM_STACK_4_CONES_POS                   = 90.0;
+    static final double ARM_STACK_5_CONES_POS                   = 80.0;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
