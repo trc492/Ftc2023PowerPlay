@@ -257,6 +257,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
                     robot.turret.setTarget(turretStartPos + RobotParams.TURRET_SCAN_OFFSET, true, 0.8, null, 0.0);
+                    robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
@@ -264,6 +265,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case PARK:
+                    robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     if (autoChoices.parking == FtcAuto.Parking.NO_PARKING)
                     {
                         // We are not parking anywhere, just stop and be done.
@@ -285,7 +287,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case DONE:
                 default:
-//                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
+                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
                     cancel();
                     break;
