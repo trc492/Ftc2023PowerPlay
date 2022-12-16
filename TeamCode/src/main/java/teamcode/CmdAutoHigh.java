@@ -42,7 +42,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         AUTO_SCORE_CONE,
         GO_TO_CONE_STACK,
         AUTO_PICKUP_CONE,
-        BACK_TO_SCORE_POSTIION,
+        BACK_TO_SCORE_POSITION,
         PARK,
         DONE
     }   //enum State
@@ -185,6 +185,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         // Todo: add option to do center high poles
                         // Prepare all subsystems for pre-conditions of autoScoreCone: arm up, turret at start scan
                         // position.
+                        // This operation takes about 5 sec.
                         robot.arm.setTarget(RobotParams.ARM_UP_POS, false);
                         turretStartPos =
                             autoChoices.startPos == FtcAuto.StartPos.LEFT?
@@ -222,6 +223,11 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case GO_TO_CONE_STACK:
+                    // Setup preconditions for auto-pickup: arm at top cone, elevator down, turret front.
+                    // This operation takes about 3 sec.
+                    robot.arm.setTarget(RobotParams.ARM_PICKUP_PRESETS[5]);
+                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, true);
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
@@ -242,11 +248,11 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                             visionAssist && robot.vision != null && robot.vision.frontEocvVision != null,
                             event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.DONE);//BACK_TO_SCORE_POSITION);
+                        sm.waitForSingleEvent(event, State.BACK_TO_SCORE_POSITION);
                     }
                     break;
 
-                case BACK_TO_SCORE_POSTIION:
+                case BACK_TO_SCORE_POSITION:
                     turretStartPos =
                         autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;

@@ -419,7 +419,7 @@ public class RobotParams
     static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
     static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
     static final double ELEVATOR_OFFSET                         = 7.8;              // in inches
-    static final double ELEVATOR_MIN_POS                        = 7.0;
+    static final double ELEVATOR_MIN_POS                        = ELEVATOR_OFFSET;
     static final double ELEVATOR_MAX_POS                        = 34.0;
     static final double ELEVATOR_MIN_POS_FOR_TURRET             = 10.0;
     static final boolean ELEVATOR_MOTOR_INVERTED                = false;
@@ -469,7 +469,7 @@ public class RobotParams
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
     static final double ARM_ANGLE_OFFSET                        = -11.94;   // in degrees
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.20;    // in inches
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.00;    // in inches
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down

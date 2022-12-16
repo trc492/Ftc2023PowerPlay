@@ -272,6 +272,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
 
             case FIND_POLE:
                 // Enable the sensor trigger and start scanning for the pole.
+                // This operation takes about 0.5 sec.
                 robot.turret.setTriggerEnabled(true);
                 robot.turret.getPidActuator().setPower(currOwner, taskParams.scanPower, taskParams.scanDuration, event);
                 sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
@@ -285,6 +286,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 if (taskParams.scoreHeight > 0.0)
                 {
                     // Set the proper elevator height for scoring.
+                    // This operation takes about 1.2 sec.
                     robot.elevator.setTarget(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.EXTEND_ARM);
                 }
@@ -320,16 +322,17 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     {
                         msgTracer.traceInfo(funcName, "Failed to determine valid arm angle (armAngle=%f).", armTarget);
                     }
-                    armTarget = 24.0;
+                    armTarget = 25.0;
                 }
 
+                // This operation takes about 1 sec.
                 robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
                 sm.waitForSingleEvent(event, State.CAP_POLE);
                 break;
 
             case CAP_POLE:
                 // Slowly set the elevator down to cap the pole to ensure secured scoring.
-                robot.elevator.setPower(currOwner, -0.3, 0.2, event);
+                robot.elevator.setPower(currOwner, -0.5, 0.2, event);
                 sm.waitForSingleEvent(event, State.SCORE_CONE);
                 break;
 

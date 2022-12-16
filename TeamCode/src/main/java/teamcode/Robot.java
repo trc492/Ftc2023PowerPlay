@@ -175,9 +175,9 @@ public class Robot
                         .setPidParams(new TrcPidController.PidParameters(
                             RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
                         .resetPositionOnLowerLimit(true)
-                        .setStallProtectionParams(
-                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
-                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
+//                        .setStallProtectionParams(
+//                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
+//                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
                         .setPresetTolerance(RobotParams.ARM_PRESET_TOLERANCE)
                         .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
@@ -431,6 +431,7 @@ public class Robot
      */
     private double getElevatorPowerCompensation(double currPower)
     {
+        // Don't apply power if it's already at the bottom.
         return Math.abs(elevator.getPosition() - RobotParams.ELEVATOR_MIN_POS) <= RobotParams.ELEVATOR_TOLERANCE?
                 0.0: RobotParams.ELEVATOR_POWER_COMPENSATION;
     }   //getElevatorPowerCompensation
