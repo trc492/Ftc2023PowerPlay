@@ -37,6 +37,9 @@ public class MecanumDrive extends RobotDrive
 {
     private static final boolean logPoseEvents = true;
     private static final boolean tracePidInfo = false;
+    private final Robot robot;
+    public TrcPidController distPidCtrl;
+    public TrcPidDrive distDrive;
 
     /**
      * Constructor: Create an instance of the object.
@@ -47,6 +50,7 @@ public class MecanumDrive extends RobotDrive
     {
         super();
 
+        this.robot = robot;
         lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, RobotParams.LEFT_WHEEL_INVERTED);
         lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, RobotParams.LEFT_WHEEL_INVERTED);
         rfDriveMotor = createDriveMotor(RobotParams.HWNAME_RFDRIVE_MOTOR, RobotParams.RIGHT_WHEEL_INVERTED);
@@ -95,12 +99,17 @@ public class MecanumDrive extends RobotDrive
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.
         // If the robot turns too fast, PID will cause oscillation. By limiting turn power, the robot turns slower.
         turnPidCtrl.setOutputLimit(RobotParams.TURN_POWER_LIMIT);
+        distPidCtrl = new TrcPidController(
+            "distPidCtrl", RobotParams.yPosPidCoeff, RobotParams.YPOS_TOLERANCE, this::getGrabberSensorValue);
+        distPidCtrl.setAbsoluteSetPoint(true);
+        distPidCtrl.setInverted(true);
 
         pidDrive = new TrcPidDrive("pidDrive", driveBase, xPosPidCtrl, yPosPidCtrl, turnPidCtrl);
         // AbsoluteTargetMode eliminates cumulative errors on multi-segment runs because drive base is keeping track
         // of the absolute target position.
         pidDrive.setAbsoluteTargetModeEnabled(true);
         pidDrive.setMsgTracer(robot.globalTracer, logPoseEvents, tracePidInfo);
+        distDrive = new TrcPidDrive("distDrive", driveBase, xPosPidCtrl, distPidCtrl, turnPidCtrl);
 
         purePursuitDrive = new TrcPurePursuitDrive(
             "purePursuitDrive", driveBase,
@@ -111,5 +120,15 @@ public class MecanumDrive extends RobotDrive
         gridDrive = new TrcGridDrive(driveBase, purePursuitDrive, RobotParams.GRIDDRIVE_CELL_SIZE);
         gridDrive.setMsgTracer(robot.globalTracer);
     }   //MecanumDrive
+
+    /**
+     * This method returns the grabber sensor value for pidDistDrive.
+     *
+     * @return grabber sensor value.
+     */
+    private double getGrabberSensorValue()
+    {
+        return robot.grabber != null? robot.grabber.getSensorValue(): 0.0;
+    }   //getGrabberSensorValue
 
 }   //class MecanumDrive

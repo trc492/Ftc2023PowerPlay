@@ -135,7 +135,7 @@ public class Robot
             {
                 if(RobotParams.Preferences.useTurret)
                 {
-                    turret = new Turret(globalTracer, false);
+                    turret = new Turret(RobotParams.HWNAME_TURRET, globalTracer, false);
                 }
 
                 if (RobotParams.Preferences.useElevator)
@@ -187,16 +187,7 @@ public class Robot
 
                 if (RobotParams.Preferences.useGrabber)
                 {
-                    TrcServoGrabber.Parameters grabberParams = new TrcServoGrabber.Parameters()
-                        .setStepParams(
-                            RobotParams.GRABBER_MAX_STEPRATE, RobotParams.GRABBER_MIN_POS, RobotParams.GRABBER_MAX_POS)
-                        .setServoInverted(RobotParams.GRABBER_LSERVO_INVERTED, RobotParams.GRABBER_RSERVO_INVERTED)
-                        .setTriggerInverted(RobotParams.GRABBER_TRIGGER_INVERTED)
-                        .setThresholds(RobotParams.GRABBER_TRIGGER_THRESHOLD, RobotParams.GRABBER_HAS_OBJECT_THRESHOLD)
-                        .setOpenParams(RobotParams.GRABBER_OPEN_POS, RobotParams.GRABBER_OPEN_TIME)
-                        .setCloseParams(RobotParams.GRABBER_CLOSE_POS, RobotParams.GRABBER_CLOSE_TIME)
-                        .setMsgTracer(globalTracer);
-                    grabber = new Grabber(RobotParams.HWNAME_GRABBER, grabberParams).getServoGrabber();
+                    grabber = new Grabber(RobotParams.HWNAME_GRABBER, globalTracer).getServoGrabber();
                 }
 
 //                zeroCalibrate();

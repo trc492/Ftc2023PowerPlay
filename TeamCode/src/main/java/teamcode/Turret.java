@@ -51,7 +51,14 @@ public class Turret
     private double prevTurretPower = 0.0;
     private String currOwner = null;
 
-    public Turret(TrcDbgTrace msgTracer, boolean tracePidInfo)
+    /**
+     * Constructor: Create an instance of the object.
+     *
+     * @param instanceName specifies the hardware name.
+     * @param msgTracer specifies the tracer to used for logging events, can be null if not provided.
+     * @param tracePidInfo specifies true to enable PidInfo tracing, false to disable, only valid if msgTracer not null.
+     */
+    public Turret(String instanceName, TrcDbgTrace msgTracer, boolean tracePidInfo)
     {
         final FtcMotorActuator.MotorParams motorParams = new FtcMotorActuator.MotorParams(
             RobotParams.TURRET_MOTOR_INVERTED,
@@ -68,19 +75,19 @@ public class Turret
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
 
         this.msgTracer = msgTracer;
-        pidTurret = new FtcMotorActuator(RobotParams.HWNAME_TURRET, motorParams, turretParams).getPidActuator();
+        pidTurret = new FtcMotorActuator(instanceName, motorParams, turretParams).getPidActuator();
         if (msgTracer != null)
         {
             pidTurret.setMsgTracer(msgTracer, tracePidInfo);
         }
 
         calDirectionSwitch = new FtcDigitalInput(
-            RobotParams.HWNAME_TURRET + ".dirSwitch", RobotParams.TURRET_DIR_SWITCH_INVERTED);
+            instanceName + ".dirSwitch", RobotParams.TURRET_DIR_SWITCH_INVERTED);
         if (RobotParams.Preferences.hasTurretSensor)
         {
-            sensor = new FtcDistanceSensor(RobotParams.HWNAME_TURRET + ".sensor");
+            sensor = new FtcDistanceSensor(instanceName + ".sensor");
             thresholdTrigger = new TrcThresholdTrigger(
-                RobotParams.HWNAME_TURRET + ".thresholdTrigger", this::getSensorValue, this::thresholdTriggerEvent);
+                instanceName + ".thresholdTrigger", this::getSensorValue, this::thresholdTriggerEvent);
             thresholdTrigger.setTrigger(
                 RobotParams.TURRET_SENSOR_LOWER_THRESHOLD, RobotParams.TURRET_SENSOR_UPPER_THRESHOLD,
                 RobotParams.TURRET_SENSOR_SETTLING_PERIOD);

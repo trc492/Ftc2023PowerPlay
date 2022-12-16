@@ -23,24 +23,35 @@
 package teamcode;
 
 import TrcCommonLib.trclib.TrcAnalogSensorTrigger;
+import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcCommonLib.trclib.TrcServoGrabber;
 import TrcFtcLib.ftclib.FtcServo;
 
 public class Grabber
 {
-    private final TrcServoGrabber.Parameters params;
+    private final TrcDbgTrace msgTracer;
     private final TrcServoGrabber grabber;
 
     /**
-     * Constructor: Creates an instance of the object.
+     * Constructor: Create an instance of the object.
      *
      * @param instanceName specifies the hardware name.
-     * @param params specifies the parameters for the Intake subsystem.
+     * @param msgTracer specifies the tracer to used for logging events, can be null if not provided.
      */
-    public Grabber(String instanceName, TrcServoGrabber.Parameters params)
+    public Grabber(String instanceName, TrcDbgTrace msgTracer)
     {
-        this.params = params;
+        final TrcServoGrabber.Parameters grabberParams = new TrcServoGrabber.Parameters()
+            .setStepParams(
+                RobotParams.GRABBER_MAX_STEPRATE, RobotParams.GRABBER_MIN_POS, RobotParams.GRABBER_MAX_POS)
+            .setServoInverted(RobotParams.GRABBER_LSERVO_INVERTED, RobotParams.GRABBER_RSERVO_INVERTED)
+            .setTriggerInverted(RobotParams.GRABBER_TRIGGER_INVERTED)
+            .setThresholds(RobotParams.GRABBER_TRIGGER_THRESHOLD, RobotParams.GRABBER_HAS_OBJECT_THRESHOLD)
+            .setOpenParams(RobotParams.GRABBER_OPEN_POS, RobotParams.GRABBER_OPEN_TIME)
+            .setCloseParams(RobotParams.GRABBER_CLOSE_POS, RobotParams.GRABBER_CLOSE_TIME)
+            .setMsgTracer(msgTracer);
+
+        this.msgTracer = msgTracer;
         FtcServo leftServo = new FtcServo(instanceName + ".left");
         FtcServo rightServo = new FtcServo(instanceName + ".right");
         TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger = null;
@@ -49,11 +60,11 @@ public class Grabber
         {
             FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcAnalogSensorTrigger<>(
-                instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_CM,
-                new double[]{params.triggerThreshold}, false, this::analogTriggerEvent);
+                instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_INCH,
+                new double[]{grabberParams.triggerThreshold}, false, this::analogTriggerEvent);
         }
 
-        grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, params, analogTrigger);
+        grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, grabberParams, analogTrigger);
         grabber.close();
     }   //Grabber
 
@@ -77,9 +88,9 @@ public class Grabber
         final String funcName = "analogTriggerEvent";
         TrcAnalogSensorTrigger.CallbackContext callbackContext = (TrcAnalogSensorTrigger.CallbackContext) context;
 
-        if (params.msgTracer != null)
+        if (msgTracer != null)
         {
-            params.msgTracer.traceInfo(
+            msgTracer.traceInfo(
                 funcName, "Zone=%d->%d, value=%.3f",
                 callbackContext.prevZone, callbackContext.currZone, callbackContext.sensorValue);
         }
@@ -88,9 +99,9 @@ public class Grabber
         {
             boolean inProximity = grabber.objectInProximity();
 
-            if (params.msgTracer != null)
+            if (msgTracer != null)
             {
-                params.msgTracer.traceInfo(funcName, "Trigger: inProximity=%s", inProximity);
+                msgTracer.traceInfo(funcName, "Trigger: inProximity=%s", inProximity);
             }
 
             if (inProximity)

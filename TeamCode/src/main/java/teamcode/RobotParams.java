@@ -52,7 +52,7 @@ public class RobotParams
         public static boolean useTensorFlow = false;
         public static boolean showTensorFlowView = false;
         public static boolean useEasyOpenCV = true;
-        public static boolean showEasyOpenCvView = false;
+        public static boolean showEasyOpenCvView = true;
         public static boolean useFrontWebcam = true;
         public static boolean useElevatorWebcam = false;
         // Robot
@@ -453,7 +453,7 @@ public class RobotParams
         STACKED_CONE_ADDITION * 3 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 4
         STACKED_CONE_ADDITION * 4 + ELEVATOR_CONE_GRAB_HEIGHT,  // Slot 5
     };
-    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.2;
+    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.3;
     //
     // Arm subsystem.
     //
@@ -522,7 +522,7 @@ public class RobotParams
     static final boolean GRABBER_LSERVO_INVERTED                = false;
     static final boolean GRABBER_RSERVO_INVERTED                = true;
     static final boolean GRABBER_TRIGGER_INVERTED               = true;
-    static final double GRABBER_TRIGGER_THRESHOLD               = 4.0;
+    static final double GRABBER_TRIGGER_THRESHOLD               = 1.5;  // in inches
     static final double GRABBER_HAS_OBJECT_THRESHOLD            = 6.0;
     static final double GRABBER_OPEN_POS                        = GRABBER_MAX_POS;
     static final double GRABBER_OPEN_TIME                       = 0.5;
