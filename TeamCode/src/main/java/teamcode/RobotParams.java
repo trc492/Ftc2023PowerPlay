@@ -489,7 +489,7 @@ public class RobotParams
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
     static final double ARM_RESET_TIMEOUT                       = 0.5;
-    static final double ARM_SCORE_POS                           = 20;
+    static final double ARM_SAFE_POS                            = 10.0;
     static final double ARM_SINGLE_CONE_POS                     = ARM_MAX_POS;
     static final double ARM_STACK_2_POS                         = 135.0;
     static final double ARM_STACK_3_CONES_POS                   = 110.0;
@@ -498,8 +498,8 @@ public class RobotParams
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
-        ARM_MIN_POS,                                            // Slot 0: Up position
-        ARM_SCORE_POS,                                          // Slot 1
+        ARM_UP_POS,                                             // Slot 0: Up position
+        ARM_SAFE_POS,                                           // Slot 1
         ARM_HORIZONTAL,                                         // Slot 2
         ARM_MAX_POS                                             // Slot 2: Down position
     };

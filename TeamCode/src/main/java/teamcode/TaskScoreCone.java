@@ -39,6 +39,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     public enum State
     {
         START,
+        GO_TO_START_POS,
         FIND_POLE,
         RAISE_TO_SCORE_HEIGHT,
         EXTEND_ARM,
@@ -257,19 +258,35 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         switch (state)
         {
             case START:
+                if (robot.arm.getPosition() > RobotParams.ARM_SAFE_POS)
+                {
+                    robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
+                    sm.waitForSingleEvent(event, State.GO_TO_START_POS);
+                    break;
+                }
+                else
+                {
+                    sm.setState(State.GO_TO_START_POS);
+                }
+                //
+                // Intentionally falling through to the next state (GO_TO_START_POS).
+                //
+            case GO_TO_START_POS:
                 if (taskParams.startPowerLimit != 0.0)
                 {
                     // Turn the turret to the position for starting the scan.
                     robot.turret.setTarget(
                         currOwner, 0.0, taskParams.startTarget, false, taskParams.startPowerLimit, event, 5.0);
                     sm.waitForSingleEvent(event, State.FIND_POLE);
+                    break;
                 }
                 else
                 {
                     sm.setState(State.FIND_POLE);
                 }
-                break;
-
+                //
+                // Intentionally falling through to the next state (FIND_POLE).
+                //
             case FIND_POLE:
                 // Enable the sensor trigger and start scanning for the pole.
                 // This operation takes about 0.5 sec.
