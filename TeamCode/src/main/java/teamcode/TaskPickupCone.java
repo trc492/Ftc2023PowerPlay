@@ -45,6 +45,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         START,
         LOOK_FOR_CONE,
         DRIVE_TO_CONE,
+        APPROACH_CONE,
         PICKUP_CONE,
         DONE
     }   //enum State
@@ -168,6 +169,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
         if (ownerName != null)
         {
+            TrcDbgTrace.printThreadStack();
             if (msgTracer != null)
             {
                 TrcOwnershipMgr ownershipMgr = TrcOwnershipMgr.getInstance();
@@ -190,6 +192,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     @Override
     protected void stopSubsystems()
     {
+        msgTracer.traceInfo("stopSubsystems", "Stopping subsystems.");
         robot.robotDrive.driveBase.stop(currOwner);
         robot.turret.cancel(currOwner);
         robot.elevator.cancel(currOwner);
@@ -225,6 +228,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                             EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                 }
+                robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 targetLocation = null;
                 // Cancel grabber auto-assist just in case it was ON.
                 robot.grabber.cancelAutoAssist();
@@ -246,7 +250,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             msgTracer.traceInfo(funcName, "Found cone: coneInfo=%s", coneInfo);
                         }
                         targetLocation = new TrcPose2D(
-                            coneInfo.distanceFromCamera.x, coneInfo.distanceFromCamera.y, coneInfo.horizontalAngle);
+                            coneInfo.distanceFromCamera.x - 1, coneInfo.distanceFromCamera.y, coneInfo.horizontalAngle);
                     }
                 }
 
@@ -280,7 +284,6 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 // next state.
                 robot.arm.setTarget(
                     currOwner, RobotParams.ARM_PICKUP_PRESETS[taskParams.conesRemaining], false, 1.0, null, 0.0);
-                robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                 if (targetLocation != null)
                 {
@@ -289,7 +292,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     robot.robotDrive.purePursuitDrive.start(
                         currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
                         new TrcPose2D(
-                            targetLocation.x, targetLocation.y - 5.0,
+                            targetLocation.x, 0,
                             robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
                             robot.robotDrive.driveBase.getHeading()));
                 }
@@ -301,11 +304,16 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
                 }
-                sm.waitForSingleEvent(event, State.PICKUP_CONE);
+                sm.waitForSingleEvent(event, State.APPROACH_CONE);
                 break;
-
+            case APPROACH_CONE:
+                robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
+                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0, 0.2, 0, 2, event);
+                sm.waitForSingleEvent(event, State.DONE);//PICKUP_CONE);
+                break;
             case PICKUP_CONE:
                 // Have the cone or not, we will clean up: stop PurePursuit, stop grabber, raise elevator, retract arm.
+                robot.robotDrive.driveBase.stop(currOwner);
                 robot.robotDrive.purePursuitDrive.cancel();
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS + 6.0, false, 1.0, event, 0.0);
                 robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
@@ -364,6 +372,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
             default:
             case DONE:
+                robot.robotDrive.driveBase.stop(currOwner);
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                 stopAutoTask(true);

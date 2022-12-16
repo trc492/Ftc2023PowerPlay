@@ -135,7 +135,7 @@ public class Robot
             {
                 if(RobotParams.Preferences.useTurret)
                 {
-                    turret = new Turret(globalTracer, false);
+                    turret = new Turret(globalTracer, true);
                 }
 
                 if (RobotParams.Preferences.useElevator)

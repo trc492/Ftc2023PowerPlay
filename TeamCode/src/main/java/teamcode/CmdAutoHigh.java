@@ -227,7 +227,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     // This operation takes about 3 sec.
                     robot.arm.setTarget(RobotParams.ARM_PICKUP_PRESETS[5]);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
-                    robot.turret.setTarget(RobotParams.TURRET_FRONT, true);
+                    robot.turret.setTarget(RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
@@ -248,7 +248,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                             visionAssist && robot.vision != null && robot.vision.frontEocvVision != null,
                             event);
                         conesRemaining--;
-                        sm.waitForSingleEvent(event, State.BACK_TO_SCORE_POSITION);
+                        sm.waitForSingleEvent(event, State.DONE);//BACK_TO_SCORE_POSITION);
                     }
                     break;
 
@@ -285,7 +285,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case DONE:
                 default:
-                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
+//                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
                     cancel();
                     break;
