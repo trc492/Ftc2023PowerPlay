@@ -425,7 +425,7 @@ public class TaskCyclingCones
                     sm.waitForSingleEvent(event, State.LOWER_ELEVATOR_ABOVE_POLE);
                     break;
                 case LOWER_ELEVATOR_ABOVE_POLE:
-                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_HEIGHT - 2.0, true, 0.0, event, 2.0);
+                    robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT - 2.0, true, 0.0, event, 2.0);
                     sm.waitForSingleEvent(event, State.SCORE);
                     break;
 

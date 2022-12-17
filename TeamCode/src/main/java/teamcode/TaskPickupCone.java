@@ -30,6 +30,7 @@ import TrcCommonLib.trclib.TrcOwnershipMgr;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcTaskMgr;
+import TrcCommonLib.trclib.TrcTimer;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 
@@ -39,7 +40,7 @@ import TrcCommonLib.trclib.TrcVisionTargetInfo;
 public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 {
     private static final String moduleName = "TaskPickupCone";
-    private static final boolean useHolonomicApproach = true;
+    private static final boolean useGrabberSensor = true;
 
     public enum State
     {
@@ -48,6 +49,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         DRIVE_TO_CONE,
         APPROACH_CONE,
         PICKUP_CONE,
+        LIFT_CONE,
         DONE
     }   //enum State
 
@@ -66,7 +68,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     private final String ownerName;
     private final Robot robot;
     private final TrcDbgTrace msgTracer;
+    private final TrcTimer timer;
     private final TrcEvent event;
+    private final TrcEvent elevatorEvent;
+    private final TrcEvent grabberEvent;
     private String currOwner = null;
 
     /**
@@ -82,7 +87,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
         this.ownerName = ownerName;
         this.robot = robot;
         this.msgTracer = msgTracer;
+        timer = new TrcTimer(moduleName);
         event = new TrcEvent(moduleName);
+        elevatorEvent = new TrcEvent(moduleName + ".elevatorEvent");
+        grabberEvent = new TrcEvent(moduleName + ".grabberEvent");
     }   //TaskPickupCone
 
     /**
@@ -223,7 +231,6 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
     {
         final String funcName = "runTaskState";
         TaskParams taskParams = (TaskParams) params;
-        State nextState;
         //
         // Preconditions:
         // Arm is at up position, elevator is at min position, turret is at front position.
@@ -289,36 +296,19 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 break;
 
             case DRIVE_TO_CONE:
-                // Note: both grabber and PurePursuit are signaling the same event, so either one will move us to the
-                // next state.
                 robot.arm.setTarget(
                     currOwner, RobotParams.ARM_PICKUP_PRESETS[taskParams.conesRemaining], false, 1.0, null, 0.0);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                 if (targetLocation != null)
                 {
                     // Vision found the cone, drive to it with incremental pure pursuit.
-                    // Use vision detected x but move forward with fixed distance and heading aligned to the field.
-                    robot.grabber.enableAutoAssist(null, 0.0, event, 0.0);
-                    if (useHolonomicApproach)
-                    {
-                        robot.robotDrive.purePursuitDrive.start(
-                            currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
-                            new TrcPose2D(
-                                targetLocation.x, 0,
-                                robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
-                                robot.robotDrive.driveBase.getHeading()));
-                        nextState = State.APPROACH_CONE;
-                    }
-                    else
-                    {
-                        robot.robotDrive.purePursuitDrive.start(
-                            currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
-                            new TrcPose2D(
-                                targetLocation.x, targetLocation.y - 6.0,
-                                robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
-                                robot.robotDrive.driveBase.getHeading()));
-                        nextState = State.PICKUP_CONE;
-                    }
+                    // Use vision detected x but not y. We will do y in APPROACH_CONE state.
+                    robot.robotDrive.purePursuitDrive.start(
+                        currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
+                        new TrcPose2D(
+                            targetLocation.x, 0.0,
+                            robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
+                            robot.robotDrive.driveBase.getHeading()));
                 }
                 else
                 {
@@ -327,33 +317,65 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     robot.robotDrive.purePursuitDrive.start(
                         currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), false,
                         robot.robotDrive.getAutoTargetPoint(RobotParams.CONE_STACK_RED_LEFT, FtcAuto.autoChoices));
-                    nextState = State.PICKUP_CONE;
                 }
                 sm.waitForSingleEvent(event, State.APPROACH_CONE);
                 break;
 
             case APPROACH_CONE:
-                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.15, 0.0, 2.5, event);
-                sm.waitForSingleEvent(event, State.PICKUP_CONE);
+                double coneDist = RobotParams.GRABBER_DEF_CONE_DISTANCE;
+
+                robot.grabber.enableAutoAssist(null, 0.0, grabberEvent, 0.0);
+                sm.addEvent(grabberEvent);
+                if (useGrabberSensor)
+                {
+                    double sensorDist = robot.grabber.getSensorValue();
+
+                    if (msgTracer != null)
+                    {
+                        msgTracer.traceInfo(funcName, "grabberSensorDist=%.3f", robot.grabber.getSensorValue());
+                    }
+
+                    if (sensorDist <= 10.0)
+                    {
+                        coneDist = sensorDist;
+                    }
+                }
+                robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.3);
+                robot.robotDrive.purePursuitDrive.start(
+                    currOwner, event, 0.0, robot.robotDrive.driveBase.getFieldPosition(), true,
+                    new TrcPose2D(0.0, coneDist,
+                        robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
+                        robot.robotDrive.driveBase.getHeading()));
+                sm.addEvent(event);
+//                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.15, 0.0, 2.5, event);
+                sm.waitForEvents(State.PICKUP_CONE);
                 break;
 
             case PICKUP_CONE:
-                // Have the cone or not, we will clean up: stop PurePursuit, stop grabber, raise elevator, retract arm.
-                // We could be using holonomic drive or PPD, stop the drive base either way.
-                robot.robotDrive.driveBase.stop(currOwner);
+//                robot.robotDrive.driveBase.stop(currOwner);
                 robot.robotDrive.purePursuitDrive.cancel();
-                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS + 12.0, false, 1.0, event, 0.0);
-                robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 if (!robot.grabber.hasObject())
                 {
-                    // We don't have the cone. What to do? Maybe just go to DONE anyway?
-                    // If we have time, we may do the fancy sensor scanning here.
+                    // Grabber sensor did not detect the cone. Turret may be slightly mis-aligned. Close the grabber
+                    // anyway hoping it will grab it.
+                    robot.grabber.close();
                     if (msgTracer != null)
                     {
-                        msgTracer.traceInfo(funcName, "Don't have the cone, giving up.");
+                        msgTracer.traceInfo(
+                            funcName, "Didn't detecte the cone, grab it anyway (grabberSensor=%.3f).",
+                            robot.grabber.getSensorValue());
                     }
                 }
-                sm.waitForSingleEvent(event, State.DONE);
+                timer.set(0.5, event);
+                sm.waitForSingleEvent(event, State.LIFT_CONE);
+                break;
+
+            case LIFT_CONE:
+                // Delay a little to make sure the grabber firmly grabbed the cone.
+                robot.elevator.setTarget(
+                    currOwner, RobotParams.ELEVATOR_MIN_POS + 20.0, true, 1.0, elevatorEvent, 0.0);
+                robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
+                sm.waitForSingleEvent(elevatorEvent, State.DONE);
                 break;
 
 //            case SET_TURRET_SCAN_POS:
@@ -399,7 +421,6 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
             default:
             case DONE:
-                robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                 stopAutoTask(true);
                 break;

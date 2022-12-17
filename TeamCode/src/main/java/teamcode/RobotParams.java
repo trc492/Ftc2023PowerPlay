@@ -207,10 +207,6 @@ public class RobotParams
     public static final TrcPose2D SUBSTATION_RED_LEFT           = new TrcPose2D(-0.55, -1.95, 150.0);
     // Game element dimensions
     public static final double STACKED_CONE_ADDITION            = 1.5;
-    public static final double LOW_JUNCTION_HEIGHT              = 20.0;
-    public static final double MID_JUNCTION_HEIGHT              = 26.5;
-    public static final double HIGH_JUNCTION_HEIGHT             = 36.0;
-    public static final double POLE_RADIUS                      = 0.5; //In inches
     //
     // Vision subsystem.
     //
@@ -331,7 +327,7 @@ public class RobotParams
     public static final Double Y_RAMP_RATE                      = null;//10.0;
 
     public static final TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.022, 0.04, 0.000, 0.0, 30.0);
+        new TrcPidController.PidCoefficients(0.02, 0.02, 0.000, 0.0, 30.0);
     public static final double TURN_SETTLING                    = TrcPidController.DEF_SETTLING_TIME;
     public static final double TURN_TOLERANCE                   = 1.0;
     public static final double TURN_STEADY_STATE_ERR            = 2.0;
@@ -441,7 +437,7 @@ public class RobotParams
         12.0,
         24.0,
         30.0,
-        HIGH_JUNCTION_HEIGHT,
+        HIGH_JUNCTION_SCORING_HEIGHT,
         ELEVATOR_MAX_POS
     };
     // 0.0 for placeholder so 1 additional cone per index
@@ -523,10 +519,11 @@ public class RobotParams
     static final boolean GRABBER_RSERVO_INVERTED                = true;
     static final boolean GRABBER_TRIGGER_INVERTED               = true;
     static final double GRABBER_TRIGGER_THRESHOLD               = 1.5;  // in inches
-    static final double GRABBER_HAS_OBJECT_THRESHOLD            = 6.0;
+    static final double GRABBER_HAS_OBJECT_THRESHOLD            = 2.5;  // in inches
     static final double GRABBER_OPEN_POS                        = GRABBER_MAX_POS;
     static final double GRABBER_OPEN_TIME                       = 0.5;
     static final double GRABBER_CLOSE_POS                       = GRABBER_MIN_POS;
     static final double GRABBER_CLOSE_TIME                      = 0.5;
+    static final double GRABBER_DEF_CONE_DISTANCE               = 7.0;
 
 }   //class RobotParams

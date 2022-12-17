@@ -52,7 +52,7 @@ public class Turret
     private String currOwner = null;
 
     /**
-     * Constructor: Create an instance of the object.
+     * Constructor: Creates an instance of the object.
      *
      * @param instanceName specifies the hardware name.
      * @param msgTracer specifies the tracer to used for logging events, can be null if not provided.
