@@ -238,6 +238,7 @@ public class FtcTeleOp extends FtcOpMode
                 turretPower, robot.turret.getPosition(),
                 robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive(),
                 robot.turret.getSensorValue(), robot.turret.detectedTarget());
+            robot.dashboard.displayPrintf(15, "Turret: raw pos=%.3f", robot.turret.rawPosition);
         }
 
         if (robot.elevator != null)

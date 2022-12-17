@@ -30,6 +30,7 @@ import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcSensor;
 import TrcCommonLib.trclib.TrcThresholdTrigger;
+import TrcFtcLib.ftclib.FtcDcMotor;
 import TrcFtcLib.ftclib.FtcDigitalInput;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcFtcLib.ftclib.FtcMotorActuator;
@@ -44,12 +45,14 @@ public class Turret
     private static final boolean debugEnabled = false;
 
     private final TrcDbgTrace msgTracer;
+    public final FtcDcMotor motor;
     private final TrcPidActuator pidTurret;
     private final FtcDigitalInput calDirectionSwitch;
     private final FtcDistanceSensor sensor;
     private final TrcThresholdTrigger thresholdTrigger;
     private double prevTurretPower = 0.0;
     private String currOwner = null;
+    public double rawPosition;
 
     /**
      * Constructor: Creates an instance of the object.
@@ -75,7 +78,9 @@ public class Turret
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
 
         this.msgTracer = msgTracer;
-        pidTurret = new FtcMotorActuator(instanceName, motorParams, turretParams).getPidActuator();
+        FtcMotorActuator motorActuator = new FtcMotorActuator(instanceName, motorParams, turretParams);
+        motor = motorActuator.getMotor();
+        pidTurret = motorActuator.getPidActuator();
         if (msgTracer != null)
         {
             pidTurret.setMsgTracer(msgTracer, tracePidInfo);
@@ -210,6 +215,8 @@ public class Turret
      */
     public double getPosition()
     {
+        int encoderPos = motor.motor.getCurrentPosition();
+        rawPosition = encoderPos * RobotParams.TURRET_DEG_PER_COUNT;
         return pidTurret.getPosition();
     }   //getPosition
 

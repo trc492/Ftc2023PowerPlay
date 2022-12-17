@@ -384,6 +384,7 @@ public class Robot
 
         if (turret != null)
         {
+            turret.motor.forbidReset(false);
             globalTracer.traceInfo(funcName, "Zero calibrating turret.");
             turret.zeroCalibrate();
         }
