@@ -55,6 +55,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
     private int signalPos = 0;
     private int conesRemaining = 5;
     private double scanPower = RobotParams.TURRET_SCAN_POWER;
+
     /**
      * Constructor: Create an instance of the object.
      *
@@ -234,8 +235,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case AUTO_PICKUP_CONE:
-                    // Scan in the opposition direction when cycling.
-                    scanPower = -RobotParams.TURRET_SCAN_POWER;
                     if (TrcUtil.getModeElapsedTime() >= 25 || conesRemaining == 0)
                     {
                         sm.setState(State.PARK);
@@ -252,10 +251,19 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case BACK_TO_SCORE_POSITION:
-                    turretStartPos =
-                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
-                    robot.turret.setTarget(turretStartPos - RobotParams.TURRET_SCAN_OFFSET, true, 0.8, null, 0.0);
+                    if (autoChoices.startPos == FtcAuto.StartPos.LEFT)
+                    {
+                        // Set startPos past 90 and scan backward.
+                        turretStartPos = RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET;
+                        scanPower = -RobotParams.TURRET_SCAN_POWER;
+                    }
+                    else
+                    {
+                        // Set startPos before 270 and scan forward.
+                        turretStartPos = RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET;
+                        scanPower = RobotParams.TURRET_SCAN_POWER;
+                    }
+                    robot.turret.setTarget(turretStartPos, true, 0.8, null, 0.0);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,

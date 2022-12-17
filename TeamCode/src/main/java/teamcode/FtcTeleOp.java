@@ -586,10 +586,10 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.turret != null)
                 {
                     robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
-                            RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
-                            RobotParams.TURRET_SCAN_DURATION, null);
-                    //robot.turret.presetPositionUp();
+                        RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                        RobotParams.TURRET_SCAN_DURATION, null);
+//                    robot.turret.presetPositionUp();
                 }
                 break;
 
@@ -597,10 +597,10 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.turret != null)
                 {
                     robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
-                            RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
-                            RobotParams.TURRET_SCAN_DURATION, null);
-                    //                    robot.turret.presetPositionDown();
+                        RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                        RobotParams.TURRET_SCAN_DURATION, null);
+//                    robot.turret.presetPositionDown();
                 }
                 break;
 
