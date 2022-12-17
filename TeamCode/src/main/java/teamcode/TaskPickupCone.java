@@ -332,7 +332,9 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
                     if (msgTracer != null)
                     {
-                        msgTracer.traceInfo(funcName, "grabberSensorDist=%.3f", robot.grabber.getSensorValue());
+                        msgTracer.traceInfo(
+                            funcName, "grabberSensorDist=%.3f, turretPos=%.3f",
+                            robot.grabber.getSensorValue(), robot.turret.getPosition());
                     }
 
                     if (sensorDist <= 10.0)
