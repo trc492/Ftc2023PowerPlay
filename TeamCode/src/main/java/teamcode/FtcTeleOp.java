@@ -529,18 +529,10 @@ public class FtcTeleOp extends FtcOpMode
                 {
                     if (pressed)
                     {
-                        //if right bumper is held, kyle needs elevator to the right height first
-                        if (turretSlowModeOn)
-                        {
-                            robot.scoreConeTask.autoAssistScoreCone(0.3, 3, null);
-                        }
-                        else
-                        {
-                            robot.scoreConeTask.autoAssistScoreCone(
-                                RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
-                                RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
-                                RobotParams.TURRET_SCAN_DURATION, null);
-                        }
+                        robot.scoreConeTask.autoAssistScoreCone(
+                            RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
                 break;
@@ -593,14 +585,22 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
                 if (pressed && robot.turret != null)
                 {
-                    robot.turret.presetPositionUp();
+                    robot.scoreConeTask.autoAssistScoreCone(
+                            RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                            RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.TURRET_SCAN_DURATION, null);
+                    //robot.turret.presetPositionUp();
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
                 if (pressed && robot.turret != null)
                 {
-                    robot.turret.presetPositionDown();
+                    robot.scoreConeTask.autoAssistScoreCone(
+                            RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                            RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.TURRET_SCAN_DURATION, null);
+                    //                    robot.turret.presetPositionDown();
                 }
                 break;
 
