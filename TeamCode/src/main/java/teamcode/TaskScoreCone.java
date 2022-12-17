@@ -331,21 +331,29 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     }
                 }
 
-                if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 30.0)
+                if (armTarget == null && runMode == TrcRobot.RunMode.TELEOP_MODE)
                 {
-                    // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
-                    // picking up a erroneous distance. In this case, just use the known good arm angle and hope it
-                    // will work.
-                    if (msgTracer != null)
-                    {
-                        msgTracer.traceInfo(funcName, "Failed to determine valid arm angle (armAngle=%f).", armTarget);
-                    }
-                    armTarget = 25.0;
+                    // We are in teleop and we did not detect the target, just quit.
+                    sm.setState(State.DONE);
                 }
-
-                // This operation takes about 1 sec.
-                robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
-                sm.waitForSingleEvent(event, State.CAP_POLE);
+                else
+                {
+                    // We are in autonomous mode or we detected target.
+                    if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 30.0)
+                    {
+                        // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
+                        // picking up a erroneous distance. In this case, just use the known good arm angle and hope it
+                        // will work.
+                        if (msgTracer != null)
+                        {
+                            msgTracer.traceInfo(funcName, "Failed to determine valid arm angle (armAngle=%f).", armTarget);
+                        }
+                        armTarget = 25.0;
+                    }
+                    // This operation takes about 1 sec.
+                    robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
+                    sm.waitForSingleEvent(event, State.CAP_POLE);
+                }
                 break;
 
             case CAP_POLE:
