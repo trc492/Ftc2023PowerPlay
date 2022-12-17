@@ -219,8 +219,11 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case AUTO_SCORE_CONE:
+                    turretStartPos =
+                        autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
                     robot.scoreConeTask.autoAssistScoreCone(
-                        0.0, 0.0, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, scanPower,
+                        0.0, 0.0, turretStartPos, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, scanPower,
                         RobotParams.TURRET_SCAN_DURATION, event);
                     sm.waitForSingleEvent(event, State.GO_TO_CONE_STACK);
                     break;

@@ -41,6 +41,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         START,
         GO_TO_START_POS,
         FIND_POLE,
+        CHECK_FOR_POLE,
         RAISE_TO_SCORE_HEIGHT,
         EXTEND_ARM,
         CAP_POLE,
@@ -52,15 +53,18 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
     {
         double startTarget;
         double startPowerLimit;
+        double expectedTarget;
         double scoreHeight;
         double scanPower;
         double scanDuration;
 
         TaskParams(
-            double startTarget, double startPowerLimit, double scoreHeight, double scanPower, double scanDuration)
+            double startTarget, double startPowerLimit, double expectedTarget, double scoreHeight, double scanPower,
+            double scanDuration)
         {
             this.startTarget = startTarget;
             this.startPowerLimit = startPowerLimit;
+            this.expectedTarget = expectedTarget;
             this.scoreHeight = scoreHeight;
             this.scanPower = scanPower;
             this.scanDuration = scanDuration;
@@ -97,14 +101,15 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      *
      * @param startTarget specifies the absolute start turret position to go to before doing the slow scan.
      * @param startPowerLimit specifies the turret power limit going to the startTarget.
+     * @param expectedTarget specifies the expect turret position where the target should be.
      * @param scoreHeight specifies the elevator height to score the cone.
      * @param scanPower specifies how fast to scan for target, positive to scan left and negative to scan right.
      * @param scanDuration specifies how long to scan for target in seconds, scan will stop early if detected target.
      * @param event specifies the event to signal when done, can be null if none provided.
      */
     public void autoAssistScoreCone(
-        double startTarget, double startPowerLimit, double scoreHeight, double scanPower, double scanDuration,
-        TrcEvent event)
+        double startTarget, double startPowerLimit, double expectedTarget, double scoreHeight, double scanPower,
+        double scanDuration, TrcEvent event)
     {
         final String funcName = "autoAssistScoreCone";
 
@@ -112,13 +117,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         {
             msgTracer.traceInfo(
                 funcName,
-                "%s: startTarget=%.2f, startPowerLimit=%.2f, scoreHeight=%.2f, scanPower=%.2f, scanDuration=%.3f, " +
-                "event=%s",
-                moduleName, startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration, event);
+                "%s: startTarget=%.2f, startPowerLimit=%.2f, expectedTarget=%.2f, scoreHeight=%.2f, scanPower=%.2f, " +
+                "scanDuration=%.3f, event=%s",
+                moduleName, startTarget, startPowerLimit, expectedTarget, scoreHeight, scanPower, scanDuration, event);
         }
 
         startAutoTask(
-            State.START, new TaskParams(startTarget, startPowerLimit, scoreHeight, scanPower, scanDuration), event);
+            State.START, new TaskParams(
+                startTarget, startPowerLimit, expectedTarget, scoreHeight, scanPower, scanDuration), event);
     }   //autoAssistScoreCone
 
     /**
@@ -127,14 +133,16 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      * the arm on top of the pole, lower the elevator to cap the pole, release the cone and retract the arm and
      * elevator.
      *
+     * @param expectedTarget specifies the expect turret position where the target should be.
      * @param scoreHeight specifies the elevator height to score the cone.
      * @param scanPower specifies how fast to scan for target, positive to scan left and negative to scan right.
      * @param scanDuration specifies how long to scan for target in seconds, scan will stop early if detected target.
      * @param event specifies the event to signal when done, can be null if none provided.
      */
-    public void autoAssistScoreCone(double scoreHeight, double scanPower, double scanDuration, TrcEvent event)
+    public void autoAssistScoreCone(
+        double expectedTarget, double scoreHeight, double scanPower, double scanDuration, TrcEvent event)
     {
-        autoAssistScoreCone(0.0, 0.0, scoreHeight, scanPower, scanDuration, event);
+        autoAssistScoreCone(0.0, 0.0, expectedTarget, scoreHeight, scanPower, scanDuration, event);
     }   //autoAssistScoreCone
 
     /**
@@ -143,13 +151,14 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      * the arm on top of the pole, lower the elevator to cap the pole, release the cone and retract the arm and
      * elevator.
      *
+     * @param expectedTarget specifies the expect turret position where the target should be.
      * @param scanPower specifies how fast to scan for target, positive to scan left and negative to scan right.
      * @param scanDuration specifies how long to scan for target in seconds, scan will stop early if detected target.
      * @param event specifies the event to signal when done, can be null if none provided.
      */
-    public void autoAssistScoreCone(double scanPower, double scanDuration, TrcEvent event)
+    public void autoAssistScoreCone(double expectedTarget, double scanPower, double scanDuration, TrcEvent event)
     {
-        autoAssistScoreCone(0.0, 0.0, 0.0, scanPower, scanDuration, event);
+        autoAssistScoreCone(0.0, 0.0, expectedTarget, 0.0, scanPower, scanDuration, event);
     }   //autoAssistScoreCone
 
     /**
@@ -293,7 +302,27 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 // This operation takes about 0.5 sec.
                 robot.turret.setTriggerEnabled(true);
                 robot.turret.getPidActuator().setPower(currOwner, taskParams.scanPower, taskParams.scanDuration, event);
-                sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
+                sm.waitForSingleEvent(event, State.CHECK_FOR_POLE);
+                break;
+
+            case CHECK_FOR_POLE:
+                if (robot.turret.detectedTarget())
+                {
+                    sm.setState(State.RAISE_TO_SCORE_HEIGHT);
+                }
+                else
+                {
+                    if (msgTracer != null)
+                    {
+                        msgTracer.traceInfo(
+                            funcName, "Did not find the target (sensor=%.2f), go to default position.",
+                            robot.turret.getSensorValue());
+                    }
+                    // We didn't see the target, let's go to expected position and hope it's there.
+                    robot.turret.setTarget(
+                        currOwner, 0.0, taskParams.expectedTarget, true, 0.5, event, 1.0);
+                    sm.waitForSingleEvent(event, State.RAISE_TO_SCORE_HEIGHT);
+                }
                 break;
 
             case RAISE_TO_SCORE_HEIGHT:

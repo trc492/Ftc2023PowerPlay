@@ -509,7 +509,7 @@ public class FtcTeleOp extends FtcOpMode
                     if (pressed)
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                            RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
                             RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                             RobotParams.TURRET_SCAN_DURATION, null);
                     }
@@ -531,7 +531,7 @@ public class FtcTeleOp extends FtcOpMode
                     if (pressed)
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                            RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_LEFT,
                             RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                             RobotParams.TURRET_SCAN_DURATION, null);
                     }
@@ -587,7 +587,7 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.turret != null)
                 {
                     robot.scoreConeTask.autoAssistScoreCone(
-                        RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                        RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_LEFT,
                         RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                         RobotParams.TURRET_SCAN_DURATION, null);
 //                    robot.turret.presetPositionUp();
@@ -598,7 +598,7 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.turret != null)
                 {
                     robot.scoreConeTask.autoAssistScoreCone(
-                        RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75,
+                        RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
                         RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                         RobotParams.TURRET_SCAN_DURATION, null);
 //                    robot.turret.presetPositionDown();
