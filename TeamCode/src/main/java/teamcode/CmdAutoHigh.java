@@ -288,11 +288,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                             autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
                                 RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
                                 RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
+                        // Calling PurePursuit to get to the parking position will only work for FAR_TILE.
+                        // For NEAR_TILE, this will hit junctions on its path.
                         robot.robotDrive.purePursuitDrive.start(
-                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                                robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90, autoChoices));
-                        // PurePursuitDrive may hit obstacles especially parking at NEAR_TILE, so call
-                        // gridDrive.driveToEndPoint instead. It will avoid obstacles.
+                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                            robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90, autoChoices));
+//                        // PurePursuitDrive may hit obstacles especially parking at NEAR_TILE, so call
+//                        // gridDrive.driveToEndPoint instead. It will avoid obstacles.
 //
 //                        robot.robotDrive.gridDrive.driveToEndPoint(
 //                            robot.robotDrive.getAutoTargetPoint(parkPos, autoChoices));

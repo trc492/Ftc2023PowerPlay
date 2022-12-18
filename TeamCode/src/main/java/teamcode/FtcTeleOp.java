@@ -231,8 +231,7 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (robot.turret != null)
         {
-            double turretPower = 0;
-            turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE_TELEOP;
+            double turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE_TELEOP;
 
             robot.turret.setPower(turretPower, !manualOverride);
 
@@ -500,8 +499,7 @@ public class FtcTeleOp extends FtcOpMode
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
                             RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
-                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, -0.2,
-                            RobotParams.TURRET_SCAN_DURATION, null);
+                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, -0.2, RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
                 break;
@@ -529,16 +527,21 @@ public class FtcTeleOp extends FtcOpMode
                 break;
             //use this button for scoring on medium or low poles
             case FtcGamepad.GAMEPAD_Y:
-                if(pressed && !robot.grabber.hasObject()){
-                   //about 6 inches shorter than high pole scoring height
-                    robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
-                    robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
-                    robot.setGrabberAutoAssistOn(true);
-                }
-                else if(pressed && robot.grabber.hasObject()){
-                    robot.arm.setTarget(30);
-                   // robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT);
+                if (pressed)
+                {
+                    if (!robot.grabber.hasObject())
+                    {
+                        //about 6 inches shorter than high pole scoring height
+                        robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
+                        robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
+                        robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
+                        robot.setGrabberAutoAssistOn(true);
+                    }
+                    else
+                    {
+                        robot.arm.setTarget(30);
+//                        robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT);
+                    }
                 }
                 break;
 
