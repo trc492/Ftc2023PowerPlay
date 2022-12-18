@@ -211,6 +211,7 @@ public class FtcTeleOp extends FtcOpMode
             }
             else if (robot.robotDrive.driveBase.supportsHolonomicDrive())
             {
+                inputs[2] *= RobotParams.SLOW_DRIVE_POWER_SCALE;
                 robot.dashboard.displayPrintf(10, "xPower:%.1f,yPower:%.1f,turnPower:%.1f", inputs[0], inputs[1], inputs[2]);
                 robot.robotDrive.driveBase.holonomicDrive(
                     null, inputs[0], inputs[1], inputs[2],
@@ -230,7 +231,9 @@ public class FtcTeleOp extends FtcOpMode
         //
         if (robot.turret != null)
         {
-            double turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE;
+            double turretPower = 0;
+            turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE_TELEOP;
+
             robot.turret.setPower(turretPower, !manualOverride);
 
             robot.dashboard.displayPrintf(
@@ -509,8 +512,8 @@ public class FtcTeleOp extends FtcOpMode
                     if (pressed)
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
-                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_TELEOP_SCAN_POWER,
+                            RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
+                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, -0.2,
                             RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
@@ -547,7 +550,8 @@ public class FtcTeleOp extends FtcOpMode
                     robot.setGrabberAutoAssistOn(true);
                 }
                 else if(pressed && robot.grabber.hasObject()){
-                    robot.arm.setTarget(37);
+                    robot.arm.setTarget(30);
+                   // robot.elevator.setTarget(RobotParams.HIGH_JUNCTION_SCORING_HEIGHT);
                 }
                 break;
 
@@ -589,22 +593,22 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_DPAD_LEFT:
                 if (pressed && robot.turret != null)
                 {
-                    robot.scoreConeTask.autoAssistScoreCone(
-                        RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_LEFT,
-                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
-                        RobotParams.TURRET_SCAN_DURATION, null);
-//                    robot.turret.presetPositionUp();
+//                    robot.scoreConeTask.autoAssistScoreCone(
+//                        RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_LEFT,
+//                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+//                        RobotParams.TURRET_SCAN_DURATION, null);
+                    robot.turret.presetPositionUp();
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_RIGHT:
                 if (pressed && robot.turret != null)
                 {
-                    robot.scoreConeTask.autoAssistScoreCone(
-                        RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
-                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
-                        RobotParams.TURRET_SCAN_DURATION, null);
-//                    robot.turret.presetPositionDown();
+//                    robot.scoreConeTask.autoAssistScoreCone(
+//                        RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
+//                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+//                        RobotParams.TURRET_SCAN_DURATION, null);
+                    robot.turret.presetPositionDown();
                 }
                 break;
 

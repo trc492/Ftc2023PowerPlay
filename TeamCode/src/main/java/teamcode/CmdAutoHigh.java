@@ -209,7 +209,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                             robot.robotDrive.purePursuitDrive.start(
                                 event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                                robot.robotDrive.getAutoTargetPoint(-0.6, -0.75, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-0.6, -0.75, -10.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
                         }
                         sm.waitForSingleEvent(
@@ -288,14 +288,19 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        // PurePursuitDrive may hit obstacles especially parking at NEAR_TILE, so call
-                        // gridDrive.driveToEndPoint instead. It will avoid obstacles.
                         TrcPose2D parkPos =
                             autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
                                 RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
                                 RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
-                        robot.robotDrive.gridDrive.driveToEndPoint(
-                            robot.robotDrive.getAutoTargetPoint(parkPos, autoChoices));
+                        robot.robotDrive.purePursuitDrive.start(
+                                event, robot.robotDrive.driveBase.getFieldPosition(), false,
+                                robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90, autoChoices));
+                        // PurePursuitDrive may hit obstacles especially parking at NEAR_TILE, so call
+                        // gridDrive.driveToEndPoint instead. It will avoid obstacles.
+//
+//                        robot.robotDrive.gridDrive.driveToEndPoint(
+//                            robot.robotDrive.getAutoTargetPoint(parkPos, autoChoices));
+
                         sm.waitForSingleEvent(event, State.DONE);
                     }
                     break;

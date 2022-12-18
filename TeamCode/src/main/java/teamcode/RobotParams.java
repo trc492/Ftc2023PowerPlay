@@ -360,7 +360,7 @@ public class RobotParams
     //
     // Turret subsystem.
     //
-    static final double TURRET_KP                               = 0.06;
+    static final double TURRET_KP                               = 0.04;
     static final double TURRET_KI                               = 0.0;
     static final double TURRET_KD                               = 0.0;
     static final double TURRET_TOLERANCE                        = 1.0;
@@ -382,6 +382,7 @@ public class RobotParams
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
     static final double TURRET_CAL_POWER                        = -0.3;
     static final double TURRET_POWER_SCALE                      = 0.8;
+    static final double TURRET_POWER_SCALE_TELEOP               = 0.6;
     static final double TURRET_STALL_MIN_POWER                  = 0.5;
     static final double TURRET_STALL_TOLERANCE                  = 1.0;
     static final double TURRET_STALL_TIMEOUT                    = 1.0;
@@ -393,7 +394,7 @@ public class RobotParams
     static final double TURRET_PRESET_TOLERANCE                 = 10.0;
     static final double TURRET_SCAN_OFFSET                      = 20.0;
     static final double TURRET_SCAN_POWER                       = 0.30;
-    static final double TURRET_TELEOP_SCAN_POWER                = 0.25;
+    static final double TURRET_TELEOP_SCAN_POWER                = 0.3;
 
     static final double TURRET_SCAN_DURATION                    = 5.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
@@ -407,7 +408,7 @@ public class RobotParams
     //
     // Elevator Subsystem
     //
-    static final double ELEVATOR_KP                             = 0.35;
+    static final double ELEVATOR_KP                             = 0.30;
     static final double ELEVATOR_KI                             = 0;//0.5;
     static final double ELEVATOR_KD                             = 0.025;
     static final double ELEVATOR_TOLERANCE                      = 2.0;
@@ -454,7 +455,7 @@ public class RobotParams
     //
     // Arm subsystem.
     //
-    static final double ARM_KP                                  = 0.15;
+    static final double ARM_KP                                  = 0.1;
     static final double ARM_KI                                  = 0.0;
     static final double ARM_KD                                  = 0.0;
     static final double ARM_TOLERANCE                           = 0.5;
@@ -466,7 +467,7 @@ public class RobotParams
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
     static final double ARM_ANGLE_OFFSET                        = -11.94;   // in degrees
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.0;    // in inches
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -2.7;    // in inches
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
