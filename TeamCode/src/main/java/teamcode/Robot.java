@@ -151,9 +151,9 @@ public class Robot
                             RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
                             RobotParams.ELEVATOR_TOLERANCE))
                         .setPowerCompensation(this::getElevatorPowerCompensation)
-                        .setStallProtectionParams(
-                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
-                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
+//                        .setStallProtectionParams(
+//                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
+//                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
                         .setPresetTolerance(RobotParams.ELEVATOR_PRESET_TOLERANCE)
                         .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);

@@ -244,6 +244,8 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                             EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                 }
+                robot.globalTracer.traceInfo(funcName, "TURRET POS:%.1f", robot.turret.getPosition());
+
                 robot.turret.setTarget(currOwner, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 targetLocation = null;
                 // Cancel grabber auto-assist just in case it was ON.
@@ -254,6 +256,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 //
             case LOOK_FOR_CONE:
                 // This operation takes about 100 msec.
+                robot.globalTracer.traceInfo(funcName, "TURRET POS:%.1f", robot.turret.getPosition());
                 if (taskParams.useVision)
                 {
                     // Use vision to find the relative location of the cone.
@@ -374,10 +377,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
             case LIFT_CONE:
                 // Delay a little to make sure the grabber firmly grabbed the cone.
-                robot.elevator.setTarget(
-                    currOwner, RobotParams.ELEVATOR_MIN_POS + 20.0, true, 1.0, elevatorEvent, 0.0);
-                robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
-                sm.waitForSingleEvent(elevatorEvent, State.DONE);
+//                robot.elevator.setTarget(
+//                    currOwner, RobotParams.ELEVATOR_MIN_POS + 20.0, true, 1.0, elevatorEvent, 0.0);
+                robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
+                sm.waitForSingleEvent(event, State.DONE);
                 break;
 
 //            case SET_TURRET_SCAN_POS:

@@ -40,6 +40,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         START_DELAY,
         DRIVE_TO_SCORE_POSITION,
         AUTO_SCORE_CONE,
+        HANG_ELEVATOR,
         GO_TO_CONE_STACK,
         AUTO_PICKUP_CONE,
         BACK_TO_SCORE_POSITION,
@@ -201,14 +202,14 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                                 event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
                                 robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
-                                robot.robotDrive.pathPoint(1.00, 0.6, 91));
+                                robot.robotDrive.pathPoint(1.00, 0.5, 90));
                         }
                         else
                         {
                             robot.robotDrive.purePursuitDrive.start(
                                 event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.getAutoTargetPoint(-0.6, -2.5, 0.0, autoChoices),
-                                robot.robotDrive.getAutoTargetPoint(-0.5, -0.75, 0.0, autoChoices),
+                                robot.robotDrive.getAutoTargetPoint(-0.6, -0.75, 0.0, autoChoices),
                                 robot.robotDrive.getAutoTargetPoint(-1.05, -0.55, -90, autoChoices));
                         }
                         sm.waitForSingleEvent(
@@ -241,7 +242,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case AUTO_PICKUP_CONE:
-                    if (TrcUtil.getModeElapsedTime() >= 25 || conesRemaining == 0)
+                    if (30 - TrcUtil.getModeElapsedTime() < RobotParams.CYCLE_TIME + RobotParams.PARK_TIME)
                     {
                         sm.setState(State.PARK);
                     }
@@ -261,13 +262,13 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     {
                         // Set startPos past 90 and scan backward.
                         turretStartPos = RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET;
-                        scanPower = -RobotParams.TURRET_SCAN_POWER;
+                        scanPower = -0.2;//RobotParams.TURRET_SCAN_POWER;
                     }
                     else
                     {
                         // Set startPos before 270 and scan forward.
                         turretStartPos = RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET;
-                        scanPower = RobotParams.TURRET_SCAN_POWER;
+                        scanPower = 0.2;//RobotParams.TURRET_SCAN_POWER;
                     }
                     robot.turret.setTarget(turretStartPos, true, 0.8, null, 0.0);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
@@ -278,6 +279,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case PARK:
+                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     if (autoChoices.parking == FtcAuto.Parking.NO_PARKING)
                     {

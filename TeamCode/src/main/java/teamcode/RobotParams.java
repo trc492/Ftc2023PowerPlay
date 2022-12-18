@@ -327,7 +327,7 @@ public class RobotParams
     public static final Double Y_RAMP_RATE                      = null;//10.0;
 
     public static final TrcPidController.PidCoefficients turnPidCoeff =
-        new TrcPidController.PidCoefficients(0.02, 0.02, 0.000, 0.0, 30.0);
+        new TrcPidController.PidCoefficients(0.02, 0.08, 0.003, 0.0, 30.0);
     public static final double TURN_SETTLING                    = TrcPidController.DEF_SETTLING_TIME;
     public static final double TURN_TOLERANCE                   = 1.0;
     public static final double TURN_STEADY_STATE_ERR            = 2.0;
@@ -380,7 +380,7 @@ public class RobotParams
     static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
     static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
     static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
-    static final double TURRET_CAL_POWER                        = -0.35;
+    static final double TURRET_CAL_POWER                        = -0.3;
     static final double TURRET_POWER_SCALE                      = 0.8;
     static final double TURRET_STALL_MIN_POWER                  = 0.5;
     static final double TURRET_STALL_TOLERANCE                  = 1.0;
@@ -393,6 +393,8 @@ public class RobotParams
     static final double TURRET_PRESET_TOLERANCE                 = 10.0;
     static final double TURRET_SCAN_OFFSET                      = 20.0;
     static final double TURRET_SCAN_POWER                       = 0.30;
+    static final double TURRET_TELEOP_SCAN_POWER                = 0.25;
+
     static final double TURRET_SCAN_DURATION                    = 5.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
         TURRET_BACK,    // Slot 0
@@ -431,16 +433,13 @@ public class RobotParams
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = ELEVATOR_MIN_POS;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
-    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 31.0;
+    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;
     //todo: tune this
     static final double MEDIUM_JUNCTION_SCORING_HEIGHT          = 25.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
-        ELEVATOR_MIN_POS,
-        12.0,
-        24.0,
-        30.0,
+        10.8,
+        21.0,
         HIGH_JUNCTION_SCORING_HEIGHT,
-        ELEVATOR_MAX_POS
     };
     // 0.0 for placeholder so 1 additional cone per index
     static final double[] ELEVATOR_PICKUP_PRESETS               = new double[] {
@@ -467,7 +466,7 @@ public class RobotParams
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
     static final double ARM_ANGLE_OFFSET                        = -11.94;   // in degrees
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.00;    // in inches
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.0;    // in inches
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
@@ -492,7 +491,7 @@ public class RobotParams
     static final double ARM_STACK_2_POS                         = 120.0;
     static final double ARM_STACK_3_CONES_POS                   = 100.0;
     static final double ARM_STACK_4_CONES_POS                   = 90.0;
-    static final double ARM_STACK_5_CONES_POS                   = 80.0;
+    static final double ARM_STACK_5_CONES_POS                   = 85.0;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
     static final double[] ARM_PRESET_LEVELS                     = new double[] {
@@ -526,6 +525,9 @@ public class RobotParams
     static final double GRABBER_OPEN_TIME                       = 0.5;
     static final double GRABBER_CLOSE_POS                       = GRABBER_MIN_POS;
     static final double GRABBER_CLOSE_TIME                      = 0.5;
-    static final double GRABBER_DEF_CONE_DISTANCE               = 7.0;
+    static final double GRABBER_DEF_CONE_DISTANCE               = 8.0;
+
+    static final double CYCLE_TIME                              = 10;
+    static final double PARK_TIME                               = 1;
 
 }   //class RobotParams

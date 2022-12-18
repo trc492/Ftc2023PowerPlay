@@ -510,7 +510,7 @@ public class FtcTeleOp extends FtcOpMode
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
                             RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
-                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_TELEOP_SCAN_POWER,
                             RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
@@ -532,19 +532,22 @@ public class FtcTeleOp extends FtcOpMode
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
                             RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_LEFT,
-                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
+                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_TELEOP_SCAN_POWER,
                             RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
                 break;
             //use this button for scoring on medium or low poles
             case FtcGamepad.GAMEPAD_Y:
-                if(pressed){
+                if(pressed && !robot.grabber.hasObject()){
                    //about 6 inches shorter than high pole scoring height
                     robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
                     robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
                     robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
                     robot.setGrabberAutoAssistOn(true);
+                }
+                else if(pressed && robot.grabber.hasObject()){
+                    robot.arm.setTarget(37);
                 }
                 break;
 

@@ -43,6 +43,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         FIND_POLE,
         CHECK_FOR_POLE,
         RAISE_TO_SCORE_HEIGHT,
+        HANG_ELEVATOR,
         EXTEND_ARM,
         CAP_POLE,
         SCORE_CONE,
@@ -339,8 +340,10 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 }
                 else
                 {
-                    sm.setState(State.EXTEND_ARM);
+                    sm.setState(State.DONE);
                 }
+                break;
+            case HANG_ELEVATOR:
                 break;
 
             case EXTEND_ARM:
@@ -359,16 +362,16 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                         msgTracer.traceInfo(funcName, "Found the pole (armAngle=%f).", armTarget);
                     }
                 }
-
-                if (armTarget == null && runMode == TrcRobot.RunMode.TELEOP_MODE)
-                {
-                    // We are in teleop and we did not detect the target, just quit.
-                    sm.setState(State.DONE);
-                }
-                else
-                {
+//
+//                if (armTarget == null && runMode == TrcRobot.RunMode.TELEOP_MODE)
+//                {
+//                    // We are in teleop and we did not detect the target, just quit.
+//                    sm.setState(State.DONE);
+//                }
+//                else
+//                {
                     // We are in autonomous mode or we detected target.
-                    if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 30.0)
+                    if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 60.0)
                     {
                         // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
                         // picking up a erroneous distance. In this case, just use the known good arm angle and hope it
@@ -382,7 +385,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     // This operation takes about 1 sec.
                     robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.CAP_POLE);
-                }
+//                }
                 break;
 
             case CAP_POLE:
@@ -394,6 +397,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case SCORE_CONE:
                 // Release the cone to score it and retract the elevator and arm.
                 robot.setGrabberAutoAssistOn(false);
+                robot.grabber.open();
                 robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(currOwner, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 // Delay a little to wait for the arm to retract before turning the turret.
