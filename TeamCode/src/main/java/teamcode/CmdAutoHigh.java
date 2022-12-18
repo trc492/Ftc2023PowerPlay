@@ -124,9 +124,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
             switch (state)
             {
                 case START_DELAY:
-                    robot.turret.motor.forbidReset(true);
-                    robot.dashboard.displayPrintf(14, "Turret: zeroPos=%.3f, rawPos=%.3f",
-                                                  robot.turret.getPosition(), robot.turret.rawPosition);
                     //
                     // Set robot starting position in the field.
                     //

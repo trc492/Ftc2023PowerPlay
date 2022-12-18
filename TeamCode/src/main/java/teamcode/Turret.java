@@ -52,7 +52,7 @@ public class Turret
     private final TrcThresholdTrigger thresholdTrigger;
     private double prevTurretPower = 0.0;
     private String currOwner = null;
-    public double rawPosition;
+    public double rawMotorPosition;
 
     /**
      * Constructor: Creates an instance of the object.
@@ -112,7 +112,13 @@ public class Turret
      */
     public boolean acquireExclusiveAccess(String owner)
     {
+        final String funcName = "acquireExclusiveAccess";
         boolean success = pidTurret.acquireExclusiveAccess(owner);
+
+        if (debugEnabled)
+        {
+            globalTracer.traceInfo(funcName, "owner=%s, success=%s", owner, success);
+        }
 
         if (success)
         {
@@ -130,7 +136,13 @@ public class Turret
      */
     public boolean releaseExclusiveAccess(String owner)
     {
+        final String funcName = "releaseExclusiveAccess";
         boolean success = pidTurret.releaseExclusiveAccess(owner);
+
+        if (debugEnabled)
+        {
+            globalTracer.traceInfo(funcName, "owner=%s, success=%s", owner, success);
+        }
 
         if (success)
         {
@@ -175,6 +187,13 @@ public class Turret
      */
     public void setTriggerEnabled(boolean enabled)
     {
+        final String funcName = "setTriggerEnabled";
+
+        if (debugEnabled)
+        {
+            globalTracer.traceInfo(funcName, "enabled=%s", enabled);
+        }
+
         thresholdTrigger.setEnabled(enabled);
     }   //setTriggerEnabled
 
@@ -216,7 +235,7 @@ public class Turret
     public double getPosition()
     {
         int encoderPos = motor.motor.getCurrentPosition();
-        rawPosition = encoderPos * RobotParams.TURRET_DEG_PER_COUNT;
+        rawMotorPosition = encoderPos * RobotParams.TURRET_DEG_PER_COUNT;
         return pidTurret.getPosition();
     }   //getPosition
 
