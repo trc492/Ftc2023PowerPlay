@@ -241,7 +241,6 @@ public class FtcTeleOp extends FtcOpMode
                 turretPower, robot.turret.getPosition(),
                 robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive(),
                 robot.turret.getSensorValue(), robot.turret.detectedTarget());
-            robot.dashboard.displayPrintf(15, "Turret: raw pos=%.3f", robot.turret.rawPosition);
         }
 
         if (robot.elevator != null)
@@ -443,18 +442,6 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-                //aligning to cone or pole version
-//                if(!robot.grabber.hasObject()){
-//                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-//                    robot.cyclingTask.doConeAlignOnly(TaskCyclingCones.VisionType.CONE_VISION);
-//                }
-//                else {
-//                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
-//                    callbackEvent.setCallback(this::scoreCone, null);
-//                    robot.turret.setTarget(
-//                            0.0, RobotParams.TURRET_LEFT, true, 0.0,
-//                            null, 0);
-//                }
                 break;
         }
     }   //driverButtonEvent
@@ -598,6 +585,7 @@ public class FtcTeleOp extends FtcOpMode
 //                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
 //                        RobotParams.TURRET_SCAN_DURATION, null);
                     robot.turret.presetPositionUp();
+
                 }
                 break;
 
@@ -609,6 +597,7 @@ public class FtcTeleOp extends FtcOpMode
 //                        RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
 //                        RobotParams.TURRET_SCAN_DURATION, null);
                     robot.turret.presetPositionDown();
+
                 }
                 break;
 
@@ -620,22 +609,6 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-                //Cycling code version
-                //if robot does not have a cone, initiate pickup
-//                if (!robot.grabber.hasObject())
-//                {
-//                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-//                    robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
-//                }
-//                //otherwise robot has a cone, turn turret to the left, raise arm, elevator, then score cone when that is done
-//                else
-//                {
-//                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
-//                    callbackEvent.setCallback(this::scoreCone, null);
-//                    robot.turret.setTarget(
-//                            0, RobotParams.TURRET_LEFT, 0.9, callbackEvent, 0,
-//                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
-//                }
                 break;
         }
     }   //operatorButtonEvent
