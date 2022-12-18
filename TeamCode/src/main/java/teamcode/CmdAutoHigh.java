@@ -40,7 +40,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         START_DELAY,
         DRIVE_TO_SCORE_POSITION,
         AUTO_SCORE_CONE,
-        HANG_ELEVATOR,
         GO_TO_CONE_STACK,
         AUTO_PICKUP_CONE,
         BACK_TO_SCORE_POSITION,
@@ -202,7 +201,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                                 event, robot.robotDrive.driveBase.getFieldPosition(), false,
                                 robot.robotDrive.pathPoint(0.6, 2.5, 180.0),
                                 robot.robotDrive.pathPoint(0.5, 1.0, 180.0),
-                                robot.robotDrive.pathPoint(1.00, 0.5, 90));
+                                robot.robotDrive.pathPoint(1.0, 0.5, 90.0));
                         }
                         else
                         {
@@ -242,7 +241,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case AUTO_PICKUP_CONE:
-                    if (30 - TrcUtil.getModeElapsedTime() < RobotParams.CYCLE_TIME + RobotParams.PARK_TIME)
+                    if (30.0 - TrcUtil.getModeElapsedTime() < RobotParams.CYCLE_TIME + RobotParams.PARK_TIME)
                     {
                         sm.setState(State.PARK);
                     }

@@ -394,7 +394,6 @@ public class RobotParams
     static final double TURRET_SCAN_OFFSET                      = 20.0;
     static final double TURRET_SCAN_POWER                       = 0.30;
     static final double TURRET_TELEOP_SCAN_POWER                = 0.25;
-
     static final double TURRET_SCAN_DURATION                    = 5.0;
     static final double[] TURRET_PRESET_LEVELS                  = new double[] {
         TURRET_BACK,    // Slot 0
@@ -433,13 +432,16 @@ public class RobotParams
     static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
     static final double ELEVATOR_CONE_GRAB_HEIGHT               = ELEVATOR_MIN_POS;
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
+    static final double LOW_JUNCTION_SCORING_HEIGHT             = 10.8;
+    static final double MID_JUNCTION_SCORING_HEIGHT             = 21.0;
     static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;
     //todo: tune this
     static final double MEDIUM_JUNCTION_SCORING_HEIGHT          = 25.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
-        10.8,
-        21.0,
-        HIGH_JUNCTION_SCORING_HEIGHT,
+        ELEVATOR_MIN_POS,
+        LOW_JUNCTION_SCORING_HEIGHT,
+        MID_JUNCTION_SCORING_HEIGHT,
+        HIGH_JUNCTION_SCORING_HEIGHT
     };
     // 0.0 for placeholder so 1 additional cone per index
     static final double[] ELEVATOR_PICKUP_PRESETS               = new double[] {
@@ -466,7 +468,7 @@ public class RobotParams
     //For calculating angle for aligning claw to pole
     static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
     static final double ARM_ANGLE_OFFSET                        = -11.94;   // in degrees
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.0;    // in inches
+    static final double CLAW_DISTANCE_ADUSTMENT                 = -3.0;     // in inches
     /*
      * Arm Zero-Calibrated to Up Position
      * Arm Max Position is Down
@@ -494,12 +496,6 @@ public class RobotParams
     static final double ARM_STACK_5_CONES_POS                   = 85.0;
     static final double ARM_HORIZONTAL                          = 90.0;
     static final double ARM_PRESET_TOLERANCE                    = 2.0;
-    static final double[] ARM_PRESET_LEVELS                     = new double[] {
-        ARM_UP_POS,                                             // Slot 0: Up position
-        ARM_SAFE_POS,                                           // Slot 1
-        ARM_HORIZONTAL,                                         // Slot 2
-        ARM_MAX_POS                                             // Slot 2: Down position
-    };
     //0 is a placeholder so index 1 is 1 cone, 2 is 2 cones, etc.
     static final double ARM_PICKUP_POS                          = 100;
     static final double[] ARM_PICKUP_PRESETS                    = new double[] {
@@ -527,7 +523,7 @@ public class RobotParams
     static final double GRABBER_CLOSE_TIME                      = 0.5;
     static final double GRABBER_DEF_CONE_DISTANCE               = 8.0;
 
-    static final double CYCLE_TIME                              = 10;
-    static final double PARK_TIME                               = 1;
+    static final double CYCLE_TIME                              = 10.0; // in seconds
+    static final double PARK_TIME                               = 1.0;  // in seconds
 
 }   //class RobotParams

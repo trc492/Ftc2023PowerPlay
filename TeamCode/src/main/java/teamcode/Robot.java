@@ -180,7 +180,7 @@ public class Robot
 //                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
                         .setPresetTolerance(RobotParams.ARM_PRESET_TOLERANCE)
-                        .setPosPresets(RobotParams.ARM_PRESET_LEVELS);
+                        .setPosPresets(RobotParams.ARM_PICKUP_PRESETS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);
                 }
@@ -189,8 +189,6 @@ public class Robot
                 {
                     grabber = new Grabber(RobotParams.HWNAME_GRABBER, globalTracer).getServoGrabber();
                 }
-
-//                zeroCalibrate();
                 //
                 // Create and initialize auto-assist tasks.
                 //

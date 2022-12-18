@@ -440,18 +440,6 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-                //aligning to cone or pole version
-//                if(!robot.grabber.hasObject()){
-//                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-//                    robot.cyclingTask.doConeAlignOnly(TaskCyclingCones.VisionType.CONE_VISION);
-//                }
-//                else {
-//                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
-//                    callbackEvent.setCallback(this::scoreCone, null);
-//                    robot.turret.setTarget(
-//                            0.0, RobotParams.TURRET_LEFT, true, 0.0,
-//                            null, 0);
-//                }
                 break;
         }
     }   //driverButtonEvent
@@ -539,15 +527,20 @@ public class FtcTeleOp extends FtcOpMode
                 break;
             //use this button for scoring on medium or low poles
             case FtcGamepad.GAMEPAD_Y:
-                if(pressed && !robot.grabber.hasObject()){
-                   //about 6 inches shorter than high pole scoring height
-                    robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
-                    robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
-                    robot.setGrabberAutoAssistOn(true);
-                }
-                else if(pressed && robot.grabber.hasObject()){
-                    robot.arm.setTarget(37);
+                if (pressed)
+                {
+                    if (robot.grabber.hasObject())
+                    {
+                        robot.arm.setTarget(37.0);
+                    }
+                    else
+                    {
+                        //about 6 inches shorter than high pole scoring height
+                        robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
+                        robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2, true, 1.0, null, 0);
+                        robot.elevator.setTarget(RobotParams.ELEVATOR_PICKUP_PRESETS[1]);
+                        robot.setGrabberAutoAssistOn(true);
+                    }
                 }
                 break;
 
@@ -593,7 +586,6 @@ public class FtcTeleOp extends FtcOpMode
                         RobotParams.TURRET_LEFT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_LEFT,
                         RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                         RobotParams.TURRET_SCAN_DURATION, null);
-//                    robot.turret.presetPositionUp();
                 }
                 break;
 
@@ -604,7 +596,6 @@ public class FtcTeleOp extends FtcOpMode
                         RobotParams.TURRET_RIGHT - RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
                         RobotParams.MEDIUM_JUNCTION_SCORING_HEIGHT, RobotParams.TURRET_SCAN_POWER,
                         RobotParams.TURRET_SCAN_DURATION, null);
-//                    robot.turret.presetPositionDown();
                 }
                 break;
 
@@ -616,22 +607,6 @@ public class FtcTeleOp extends FtcOpMode
                 break;
 
             case FtcGamepad.GAMEPAD_LSTICK_BTN:
-                //Cycling code version
-                //if robot does not have a cone, initiate pickup
-//                if (!robot.grabber.hasObject())
-//                {
-//                    robot.robotDrive.driveBase.acquireExclusiveAccess("TaskCyclingCones");
-//                    robot.cyclingTask.doTeleopPickup(TaskCyclingCones.VisionType.CONE_AND_POLE_VISION, 1, null);
-//                }
-//                //otherwise robot has a cone, turn turret to the left, raise arm, elevator, then score cone when that is done
-//                else
-//                {
-//                    TrcEvent callbackEvent = new TrcEvent(moduleName + ".callbackEvent");
-//                    callbackEvent.setCallback(this::scoreCone, null);
-//                    robot.turret.setTarget(
-//                            0, RobotParams.TURRET_LEFT, 0.9, callbackEvent, 0,
-//                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, RobotParams.ARM_SCORE_POS );
-//                }
                 break;
         }
     }   //operatorButtonEvent

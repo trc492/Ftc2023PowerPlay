@@ -43,7 +43,6 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
         FIND_POLE,
         CHECK_FOR_POLE,
         RAISE_TO_SCORE_HEIGHT,
-        HANG_ELEVATOR,
         EXTEND_ARM,
         CAP_POLE,
         SCORE_CONE,
@@ -340,10 +339,8 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 }
                 else
                 {
-                    sm.setState(State.DONE);
+                    sm.setState(State.EXTEND_ARM);
                 }
-                break;
-            case HANG_ELEVATOR:
                 break;
 
             case EXTEND_ARM:
@@ -362,30 +359,21 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                         msgTracer.traceInfo(funcName, "Found the pole (armAngle=%f).", armTarget);
                     }
                 }
-//
-//                if (armTarget == null && runMode == TrcRobot.RunMode.TELEOP_MODE)
-//                {
-//                    // We are in teleop and we did not detect the target, just quit.
-//                    sm.setState(State.DONE);
-//                }
-//                else
-//                {
-                    // We are in autonomous mode or we detected target.
-                    if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 60.0)
+                // We are in autonomous mode or we detected target.
+                if (armTarget == null || runMode == TrcRobot.RunMode.AUTO_MODE && armTarget > 60.0)
+                {
+                    // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
+                    // picking up a erroneous distance. In this case, just use the known good arm angle and hope it
+                    // will work.
+                    if (msgTracer != null)
                     {
-                        // Can't determine a valid arm angle. Either we don't see the pole or the sensor is probably
-                        // picking up a erroneous distance. In this case, just use the known good arm angle and hope it
-                        // will work.
-                        if (msgTracer != null)
-                        {
-                            msgTracer.traceInfo(funcName, "Failed to determine valid arm angle (armAngle=%f).", armTarget);
-                        }
-                        armTarget = 25.0;
+                        msgTracer.traceInfo(funcName, "Failed to determine valid arm angle (armAngle=%f).", armTarget);
                     }
-                    // This operation takes about 1 sec.
-                    robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
-                    sm.waitForSingleEvent(event, State.CAP_POLE);
-//                }
+                    armTarget = 25.0;
+                }
+                // This operation takes about 1 sec.
+                robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
+                sm.waitForSingleEvent(event, State.CAP_POLE);
                 break;
 
             case CAP_POLE:
