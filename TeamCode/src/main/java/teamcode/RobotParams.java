@@ -435,7 +435,7 @@ public class RobotParams
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double LOW_JUNCTION_SCORING_HEIGHT             = 10.8;
     static final double MID_JUNCTION_SCORING_HEIGHT             = 21.0;
-    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;
+    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;//32.5;
     //todo: tune this
     static final double MEDIUM_JUNCTION_SCORING_HEIGHT          = 25.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
@@ -484,7 +484,7 @@ public class RobotParams
     static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
     static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = false;
     static final boolean ARM_UPPER_LIMIT_INVERTED               = false;
-    static final double ARM_CAL_POWER                           = -1.0;
+    static final double ARM_CAL_POWER                           = -0.5;
     static final double ARM_STALL_MIN_POWER                     = 0.75;
     static final double ARM_STALL_TOLERANCE                     = 0.0;
     static final double ARM_STALL_TIMEOUT                       = 1.0;
@@ -512,7 +512,7 @@ public class RobotParams
     //
     static final double GRABBER_MAX_STEPRATE                    = 1.0;
     static final double GRABBER_MIN_POS                         = 0.0;
-    static final double GRABBER_MAX_POS                         = 0.25;
+    static final double GRABBER_MAX_POS                         = 0.2;
     static final boolean GRABBER_LSERVO_INVERTED                = false;
     static final boolean GRABBER_RSERVO_INVERTED                = true;
     static final boolean GRABBER_TRIGGER_INVERTED               = true;

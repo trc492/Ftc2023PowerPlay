@@ -8,7 +8,7 @@
     <grip:Step name="CV cvtColor">
       <grip:Input step="0" socket="0"/>
       <grip:Input step="0" socket="1">
-        <value>COLOR_BGR2YCrCb</value>
+        <value>COLOR_RGBA2RGB</value>
       </grip:Input>
       <grip:Output step="0" socket="0" previewed="true"/>
     </grip:Step>
@@ -17,19 +17,19 @@
       <grip:Input step="1" socket="1">
         <value>
           <double>0.0</double>
-          <double>255.0</double>
+          <double>60.0</double>
         </value>
       </grip:Input>
       <grip:Input step="1" socket="2">
         <value>
           <double>0.0</double>
-          <double>120.0</double>
+          <double>100.0</double>
         </value>
       </grip:Input>
       <grip:Input step="1" socket="3">
         <value>
-          <double>0.0</double>
-          <double>60.0</double>
+          <double>100.0</double>
+          <double>255.0</double>
         </value>
       </grip:Input>
       <grip:Output step="1" socket="0" previewed="true"/>
@@ -44,7 +44,7 @@
     <grip:Step name="Filter Contours">
       <grip:Input step="3" socket="0"/>
       <grip:Input step="3" socket="1">
-        <value>1000.0</value>
+        <value>10000.0</value>
       </grip:Input>
       <grip:Input step="3" socket="2">
         <value>200.0</value>

@@ -372,7 +372,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     armTarget = 25.0;
                 }
                 // This operation takes about 1 sec.
-                robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 3.0);
+                robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 2.0);
                 sm.waitForSingleEvent(event, State.CAP_POLE);
                 break;
 
@@ -385,9 +385,9 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case SCORE_CONE:
                 // Release the cone to score it and retract the elevator and arm.
                 robot.grabber.open();
-                robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(currOwner, RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, false, 1.0, null, 0.0);
-                // Delay a little to wait for the arm to retract before turning the turret.
+                robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
+                robot.elevator.setTarget(currOwner, 0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
+//                // Delay a little to wait for the arm to retract before turning the turret.
                 robot.turret.setTarget(currOwner, 0.5, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.

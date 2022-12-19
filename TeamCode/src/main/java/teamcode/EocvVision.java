@@ -139,19 +139,19 @@ public class EocvVision extends FtcEocvDetector
 //                .setAspectRatioRange(0.0, 1000.0);
         TrcOpenCvColorBlobPipeline.FilterContourParams redConeFilterContourParams =
             new TrcOpenCvColorBlobPipeline.FilterContourParams()
-                .setMinArea(500.0)
-                .setMinPerimeter(100.0)
-                .setWidthRange(50.0, 1000.0)
-                .setHeightRange(50.0, 1000.0)
+                .setMinArea(10000.0)
+                .setMinPerimeter(200.0)
+                .setWidthRange(100.0, 1000.0)
+                .setHeightRange(100.0, 1000.0)
                 .setSolidityRange(0.0, 100.0)
                 .setVerticesRange(0.0, 1000.0)
                 .setAspectRatioRange(0.0, 1000.0);
         TrcOpenCvColorBlobPipeline.FilterContourParams blueConeFilterContourParams =
             new TrcOpenCvColorBlobPipeline.FilterContourParams()
-                .setMinArea(1000.0)
-                .setMinPerimeter(100.0)
-                .setWidthRange(50.0, 1000.0)
-                .setHeightRange(20.0, 1000.0)
+                .setMinArea(10000.0)
+                .setMinPerimeter(200.0)
+                .setWidthRange(100.0, 1000.0)
+                .setHeightRange(100.0, 1000.0)
                 .setSolidityRange(0.0, 100.0)
                 .setVerticesRange(0.0, 1000.0)
                 .setAspectRatioRange(0.0, 1000.0);
