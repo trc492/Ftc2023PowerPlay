@@ -498,13 +498,8 @@ public class FtcTeleOp extends FtcOpMode
                     if (pressed)
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
-<<<<<<< Updated upstream
-                            RobotParams.HIGH_JUNCTION_SCORING_HEIGHT, -0.2, RobotParams.TURRET_SCAN_DURATION, null);
-=======
-                            31, -0.2,
-                            RobotParams.TURRET_SCAN_DURATION, null);
->>>>>>> Stashed changes
+                            RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT, 2, null); 
+
                     }
                 }
                 break;
