@@ -224,7 +224,6 @@ public class FtcTeleOp extends FtcOpMode
             }
 
             robot.dashboard.displayPrintf(2, "Pose:%s", robot.robotDrive.driveBase.getFieldPosition());
-
         }
         //
         // Other subsystems.
@@ -498,8 +497,8 @@ public class FtcTeleOp extends FtcOpMode
                     if (pressed)
                     {
                         robot.scoreConeTask.autoAssistScoreCone(
-                            RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT, 2, null); 
-
+                            RobotParams.TURRET_RIGHT + RobotParams.TURRET_SCAN_OFFSET, 0.75, RobotParams.TURRET_RIGHT,
+                            31.0, -0.2, RobotParams.TURRET_SCAN_DURATION, null);
                     }
                 }
                 break;

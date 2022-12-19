@@ -387,7 +387,6 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 robot.grabber.open();
                 robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
                 robot.elevator.setTarget(currOwner, 0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
-//                // Delay a little to wait for the arm to retract before turning the turret.
                 robot.turret.setTarget(currOwner, 0.5, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.

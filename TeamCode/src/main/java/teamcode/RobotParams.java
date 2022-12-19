@@ -435,7 +435,7 @@ public class RobotParams
     static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
     static final double LOW_JUNCTION_SCORING_HEIGHT             = 10.8;
     static final double MID_JUNCTION_SCORING_HEIGHT             = 21.0;
-    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;//32.5;
+    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;
     //todo: tune this
     static final double MEDIUM_JUNCTION_SCORING_HEIGHT          = 25.0;
     static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
