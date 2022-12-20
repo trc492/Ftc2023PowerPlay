@@ -264,7 +264,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     {
                         if (msgTracer != null)
                         {
-                            msgTracer.traceInfo(funcName, "Found cone: coneInfo=%s", coneInfo);
+                            msgTracer.traceInfo(funcName, "Found cone: coneInfo:%s", coneInfo);
                         }
                         targetLocation = new TrcPose2D(
                             coneInfo.distanceFromCamera.x - 1, coneInfo.distanceFromCamera.y, coneInfo.horizontalAngle);
