@@ -47,7 +47,9 @@ import TrcFtcLib.ftclib.FtcPidCoeffCache;
 import TrcFtcLib.ftclib.FtcValueMenu;
 
 /**
- * This class contains the Test Mode program.
+ * This class contains the Test Mode program. It extends FtcTeleOp so that we can teleop control the robot for
+ * testing purposes. It provides numerous tests for diagnosing problems with the robot. It also provides tools
+ * for tuning and calibration.
  */
 @TeleOp(name="FtcTest", group="Ftc3543")
 public class FtcTest extends FtcTeleOp
@@ -109,8 +111,7 @@ public class FtcTest extends FtcTeleOp
 
     }   //class TestChoices
 
-    private final FtcPidCoeffCache pidCoeffCache =
-        new FtcPidCoeffCache("PIDTuning", RobotParams.TEAM_FOLDER_PATH);
+    private final FtcPidCoeffCache pidCoeffCache = new FtcPidCoeffCache(RobotParams.TEAM_FOLDER_PATH);
     private final TestChoices testChoices = new TestChoices();
     private TrcElapsedTimer elapsedTimer = null;
     private FtcChoiceMenu<Test> testMenu = null;
@@ -129,7 +130,6 @@ public class FtcTest extends FtcTeleOp
     private int posIndex = 0;
     private int wheelIndex = 0;
 
-    private boolean useFrontEocv = true;
     //
     // Overrides FtcOpMode abstract method.
     //
@@ -187,6 +187,7 @@ public class FtcTest extends FtcTeleOp
             case PID_DRIVE:
                 if (!RobotParams.Preferences.noRobot)
                 {
+                    // Distance targets are in feet, so convert them into inches.
                     testCommand = new CmdPidDrive(
                         robot.robotDrive.driveBase, robot.robotDrive.pidDrive, 0.0, testChoices.drivePower, null,
                         new TrcPose2D(testChoices.xTarget*12.0, testChoices.yTarget*12.0, testChoices.turnTarget));
@@ -196,6 +197,7 @@ public class FtcTest extends FtcTeleOp
             case TUNE_X_PID:
                 if (!RobotParams.Preferences.noRobot)
                 {
+                    // Distance target is in feet, so convert it into inches.
                     testCommand = new CmdPidDrive(
                         robot.robotDrive.driveBase, robot.robotDrive.pidDrive, 0.0, testChoices.tuneDrivePower,
                         testChoices.tunePidCoeff, new TrcPose2D(testChoices.tuneDistance*12.0, 0.0, 0.0));
@@ -205,6 +207,7 @@ public class FtcTest extends FtcTeleOp
             case TUNE_Y_PID:
                 if (!RobotParams.Preferences.noRobot)
                 {
+                    // Distance target is in feet, so convert it into inches.
                     testCommand = new CmdPidDrive(
                         robot.robotDrive.driveBase, robot.robotDrive.pidDrive, 0.0, testChoices.tuneDrivePower,
                         testChoices.tunePidCoeff, new TrcPose2D(0.0, testChoices.tuneDistance*12.0, 0.0));
@@ -270,24 +273,15 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.vuforiaVision.setEnabled(true);
                     }
 
-                    if (robot.vision.tensorFlowVision != null)
+                    if (robot.vision.eocvVision != null)
+                    {
+                        robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
+                        robot.vision.eocvVision.setEnabled(true);
+                    }
+                    else if (robot.vision.tensorFlowVision != null)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling TensorFlow.");
                         robot.vision.tensorFlowVision.setEnabled(true);
-                    }
-                    else
-                    {
-                        if (robot.vision.frontEocvVision != null)
-                        {
-                            robot.globalTracer.traceInfo(funcName, "Enabling Front EocvVision.");
-                            robot.vision.frontEocvVision.setEnabled(true);
-                        }
-
-                        if (robot.vision.elevatorEocvVision != null)
-                        {
-                            robot.globalTracer.traceInfo(funcName, "Enabling Elevator EocvVision.");
-                            robot.vision.elevatorEocvVision.setEnabled(true);
-                        }
                     }
                 }
                 break;
@@ -411,12 +405,9 @@ public class FtcTest extends FtcTeleOp
                 if (!RobotParams.Preferences.noRobot)
                 {
                     robot.dashboard.displayPrintf(8, "Timed Drive: %.0f sec", testChoices.driveTime);
+                    robot.dashboard.displayPrintf(9, "RobotPose=%s", robot.robotDrive.driveBase.getFieldPosition());
                     robot.dashboard.displayPrintf(
-                        9, "xPos=%.1f,yPos=%.1f,heading=%.1f",
-                        robot.robotDrive.driveBase.getXPosition(), robot.robotDrive.driveBase.getYPosition(),
-                        robot.robotDrive.driveBase.getHeading());
-                    robot.dashboard.displayPrintf(
-                        10, "raw=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
+                        10, "rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
                         robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
                         robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
                 }
@@ -436,9 +427,8 @@ public class FtcTest extends FtcTeleOp
                 if (!RobotParams.Preferences.noRobot)
                 {
                     robot.dashboard.displayPrintf(
-                        8, "xPos=%.1f,yPos=%.1f,heading=%.1f,raw=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
-                        robot.robotDrive.driveBase.getXPosition(), robot.robotDrive.driveBase.getYPosition(),
-                        robot.robotDrive.driveBase.getHeading(),
+                        8, "RobotPose=%s,rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
+                        robot.robotDrive.driveBase.getFieldPosition(),
                         robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
                         robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
                     if (robot.robotDrive.xPosPidCtrl != null)
@@ -460,9 +450,8 @@ public class FtcTest extends FtcTeleOp
                 if (!RobotParams.Preferences.noRobot)
                 {
                     robot.dashboard.displayPrintf(
-                        8, "xPos=%.1f,yPos=%.1f,heading=%.1f,rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
-                        robot.robotDrive.driveBase.getXPosition(), robot.robotDrive.driveBase.getYPosition(),
-                        robot.robotDrive.driveBase.getHeading(),
+                        8, "RobotPose=%s,rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
+                        robot.robotDrive.driveBase.getFieldPosition(),
                         robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
                         robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
                 }
@@ -567,11 +556,9 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_B:
                     if (testChoices.test == Test.VISION_TEST)
                     {
-                        if (pressed && robot.vision != null && robot.vision.frontEocvVision != null)
+                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
                         {
-                            robot.vision.frontEocvVision.setNextObjectType();
-                            useFrontEocv =
-                                robot.vision.frontEocvVision.getDetectObjectType() != EocvVision.ObjectType.YELLOW_POLE;
+                            robot.vision.eocvVision.setNextObjectType();
                         }
                         processed = true;
                     }
@@ -580,16 +567,9 @@ public class FtcTest extends FtcTeleOp
                 case FtcGamepad.GAMEPAD_X:
                     if (testChoices.test == Test.VISION_TEST)
                     {
-                        if (pressed && robot.vision != null)
+                        if (pressed && robot.vision != null && robot.vision.eocvVision != null)
                         {
-                            if (useFrontEocv && robot.vision.frontEocvVision != null)
-                            {
-                                robot.vision.frontEocvVision.toggleColorFilterOutput();
-                            }
-                            else if (!useFrontEocv && robot.vision.elevatorEocvVision != null)
-                            {
-                                robot.vision.elevatorEocvVision.toggleColorFilterOutput();
-                            }
+                            robot.vision.eocvVision.toggleColorFilterOutput();
                         }
                         processed = true;
                     }
@@ -963,34 +943,31 @@ public class FtcTest extends FtcTeleOp
                 robot.dashboard.displayPrintf(10, "Signal: Not found.");
             }
 
-            TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> colorBlobInfo =
+            TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> coneInfo =
                 robot.vision.getDetectedConeInfo();
-            if (colorBlobInfo != null)
+            if (coneInfo != null)
             {
-                EocvVision.ObjectType objectType = robot.vision.frontEocvVision.getDetectObjectType();
+                EocvVision.ObjectType objectType = robot.vision.eocvVision.getDetectObjectType();
                 robot.dashboard.displayPrintf(
-                    11, "%s Cone: %s", objectType == EocvVision.ObjectType.RED_CONE? "Red": "Blue", colorBlobInfo);
+                    11, "%s Cone: %s", objectType == EocvVision.ObjectType.RED_CONE? "Red": "Blue", coneInfo);
             }
             else
             {
                 robot.dashboard.displayPrintf(11, "Cone: Not found.");
             }
 
-            colorBlobInfo = robot.vision.getDetectedPoleInfo();
-            if (colorBlobInfo != null)
-            {
-                robot.dashboard.displayPrintf(12, "Pole: %s", colorBlobInfo);
-            }
-            else
-            {
-                robot.dashboard.displayPrintf(12, "Pole: Not found.");
-            }
-
             if (robot.vision.vuforiaVision != null)
             {
                 TrcPose2D robotPose = robot.vision.vuforiaVision.getRobotPose(null, false);
-                robot.dashboard.displayPrintf(
-                    13, "RobotLoc %s: %s", robot.vision.vuforiaVision.getLastSeenImageName(), robotPose);
+                if (robotPose != null)
+                {
+                    robot.dashboard.displayPrintf(
+                        13, "RobotLoc %s: %s", robot.vision.vuforiaVision.getLastSeenImageName(), robotPose);
+                }
+                else
+                {
+                    robot.dashboard.displayPrintf(13, "RobotLoc: Unknown");
+                }
             }
         }
     }   //doVisionTest

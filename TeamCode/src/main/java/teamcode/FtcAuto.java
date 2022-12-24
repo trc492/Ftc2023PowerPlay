@@ -28,16 +28,13 @@ import java.util.Locale;
 
 import TrcCommonLib.command.CmdPidDrive;
 import TrcCommonLib.command.CmdTimedDrive;
-import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
-import TrcCommonLib.trclib.TrcTimer;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
 import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcValueMenu;
-import TrcFtcLib.ftclib.FtcVuforia;
 
 /**
  * This class contains the Autonomous Mode program.
@@ -45,7 +42,6 @@ import TrcFtcLib.ftclib.FtcVuforia;
 @Autonomous(name="FtcAutonomous", group="Ftc3543")
 public class FtcAuto extends FtcOpMode
 {
-//    private boolean initDone = false;
     public enum Alliance
     {
         RED_ALLIANCE,
@@ -85,7 +81,6 @@ public class FtcAuto extends FtcOpMode
         public StartPos startPos = StartPos.LEFT;
         public AutoStrategy strategy = AutoStrategy.DO_NOTHING;
         public Parking parking = Parking.NEAR_TILE;
-
         public double xTarget = 0.0;
         public double yTarget = 0.0;
         public double turnTarget = 0.0;
@@ -113,8 +108,8 @@ public class FtcAuto extends FtcOpMode
     }   //class AutoChoices
 
     private static final String moduleName = "FtcAuto";
-    private Robot robot;
     public static final AutoChoices autoChoices = new AutoChoices();
+    private Robot robot;
     private TrcRobot.RobotCommand autoCommand;
 
     //
@@ -190,10 +185,10 @@ public class FtcAuto extends FtcOpMode
         if (robot.vision != null)
         {
             // Enabling vision early so we can detect signal position before match starts.
-            if (robot.vision.frontEocvVision != null)
+            if (robot.vision.eocvVision != null)
             {
                 robot.globalTracer.traceInfo(funcName, "Enabling EocvVision to detect AprilTag.");
-                robot.vision.frontEocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
+                robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
             }
             else if (robot.vision.tensorFlowVision != null)
             {
@@ -222,19 +217,10 @@ public class FtcAuto extends FtcOpMode
     public void initPeriodic()
     {
         // Use vision to detect objects before the match starts.
-        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.frontEocvVision != null))
+        if (robot.vision != null && (robot.vision.tensorFlowVision != null || robot.vision.eocvVision != null))
         {
             robot.vision.getDetectedSignal();
         }
-//        if(!initDone){
-//            robot.globalTracer.traceInfo("Turning Turret", "turning turret");
-//            TrcTimer timer = new TrcTimer(moduleName);
-//            TrcEvent event = new TrcEvent(moduleName);
-//            event.setCallback(this::afterZeroTurnTurret, null);
-//            timer.set(2.0, event);
-//            initDone = true;
-//        }
-
     }   //initPeriodic
 
     /**
@@ -250,7 +236,6 @@ public class FtcAuto extends FtcOpMode
     {
         final String funcName = "startMode";
 
-        robot.dashboard.clearDisplay();
         if (robot.globalTracer.isTraceLogOpened())
         {
             robot.globalTracer.setTraceLogEnabled(true);
@@ -261,6 +246,7 @@ public class FtcAuto extends FtcOpMode
             robot.globalTracer.logInfo(moduleName, "MatchInfo", "%s", Robot.matchInfo);
         }
         robot.globalTracer.logInfo(moduleName, "AutoChoices", "%s", autoChoices);
+        robot.dashboard.clearDisplay();
         //
         // Tell robot object opmode is about to start so it can do the necessary start initialization for the mode.
         //
@@ -310,6 +296,7 @@ public class FtcAuto extends FtcOpMode
         }
 
         printPerformanceMetrics(robot.globalTracer);
+        robot.globalTracer.traceInfo(moduleName, "***** Stopping autonomous *****");
 
         if (robot.globalTracer.isTraceLogOpened())
         {
@@ -385,7 +372,7 @@ public class FtcAuto extends FtcOpMode
 
         parkingMenu.addChoice("Parking Near Tile", Parking.NEAR_TILE, false);
         parkingMenu.addChoice("Parking Far Tile", Parking.FAR_TILE, true);
-        parkingMenu.addChoice("No Parking", Parking.NO_PARKING, true);
+        parkingMenu.addChoice("No Parking", Parking.NO_PARKING, false);
         //
         // Traverse menus.
         //

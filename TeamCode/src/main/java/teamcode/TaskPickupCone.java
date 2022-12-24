@@ -111,7 +111,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
 
         startAutoTask(
             State.START,
-            new TaskParams(conesRemaining, useVision && robot.vision != null && robot.vision.frontEocvVision != null),
+            new TaskParams(conesRemaining, useVision && robot.vision != null && robot.vision.eocvVision != null),
             event);
     }   //autoAssistPickupCone
 
@@ -239,7 +239,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 robot.globalTracer.traceInfo(funcName, "TURRET POS: %.1f", robot.turret.getPosition());
                 if (taskParams.useVision)
                 {
-                    robot.vision.frontEocvVision.setDetectObjectType(
+                    robot.vision.eocvVision.setDetectObjectType(
                         FtcAuto.autoChoices.alliance == FtcAuto.Alliance.RED_ALLIANCE?
                             EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
                 }
@@ -350,12 +350,10 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                         robot.robotDrive.getAutoTargetHeading(-90.0, FtcAuto.autoChoices) -
                         robot.robotDrive.driveBase.getHeading()));
                 sm.addEvent(event);
-//                robot.robotDrive.driveBase.holonomicDrive(currOwner, 0.0, 0.15, 0.0, 2.5, event);
                 sm.waitForEvents(State.PICKUP_CONE);
                 break;
 
             case PICKUP_CONE:
-//                robot.robotDrive.driveBase.stop(currOwner);
                 robot.robotDrive.purePursuitDrive.cancel();
                 if (!robot.grabber.hasObject())
                 {
@@ -369,12 +367,12 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                             robot.grabber.getSensorValue());
                     }
                 }
+                // Delay a little to make sure the grabber firmly grabbed the cone.
                 timer.set(0.5, event);
                 sm.waitForSingleEvent(event, State.LIFT_CONE);
                 break;
 
             case LIFT_CONE:
-                // Delay a little to make sure the grabber firmly grabbed the cone.
                 robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
                 sm.waitForSingleEvent(event, State.DONE);
                 break;

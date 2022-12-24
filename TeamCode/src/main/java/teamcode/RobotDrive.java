@@ -44,21 +44,17 @@ public class RobotDrive
     //
     public final FtcBNO055Imu imu;
     public final TrcGyro gyro;
+
+    //
+    // Subclass needs to initialize the following variables.
     //
     // Drive motors.
-    //
     public FtcDcMotor lfDriveMotor, lbDriveMotor, rfDriveMotor, rbDriveMotor;
-    //
     // Drive Base.
-    //
     public TrcDriveBase driveBase;
-    //
     // PID Coefficients and Controllers.
-    //
     public TrcPidController xPosPidCtrl, yPosPidCtrl, turnPidCtrl;
-    //
     // Drive Controllers.
-    //
     public TrcPidDrive pidDrive;
     public TrcPurePursuitDrive purePursuitDrive;
     public TrcGridDrive gridDrive;
@@ -216,6 +212,18 @@ public class RobotDrive
     }   //getAutoTargetCell
 
     /**
+     * This method adjusts the target cell according to the alliance and startPos in autoChoices.
+     *
+     * @param targetPos specifies the target position in tile units.
+     * @param autoChoices specifies auto choices.
+     * @return adjusted target cell as TrcPose2D.
+     */
+    public TrcPose2D getAutoTargetCell(TrcPose2D targetPos, FtcAuto.AutoChoices autoChoices)
+    {
+        return getAutoTargetCell(targetPos.x, targetPos.y, targetPos.angle, autoChoices);
+    }   //getAutoTargetCell
+
+    /**
      * This method adjusts the target heading according to the alliance and startPos in autoChoices.
      *
      * @param heading specifies heading for RED LEFT.
@@ -227,18 +235,6 @@ public class RobotDrive
         TrcPose2D adjPose = getAutoTargetCell(0.0, 0.0, heading, autoChoices);
         return adjPose.angle;
     }   //getAutoTargetHeading
-
-    /**
-     * This method adjusts the target cell according to the alliance and startPos in autoChoices.
-     *
-     * @param targetPos specifies the target position in tile units.
-     * @param autoChoices specifies auto choices.
-     * @return adjusted target cell as TrcPose2D.
-     */
-    public TrcPose2D getAutoTargetCell(TrcPose2D targetPos, FtcAuto.AutoChoices autoChoices)
-    {
-        return getAutoTargetCell(targetPos.x, targetPos.y, targetPos.angle, autoChoices);
-    }   //getAutoTargetCell
 
     /**
      * This method adjusts the target point according to the alliance and startPos in autoChoices.

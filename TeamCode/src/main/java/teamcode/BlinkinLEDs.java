@@ -57,7 +57,7 @@ class BlinkinLEDs extends FtcRevBlinkin
         super(instanceName);
         // LED Patterns are sorted in decreasing priority order.
         final TrcRevBlinkin.Pattern[] ledPatternPriorities = {
-            // Highest.
+            // Highest priority.
             new TrcRevBlinkin.Pattern(LABEL_BOLT, TrcRevBlinkin.RevLedPattern.SolidRed),
             new TrcRevBlinkin.Pattern(LABEL_BULB, TrcRevBlinkin.RevLedPattern.SolidGreen),
             new TrcRevBlinkin.Pattern(LABEL_PANEL, TrcRevBlinkin.RevLedPattern.SolidBlue),
@@ -72,7 +72,7 @@ class BlinkinLEDs extends FtcRevBlinkin
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray)
-            // Lowest
+            // Lowest priority.
         };
         setPatternPriorities(ledPatternPriorities);
     }   //BlinkinLEDs

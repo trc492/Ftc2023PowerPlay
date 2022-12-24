@@ -104,6 +104,7 @@ public class Robot
              RobotParams.Preferences.useTensorFlow ||
              RobotParams.Preferences.useEasyOpenCV))
         {
+            // Don't need to enable vision for TeleOp because we are not doing auto-assist cone pickup (yet).
             vision = new Vision(this);
         }
         //
@@ -159,6 +160,7 @@ public class Robot
                         .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
+                    // Set asymmetric power limits so down power is smaller since it's helped by gravity.
                     elevator.getPidController().setOutputRange(-RobotParams.ELEVATOR_DOWN_POWER_SCALE, 1.0);
                     elevator.setMsgTracer(globalTracer);
                 }
@@ -236,8 +238,12 @@ public class Robot
             robotDrive.driveBase.setOdometryEnabled(true);
             if (runMode != TrcRobot.RunMode.AUTO_MODE)
             {
+                // In TeleOp or Test mode. If we are not running a competition match, autonomous may not have run
+                // prior to this. Therefore, we cannot inherit the robot position from previous autonomous mode.
+                // In this case, we will just assume previous robot start position.
                 if (endOfAutoRobotPose != null)
                 {
+                    // We had a previous autonomous run that saved the robot position at the end, use it.
                     robotDrive.driveBase.setFieldPosition(endOfAutoRobotPose);
                     globalTracer.traceInfo(funcName, "Restore saved RobotPose=%s", endOfAutoRobotPose);
                 }
@@ -245,13 +251,14 @@ public class Robot
                 {
                     // There was no saved robotPose, use previous autonomous start position. In case we didn't even
                     // have a previous autonomous run (e.g. just powering up the robot and go into TeleOp), then we
-                    // will default to RED_LEFT starting position.
+                    // will default to RED_LEFT starting position which is the AutoChoices default.
                     robotDrive.setAutoStartPosition(FtcAuto.autoChoices);
                     globalTracer.traceInfo(
                         funcName, "No saved RobotPose, use autoChoiceStartPos=%s",
                         robotDrive.driveBase.getFieldPosition());
                 }
             }
+            // Consume it so it's no longer valid for next run.
             endOfAutoRobotPose = null;
         }
         //
@@ -291,10 +298,6 @@ public class Robot
         TrcServo.printElapsedTime(globalTracer);
         TrcServo.setElapsedTimerEnabled(false);
         //
-        // Stop all auto-assists tasks if any.
-        //
-
-        //
         // Disable vision.
         //
         if (vision != null)
@@ -311,23 +314,18 @@ public class Robot
                 vision.tensorFlowShutdown();
             }
 
-            if (vision.frontEocvVision != null)
+            if (vision.eocvVision != null)
             {
-                globalTracer.traceInfo(funcName, "Disabling FrontEocvVision.");
-                vision.frontEocvVision.setEnabled(false);
+                globalTracer.traceInfo(funcName, "Disabling EocvVision.");
+                vision.eocvVision.setEnabled(false);
             }
-
-            if (vision.elevatorEocvVision != null)
-            {
-                globalTracer.traceInfo(funcName, "Disabling ElevatorEocvVision.");
-                vision.elevatorEocvVision.setEnabled(false);
-            }
-        }
+       }
 
         if (robotDrive != null)
         {
             if (runMode == TrcRobot.RunMode.AUTO_MODE)
             {
+                // Save current robot location at the end of autonomous so subsequent teleop run can restore it.
                 endOfAutoRobotPose = robotDrive.driveBase.getFieldPosition();
                 globalTracer.traceInfo(funcName, "Saved robot pose=%s", endOfAutoRobotPose);
             }
@@ -346,7 +344,8 @@ public class Robot
     }   //stopMode
 
     /**
-     * This method zero calibrates all subsystems.
+     * This method zero calibrates all subsystems. We zero calibrate the arm and elevator first before the turret
+     * because if the arm is down, it will hit the drive motors when turning the turret.
      */
     public void zeroCalibrate()
     {
@@ -360,6 +359,7 @@ public class Robot
 
         if (arm != null)
         {
+            // Set up a notification event for zero calibrating the arm so we get a callback.
             TrcEvent callbackEvent = new TrcEvent("zeroCalEvent");
             callbackEvent.setCallback(this::zeroCalTurret, null);
             globalTracer.traceInfo(funcName, "Zero calibrating arm.");
@@ -367,6 +367,7 @@ public class Robot
         }
         else
         {
+            // There is no arm to worry about, so just zero calibrate the turret.
             zeroCalTurret(null);
         }
     }   //zeroCalibrate
@@ -413,7 +414,7 @@ public class Robot
     }   //setGrabberAutoAssistOn
 
     /**
-     * This method returns the power required to make the elevator gravity neutral.
+     * This method returns the power required to make the elevator gravity neutral (i.e. held in place at any height).
      *
      * @param currPower specifies the current motor power.
      * @return elevator gravity compensation power.

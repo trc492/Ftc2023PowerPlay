@@ -37,7 +37,6 @@ public class MecanumDrive extends RobotDrive
 {
     private static final boolean logPoseEvents = true;
     private static final boolean tracePidInfo = false;
-    private final Robot robot;
 
     /**
      * Constructor: Create an instance of the object.
@@ -48,7 +47,6 @@ public class MecanumDrive extends RobotDrive
     {
         super();
 
-        this.robot = robot;
         lfDriveMotor = createDriveMotor(RobotParams.HWNAME_LFDRIVE_MOTOR, RobotParams.LEFT_WHEEL_INVERTED);
         lbDriveMotor = createDriveMotor(RobotParams.HWNAME_LBDRIVE_MOTOR, RobotParams.LEFT_WHEEL_INVERTED);
         rfDriveMotor = createDriveMotor(RobotParams.HWNAME_RFDRIVE_MOTOR, RobotParams.RIGHT_WHEEL_INVERTED);
@@ -113,15 +111,5 @@ public class MecanumDrive extends RobotDrive
         gridDrive = new TrcGridDrive(driveBase, purePursuitDrive, RobotParams.GRIDDRIVE_CELL_SIZE);
         gridDrive.setMsgTracer(robot.globalTracer);
     }   //MecanumDrive
-
-    /**
-     * This method returns the grabber sensor value for pidDistDrive.
-     *
-     * @return grabber sensor value.
-     */
-    private double getGrabberSensorValue()
-    {
-        return robot.grabber != null? robot.grabber.getSensorValue(): 0.0;
-    }   //getGrabberSensorValue
 
 }   //class MecanumDrive

@@ -47,6 +47,9 @@ public class TensorFlowVision
 
     /**
      * Constructor: Create an instance of the object.
+     *
+     * @param vuforia specifies the FtcVuforia object.
+     * @param tracer specifies the tracer to use for logging events.
      */
     public TensorFlowVision(FtcVuforia vuforia, TrcDbgTrace tracer)
     {
@@ -108,10 +111,26 @@ public class TensorFlowVision
         }
     }   //shutdown
 
-    public void setZoomFactor(double factor)
+    /**
+     * This method sets the zoom factor and aspect ratio for the camera.
+     *
+     * @param factor specifies the camera magnification factor.
+     * @param aspectRatio specifies the camera aspect ratio (width/height).
+     */
+    public void setZoom(double factor, double aspectRatio)
+    {
+        tensorFlow.setZoom(factor, aspectRatio);
+    }   //setZoom
+
+    /**
+     * This method sets the zoom factor for the camera.
+     *
+     * @param factor specifies the camera magnification factor.
+     */
+    public void setZoom(double factor)
     {
         tensorFlow.setZoom(factor, 16.0/9.0);
-    }   //setZoomFactor
+    }   //setZoom
 
     /**
      * This method returns an array of detected targets from TensorFlow vision.

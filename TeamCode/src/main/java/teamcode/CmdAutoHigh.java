@@ -71,7 +71,6 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
         timer = new TrcTimer(moduleName);
         event = new TrcEvent(moduleName);
         sm = new TrcStateMachine<>(moduleName);
-        robot.robotDrive.purePursuitDrive.setFastModeEnabled(true);
         sm.start(State.START_DELAY);
     }   //CmdAutoFarCarousel
 
@@ -182,14 +181,12 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        // Todo: add option to do center high poles
                         // Prepare all subsystems for pre-conditions of autoScoreCone: arm up, turret at start scan
                         // position.
                         // This operation takes about 5 sec.
                         robot.arm.setTarget(RobotParams.ARM_UP_POS, false);
-                        turretStartPos =
-                            autoChoices.startPos == FtcAuto.StartPos.LEFT?
-                                RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
+                        turretStartPos = autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                            RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
                         robot.turret.setTarget(turretStartPos - RobotParams.TURRET_SCAN_OFFSET, true, 0.8, null, 0.0);
                         if (autoChoices.alliance == FtcAuto.Alliance.BLUE_ALLIANCE &&
                             autoChoices.startPos == FtcAuto.StartPos.LEFT)
@@ -233,7 +230,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     robot.turret.setTarget(RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                        robot.robotDrive.getAutoTargetPoint(RobotParams.LOOK_FOR_CONE_POS_LEFT, FtcAuto.autoChoices));
+                        robot.robotDrive.getAutoTargetPoint(
+                            RobotParams.LOOK_FOR_CONE_POS_REDLEFT, FtcAuto.autoChoices));
                     sm.waitForSingleEvent(event, State.AUTO_PICKUP_CONE);
                     break;
 
@@ -246,7 +244,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     {
                         robot.pickupConeTask.autoAssistPickupCone(
                             conesRemaining,
-                            visionAssist && robot.vision != null && robot.vision.frontEocvVision != null,
+                            visionAssist && robot.vision != null && robot.vision.eocvVision != null,
                             event);
                         conesRemaining--;
                         sm.waitForSingleEvent(event, State.BACK_TO_SCORE_POSITION);
@@ -284,18 +282,29 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     }
                     else
                     {
-                        TrcPose2D parkPos =
-                            autoChoices.parking == FtcAuto.Parking.NEAR_TILE?
-                                RobotParams.PARKPOS_RED_LEFT_NEAR[signalPos - 1]:
-                                RobotParams.PARKPOS_RED_LEFT_FAR[signalPos - 1];
+                        // Park positions are not mirrored between left and right start positions so we need to adjust
+                        // it for getAutoTargetPoint because it expects mirror positions.
+                        int parkPosIndex = autoChoices.startPos == FtcAuto.StartPos.LEFT?
+                            (signalPos - 1): (3 - signalPos);
+                        TrcPose2D parkPos = autoChoices.parking == FtcAuto.Parking.FAR_TILE?
+                            RobotParams.PARKPOS_REDLEFT_FAR[parkPosIndex]:
+                            RobotParams.PARKPOS_REDLEFT_NEAR[parkPosIndex];
                         // Calling PurePursuit to get to the parking position will only work for FAR_TILE.
-                        // For NEAR_TILE, this will hit junctions on its path.
+                        // For NEAR_TILE, this will hit junctions on its path. We decided not to deal with it
+                        // because we always choose FAR_TILE. There is no reason to park near. If we decide
+                        // to park near, we need to use gridDrive.driveToEndPoint to avoid obstacles (like the
+                        // commented lines below). But after cycling, odometry may be off a little and this has
+                        // the risk of not parked exactly within the tile. Samuel decided to just use PurePursuit.
+                        // But arguably, PurePursuit also uses odometry, so this is not a valid argument. The fact
+                        // that park FAR is a straight shot and park NEAR requires a turn is probably the reason
+                        // of the inaccuracy. Therefore, I think forgoing park NEAR is a good decision but whether
+                        // using PurePursuit or GridDrive should not affect the outcome. Didn't test this theory
+                        // because this is a change during competition but I believe GridDrive should have worked.
                         robot.robotDrive.purePursuitDrive.start(
                             event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            robot.robotDrive.getAutoTargetPoint(parkPos.x, parkPos.y, -90, autoChoices));
+                            robot.robotDrive.getAutoTargetPoint(parkPos, autoChoices));
 //                        // PurePursuitDrive may hit obstacles especially parking at NEAR_TILE, so call
 //                        // gridDrive.driveToEndPoint instead. It will avoid obstacles.
-//
 //                        robot.robotDrive.gridDrive.driveToEndPoint(
 //                            robot.robotDrive.getAutoTargetPoint(parkPos, autoChoices));
 

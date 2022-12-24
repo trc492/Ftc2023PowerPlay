@@ -234,8 +234,7 @@ public class Turret
      */
     public double getPosition()
     {
-        int encoderPos = motor.motor.getCurrentPosition();
-        rawMotorPosition = encoderPos * RobotParams.TURRET_DEG_PER_COUNT;
+        rawMotorPosition = motor.motor.getCurrentPosition() * RobotParams.TURRET_DEG_PER_COUNT;
         return pidTurret.getPosition();
     }   //getPosition
 

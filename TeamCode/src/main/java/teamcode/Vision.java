@@ -25,6 +25,7 @@ package teamcode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.opencv.core.Rect;
+import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -52,8 +53,7 @@ public class Vision
     private final Robot robot;
     public VuforiaVision vuforiaVision;
     public TensorFlowVision tensorFlowVision;
-    public EocvVision frontEocvVision;
-    public EocvVision elevatorEocvVision;
+    public EocvVision eocvVision;
 
     private int lastSignal = 0;
 
@@ -73,66 +73,27 @@ public class Vision
         this.robot = robot;
         if (RobotParams.Preferences.useEasyOpenCV)
         {
-            OpenCvWebcam frontWebcam = null, elevatorWebcam = null;
+            OpenCvWebcam webcam;
 
             if (RobotParams.Preferences.showEasyOpenCvView)
             {
-                int[] viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(
-                    cameraViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
-
-                if (RobotParams.Preferences.useFrontWebcam)
-                {
-                    frontWebcam =
-                        OpenCvCameraFactory.getInstance().createWebcam(
-                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM),
-                            viewportContainerIds[0]);
-                    frontWebcam.showFpsMeterOnViewport(false);
-                }
-
-                if (RobotParams.Preferences.useElevatorWebcam)
-                {
-                    elevatorWebcam =
-                        OpenCvCameraFactory.getInstance().createWebcam(
-                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM),
-                            viewportContainerIds[1]);
-                    elevatorWebcam.showFpsMeterOnViewport(false);
-                }
+                webcam = OpenCvCameraFactory.getInstance().createWebcam(
+                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM), cameraViewId);
+                webcam.showFpsMeterOnViewport(false);
             }
             else
             {
-                if (RobotParams.Preferences.useFrontWebcam)
-                {
-                    frontWebcam =
-                        OpenCvCameraFactory.getInstance().createWebcam(
-                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM));
-                }
-
-                if (RobotParams.Preferences.useElevatorWebcam)
-                {
-                    elevatorWebcam =
-                        OpenCvCameraFactory.getInstance().createWebcam(
-                            opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_ELEVATOR_WEBCAM));
-                }
+                webcam = OpenCvCameraFactory.getInstance().createWebcam(
+                    opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM));
             }
             // EOCV sometimes timed out on opening the camera. The default timeout was 2 seconds. It seems setting
-            // it to 3 seconds would do wonder here.
+            // it to 5 seconds would do wonder here.
+            webcam.setMillisecondsPermissionTimeout(RobotParams.WEBCAM_PERMISSION_TIMEOUT);
+
             robot.globalTracer.traceInfo("Vision", "Starting EocvVision...");
-
-            if (frontWebcam != null)
-            {
-                frontWebcam.setMillisecondsPermissionTimeout(RobotParams.FRONTCAM_PERMISSION_TIMEOUT);
-                frontEocvVision = new EocvVision(
-                    "frontEocvVision", RobotParams.FRONTCAM_IMAGE_WIDTH, RobotParams.FRONTCAM_IMAGE_HEIGHT,
-                    RobotParams.cameraRect, RobotParams.worldRect, frontWebcam, OpenCvCameraRotation.UPRIGHT, null);
-            }
-
-            if (elevatorWebcam != null)
-            {
-                elevatorWebcam.setMillisecondsPermissionTimeout(RobotParams.ELEVATORCAM_PERMISSION_TIMEOUT);
-                elevatorEocvVision = new EocvVision(
-                    "elevatorEocvVision", RobotParams.ELEVATORCAM_IMAGE_WIDTH, RobotParams.ELEVATORCAM_IMAGE_HEIGHT,
-                    null, null, elevatorWebcam, OpenCvCameraRotation.SIDEWAYS_RIGHT, null);
-            }
+            eocvVision = new EocvVision(
+                "eocvVision", RobotParams.WEBCAM_IMAGE_WIDTH, RobotParams.WEBCAM_IMAGE_HEIGHT,
+                RobotParams.cameraRect, RobotParams.worldRect, webcam, OpenCvCameraRotation.UPRIGHT, null);
         }
         else if (RobotParams.Preferences.useVuforia || RobotParams.Preferences.useTensorFlow)
         {
@@ -149,7 +110,7 @@ public class Vision
                     new VuforiaLocalizer.Parameters(cameraViewId): new VuforiaLocalizer.Parameters();
 
             vuforiaParams.vuforiaLicenseKey = VUFORIA_LICENSE_KEY;
-            vuforiaParams.cameraName = opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_FRONT_WEBCAM);
+            vuforiaParams.cameraName = opMode.hardwareMap.get(WebcamName.class, RobotParams.HWNAME_WEBCAM);
             vuforiaParams.useExtendedTracking = false;
             vuforiaParams.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
             FtcVuforia vuforia = new FtcVuforia(vuforiaParams);
@@ -172,6 +133,22 @@ public class Vision
     }   //tensorFlowShutdown
 
     /**
+     * This method updates the LED state to show the vision detected object.
+     *
+     * @param label specifies the detected object.
+     */
+    private void updateVisionLEDs(String label)
+    {
+        if (label != null && robot.blinkin != null)
+        {
+            robot.blinkin.setPatternState(BlinkinLEDs.LABEL_BOLT, false);
+            robot.blinkin.setPatternState(BlinkinLEDs.LABEL_BULB, false);
+            robot.blinkin.setPatternState(BlinkinLEDs.LABEL_PANEL, false);
+            robot.blinkin.setPatternState(label, true, 1.0);
+        }
+    }   //updateVisionLEDs
+
+    /**
      * This method calls vision to detect the signal and returns the detected info.
      *
      * @return detected signal info, null if none detected.
@@ -179,19 +156,30 @@ public class Vision
     public TrcVisionTargetInfo<?> getDetectedSignalInfo()
     {
         TrcVisionTargetInfo<?>[] targets = null;
+        String label = null;
 
         if (tensorFlowVision != null && tensorFlowVision.isEnabled())
         {
             targets = tensorFlowVision.getDetectedTargetsInfo(
                 null, null, this::compareConfidence,
-                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+                RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.WEBCAM_HEIGHT_OFFSET);
+            if (targets != null)
+            {
+                label = ((TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>) targets[0]).detectedObj.label;
+            }
         }
-        else if (frontEocvVision != null && frontEocvVision.isEnabled() &&
-                 frontEocvVision.getDetectObjectType() == EocvVision.ObjectType.APRIL_TAG)
+        else if (eocvVision != null && eocvVision.isEnabled() &&
+                 eocvVision.getDetectObjectType() == EocvVision.ObjectType.APRIL_TAG)
         {
-            targets = frontEocvVision.getDetectedTargetsInfo(
-                null, null, RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.FRONTCAM_HEIGHT_OFFSET);
+            targets = eocvVision.getDetectedTargetsInfo(
+                null, null, RobotParams.APRILTAG_HEIGHT_OFFSET, RobotParams.WEBCAM_HEIGHT_OFFSET);
+            if (targets != null)
+            {
+                label = TARGET_LABELS[
+                    ((FtcEocvAprilTagPipeline.DetectedObject) targets[0].detectedObj).object.id];
+            }
         }
+        updateVisionLEDs(label);
 
         return targets != null? targets[0]: null;
     }   //getDetectedSignalInfo
@@ -226,7 +214,7 @@ public class Vision
                         break;
                 }
             }
-            else if (frontEocvVision != null && frontEocvVision.getPipeline() instanceof FtcEocvAprilTagPipeline)
+            else if (eocvVision != null && eocvVision.getPipeline() instanceof FtcEocvAprilTagPipeline)
             {
                 FtcEocvAprilTagPipeline.DetectedObject detectedObj =
                     (FtcEocvAprilTagPipeline.DetectedObject) target.detectedObj;
@@ -296,13 +284,13 @@ public class Vision
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
-        if (frontEocvVision != null && frontEocvVision.isEnabled())
+        if (eocvVision != null && eocvVision.isEnabled())
         {
-            EocvVision.ObjectType detectObjType = frontEocvVision.getDetectObjectType();
+            EocvVision.ObjectType detectObjType = eocvVision.getDetectObjectType();
 
             if (detectObjType == EocvVision.ObjectType.RED_CONE || detectObjType == EocvVision.ObjectType.BLUE_CONE)
             {
-                targets = frontEocvVision.getDetectedTargetsInfo(null, this::compareBottomY, 0.0, 0.0);
+                targets = eocvVision.getDetectedTargetsInfo(null, this::compareBottomY, 0.0, 0.0);
 
                 if (targets != null && robot.blinkin != null)
                 {
@@ -318,62 +306,6 @@ public class Vision
     }   //getDetectedConeInfo
 
     /**
-     * This method calls vision to detect the pole and returns the detected info.
-     *
-     * @return detected pole info, null if none detected.
-     */
-    public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedPoleInfo()
-    {
-        TrcVisionTargetInfo<?>[] targets = null;
-
-        if (elevatorEocvVision != null && elevatorEocvVision.isEnabled())
-        {
-            targets = elevatorEocvVision.getDetectedTargetsInfo(null, null, 0.0, 0.0);
-
-            if (targets != null && robot.blinkin != null)
-            {
-                robot.blinkin.setPatternState(BlinkinLEDs.GOT_YELLOW_POLE, true, 1.0);
-            }
-        }
-
-        return targets != null? (TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>) targets[0]: null;
-    }   //getDetectedPoleInfo
-
-    /**
-     * This method returns the angle of the detected pole.
-     *
-     * @return detected pole angle.
-     */
-    public Double getPoleAngle()
-    {
-        Double poleAngle = null;
-        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> poleInfo = getDetectedPoleInfo();
-
-        if (poleInfo != null)
-        {
-            poleAngle = poleInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
-        }
-
-        return poleAngle;
-    }   //getPoleAngle
-    /**
-     * This method returns the angle of the detected pole.
-     *
-     * @return detected pole angle.
-     */
-    public Double getConeAngle()
-    {
-        Double coneAngle = null;
-        TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> coneInfo = getDetectedPoleInfo();
-
-        if (coneInfo != null)
-        {
-            coneAngle = coneInfo.distanceFromImageCenter.x * RobotParams.ELEVATORCAM_ANGLE_PER_PIXEL;
-        }
-
-        return coneAngle;
-    }   //getPoleAngle
-    /**
      * This method is called by the Arrays.sort to sort the target object by decreasing confidence.
      *
      * @param a specifies the first target
@@ -386,47 +318,6 @@ public class Vision
     {
         return (int)((b.detectedObj.confidence - a.detectedObj.confidence)*100);
     }   //compareConfidence
-
-    /**
-     * This method is called by the Arrays.sort to sort the target object by increasing object distance.
-     *
-     * @param a specifies the first target
-     * @param b specifies the second target.
-     * @return negative value if a has smaller distance to image center than b, 0 if a and b have equal distance to
-     * image center, positive value if a has larger distance to image center than b.
-     */
-    private int compareDistanceFromCamera(TrcVisionTargetInfo<?> a, TrcVisionTargetInfo<?> b)
-    {
-        return (int)((Math.abs(a.distanceFromCamera.y) - Math.abs(b.distanceFromCamera.y))*1000);
-    }   //compareDistanceFromCamera
-
-    /**
-     * This method is called by the Arrays.sort to sort the target object by increasing camera angle.
-     *
-     * @param a specifies the first target
-     * @param b specifies the second target.
-     * @return negative value if a has smaller camera angle than b, 0 if a and b have equal camera angle, positive
-     *         value if a has larger camera angle than b.
-     */
-    private int compareCameraAngle(TrcVisionTargetInfo<?> a, TrcVisionTargetInfo<?> b)
-    {
-        return (int)((Math.abs(a.horizontalAngle) - Math.abs(b.horizontalAngle))*1000);
-    }   //compareCameraAngle
-
-    /**
-     * This method is called by the Arrays.sort to sort the target object by decreasing object size.
-     *
-     * @param a specifies the first target
-     * @param b specifies the second target.
-     * @return negative value if a has smaller area than b, 0 if a and b have equal area, positive value if a has
-     *         larger area than b.
-     */
-    private int compareObjectSize(
-        TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> a,
-        TrcVisionTargetInfo<TrcOpenCvDetector.DetectedObject<?>> b)
-    {
-        return (int)((a.detectedObj.getArea() - b.detectedObj.getArea())*1000);
-    }   //compareObjectSize
 
     /**
      * This method is called by the Arrays.sort to sort the target object by decreasing bottom Y.

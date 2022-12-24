@@ -135,8 +135,7 @@ public class EocvVision extends FtcEocvDetector
 
         aprilTagPipeline = new FtcEocvAprilTagPipeline(
             AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.APRILTAG_SIZE,
-            RobotParams.FRONTCAM_FX, RobotParams.FRONTCAM_FY, RobotParams.FRONTCAM_CX, RobotParams.FRONTCAM_CY,
-            tracer);
+            RobotParams.WEBCAM_FX, RobotParams.WEBCAM_FY, RobotParams.WEBCAM_CX, RobotParams.WEBCAM_CY, tracer);
         redConePipeline = new FtcEocvColorBlobPipeline(
             "redConePipeline", colorConversion, colorThresholdsRedCone, redConeFilterContourParams, tracer);
         blueConePipeline = new FtcEocvColorBlobPipeline(
@@ -144,16 +143,7 @@ public class EocvVision extends FtcEocvDetector
         yellowPolePipeline = new FtcEocvColorBlobPipeline(
             "yellowPolePipeline", colorConversion, colorThresholdsYellowPole, poleFilterContourParams, tracer);
         // Set default pipeline and enable it.
-        if (instanceName.equals("frontEocvVision"))
-        {
-            // Front camera default to detect AprilTag.
-            setDetectObjectType(ObjectType.APRIL_TAG);
-        }
-        else
-        {
-            // Elevator camera default to detect yellow pole.
-            setDetectObjectType(ObjectType.YELLOW_POLE);
-        }
+        setDetectObjectType(ObjectType.APRIL_TAG);
     }   //EocvVision
 
     /**
@@ -206,9 +196,9 @@ public class EocvVision extends FtcEocvDetector
     }   //setNextObjectType
 
     /**
-     * This method returns the detect object type.
+     * This method returns the selected detect object type.
      *
-     * @return detect object type.
+     * @return selected detect object type.
      */
     public ObjectType getDetectObjectType()
     {
