@@ -37,6 +37,7 @@ import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
+import TrcCommonLib.trclib.TrcTimer;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import TrcFtcLib.ftclib.FtcChoiceMenu;
@@ -372,7 +373,7 @@ public class FtcTest extends FtcTeleOp
             case DRIVE_SPEED_TEST:
                 if (!RobotParams.Preferences.noRobot)
                 {
-                    double currTime = TrcUtil.getCurrentTime();
+                    double currTime = TrcTimer.getCurrentTime();
                     TrcPose2D velPose = robot.robotDrive.driveBase.getFieldVelocity();
                     double velocity = TrcUtil.magnitude(velPose.x, velPose.y);
                     double acceleration = 0.0;

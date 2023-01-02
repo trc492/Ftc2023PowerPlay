@@ -31,7 +31,6 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcTimer;
-import TrcCommonLib.trclib.TrcUtil;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 
 /**
@@ -281,9 +280,9 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                     // We are using vision and vision did not detect anything, try again with timeout.
                     if (expireTime == null)
                     {
-                        expireTime = TrcUtil.getCurrentTime() + 0.5;
+                        expireTime = TrcTimer.getCurrentTime() + 0.5;
                     }
-                    else if (TrcUtil.getCurrentTime() >= expireTime)
+                    else if (TrcTimer.getCurrentTime() >= expireTime)
                     {
                         // Times up, reset expireTime, give up and go to next state.
                         if (msgTracer != null)

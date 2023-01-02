@@ -27,7 +27,6 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTimer;
-import TrcCommonLib.trclib.TrcUtil;
 
 class CmdAutoHigh implements TrcRobot.RobotCommand
 {
@@ -236,7 +235,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case AUTO_PICKUP_CONE:
-                    if (30.0 - TrcUtil.getModeElapsedTime() < RobotParams.CYCLE_TIME + RobotParams.PARK_TIME)
+                    if (30.0 - TrcTimer.getModeElapsedTime() < RobotParams.CYCLE_TIME + RobotParams.PARK_TIME)
                     {
                         sm.setState(State.PARK);
                     }
