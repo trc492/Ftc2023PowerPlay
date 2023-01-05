@@ -354,9 +354,11 @@ public class FtcTest extends FtcTeleOp
      * mode, you will typically put that code here.
      *
      * @param elapsedTime specifies the elapsed time since the mode started.
+     * @param slowPeriodicLoop specifies true if it is running the slow periodic loop on the main robot thread,
+     *        false otherwise.
      */
     @Override
-    public void fastPeriodic(double elapsedTime)
+    public void periodic(double elapsedTime, boolean slowPeriodicLoop)
     {
         //
         // Run the testCommand if any.
@@ -467,57 +469,49 @@ public class FtcTest extends FtcTeleOp
                 elapsedTimer.getAverageElapsedTime(), elapsedTimer.getMinElapsedTime(),
                 elapsedTimer.getMaxElapsedTime());
         }
-    }   //fastPeriodic
 
-    /**
-     * This method is called periodically at a slow rate. Typically, you put code that doesn't require frequent
-     * update here. For example, TeleOp joystick code or status display code can be put here since human responses
-     * are considered slow.
-     *
-     * @param elapsedTime specifies the elapsed time since the mode started.
-     */
-    @Override
-    public void slowPeriodic(double elapsedTime)
-    {
-        if (allowTeleOp())
+        if (slowPeriodicLoop)
         {
-            //
-            // Allow TeleOp to run so we can control the robot in subsystem test or drive speed test modes.
-            //
-            super.slowPeriodic(elapsedTime);
+            if (allowTeleOp())
+            {
+                //
+                // Allow TeleOp to run so we can control the robot in subsystem test or drive speed test modes.
+                //
+                super.periodic(elapsedTime, slowPeriodicLoop);
+            }
+
+            switch (testChoices.test)
+            {
+                case SENSORS_TEST:
+                case SUBSYSTEMS_TEST:
+                    doSensorsTest();
+                    break;
+
+                case VISION_TEST:
+                    doVisionTest();
+                    break;
+
+                case CALIBRATE_SWERVE_STEERING:
+                    if (robot.robotDrive != null && (robot.robotDrive instanceof SwerveDrive))
+                    {
+                        SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
+
+                        swerveDrive.setSteeringServoPosition(posDataIndices[posIndex]);
+                        robot.dashboard.displayPrintf(
+                            1, "State: pos=%s, wheel=%s", posNames[posIndex], SwerveDrive.servoNames[wheelIndex]);
+                        robot.dashboard.displayPrintf(
+                            2, "Front Steer: lfPos=%.2f, rfPos=%.2f",
+                            swerveDrive.getSteeringServoPosition(0, posDataIndices[posIndex]),
+                            swerveDrive.getSteeringServoPosition(1, posDataIndices[posIndex]));
+                        robot.dashboard.displayPrintf(
+                            3, "Back Steer: lbPos=%.2f, rbPos=%.2f",
+                            swerveDrive.getSteeringServoPosition(2, posDataIndices[posIndex]),
+                            swerveDrive.getSteeringServoPosition(3, posDataIndices[posIndex]));
+                    }
+                    break;
+            }
         }
-
-        switch (testChoices.test)
-        {
-            case SENSORS_TEST:
-            case SUBSYSTEMS_TEST:
-                doSensorsTest();
-                break;
-
-            case VISION_TEST:
-                doVisionTest();
-                break;
-
-            case CALIBRATE_SWERVE_STEERING:
-                if (robot.robotDrive != null && (robot.robotDrive instanceof SwerveDrive))
-                {
-                    SwerveDrive swerveDrive = (SwerveDrive) robot.robotDrive;
-
-                    swerveDrive.setSteeringServoPosition(posDataIndices[posIndex]);
-                    robot.dashboard.displayPrintf(
-                        1, "State: pos=%s, wheel=%s", posNames[posIndex], SwerveDrive.servoNames[wheelIndex]);
-                    robot.dashboard.displayPrintf(
-                        2, "Front Steer: lfPos=%.2f, rfPos=%.2f",
-                        swerveDrive.getSteeringServoPosition(0, posDataIndices[posIndex]),
-                        swerveDrive.getSteeringServoPosition(1, posDataIndices[posIndex]));
-                    robot.dashboard.displayPrintf(
-                        3, "Back Steer: lbPos=%.2f, rbPos=%.2f",
-                        swerveDrive.getSteeringServoPosition(2, posDataIndices[posIndex]),
-                        swerveDrive.getSteeringServoPosition(3, posDataIndices[posIndex]));
-                }
-                break;
-        }
-    }   //slowPeriodic
+    }   //periodic
 
     //
     // Overrides TrcGameController.ButtonHandler in TeleOp.

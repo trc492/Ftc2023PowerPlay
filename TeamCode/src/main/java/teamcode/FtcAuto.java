@@ -310,9 +310,11 @@ public class FtcAuto extends FtcOpMode
      * mode, you will typically put that code here.
      *
      * @param elapsedTime specifies the elapsed time since the mode started.
+     * @param slowPeriodicLoop specifies true if it is running the slow periodic loop on the main robot thread,
+     *        false otherwise.
      */
     @Override
-    public void fastPeriodic(double elapsedTime)
+    public void periodic(double elapsedTime, boolean slowPeriodicLoop)
     {
         if (autoCommand != null)
         {
@@ -321,7 +323,7 @@ public class FtcAuto extends FtcOpMode
             //
             autoCommand.cmdPeriodic(elapsedTime);
         }
-    }   //fastPeriodic
+    }   //periodic
 
     /**
      * This method creates the autonomous menus, displays them and stores the choices.

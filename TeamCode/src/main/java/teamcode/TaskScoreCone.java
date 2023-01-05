@@ -86,7 +86,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      */
     public TaskScoreCone(String ownerName, Robot robot, TrcDbgTrace msgTracer)
     {
-        super(moduleName, ownerName, TrcTaskMgr.TaskType.FAST_POSTPERIODIC_TASK, msgTracer);
+        super(moduleName, ownerName, TrcTaskMgr.TaskType.POST_PERIODIC_TASK, msgTracer);
         this.ownerName = ownerName;
         this.robot = robot;
         this.msgTracer = msgTracer;
@@ -255,9 +255,12 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
      * @param state specifies the current state of the task.
      * @param taskType specifies the type of task being run.
      * @param runMode specifies the competition mode (e.g. Autonomous, TeleOp, Test).
+     * @param slowPeriodicLoop specifies true if it is running the slow periodic loop on the main robot thread,
+     *        false otherwise.
      */
     @Override
-    protected void runTaskState(Object params, State state, TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode)
+    protected void runTaskState(
+        Object params, State state, TrcTaskMgr.TaskType taskType, TrcRobot.RunMode runMode, boolean slowPeriodicLoop)
     {
         final String funcName = "runTaskState";
         TaskParams taskParams = (TaskParams) params;

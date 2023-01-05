@@ -180,117 +180,122 @@ public class FtcTeleOp extends FtcOpMode
     }   //stopMode
 
     /**
-     * This method is called periodically at a slow rate. Typically, you put code that doesn't require frequent
-     * update here. For example, TeleOp joystick code or status display code can be put here since human responses
-     * are considered slow.
+     * This method is called periodically on the main robot thread. Typically, you put TeleOp control code here that
+     * doesn't require frequent update For example, TeleOp joystick code or status display code can be put here since
+     * human responses are considered slow.
      *
      * @param elapsedTime specifies the elapsed time since the mode started.
+     * @param slowPeriodicLoop specifies true if it is running the slow periodic loop on the main robot thread,
+     *        false otherwise.
      */
     @Override
-    public void slowPeriodic(double elapsedTime)
+    public void periodic(double elapsedTime, boolean slowPeriodicLoop)
     {
-        //
-        // DriveBase subsystem.
-        //
-        if (robot.robotDrive != null)
+        if (slowPeriodicLoop)
         {
-            double[] inputs = driverGamepad.getDriveInputs(RobotParams.ROBOT_DRIVE_MODE, true, drivePowerScale);
-            boolean turnOnly = inputs[0] == 0.0 && inputs[1] == 0.0;
-
-            if (pivotTurnMode && turnOnly)
+            //
+            // DriveBase subsystem.
+            //
+            if (robot.robotDrive != null)
             {
-                double leftPower, rightPower;
-                if (inputs[2] >= 0.0)
+                double[] inputs = driverGamepad.getDriveInputs(RobotParams.ROBOT_DRIVE_MODE, true, drivePowerScale);
+                boolean turnOnly = inputs[0] == 0.0 && inputs[1] == 0.0;
+
+                if (pivotTurnMode && turnOnly)
                 {
-                    leftPower = inputs[2];
-                    rightPower = 0.0;
+                    double leftPower, rightPower;
+                    if (inputs[2] >= 0.0)
+                    {
+                        leftPower = inputs[2];
+                        rightPower = 0.0;
+                    }
+                    else
+                    {
+                        leftPower = 0.0;
+                        rightPower = -inputs[2];
+                    }
+                    robot.robotDrive.driveBase.tankDrive(leftPower, rightPower);
+                }
+                else if (robot.robotDrive.driveBase.supportsHolonomicDrive())
+                {
+                    inputs[2] *= RobotParams.SLOW_DRIVE_POWER_SCALE;
+                    robot.robotDrive.driveBase.holonomicDrive(
+                        null, inputs[0], inputs[1], inputs[2],
+                        robot.robotDrive.driveBase.getDriveGyroAngle(driveOrientation));
                 }
                 else
                 {
-                    leftPower = 0.0;
-                    rightPower = -inputs[2];
+                    robot.robotDrive.driveBase.arcadeDrive(inputs[1], inputs[2]);
                 }
-                robot.robotDrive.driveBase.tankDrive(leftPower, rightPower);
+                robot.dashboard.displayPrintf(
+                    2, "Pose:%s,x=%.2f,y=%.2f,rot=%.2f",
+                    robot.robotDrive.driveBase.getFieldPosition(), inputs[0], inputs[1], inputs[2]);
             }
-            else if (robot.robotDrive.driveBase.supportsHolonomicDrive())
+            //
+            // Other subsystems.
+            //
+            if (robot.turret != null)
             {
-                inputs[2] *= RobotParams.SLOW_DRIVE_POWER_SCALE;
-                robot.robotDrive.driveBase.holonomicDrive(
-                    null, inputs[0], inputs[1], inputs[2],
-                    robot.robotDrive.driveBase.getDriveGyroAngle(driveOrientation));
+                double turretPower = -operatorGamepad.getTrigger(true)*RobotParams.TURRET_POWER_SCALE_TELEOP;
+
+                robot.turret.setPower(turretPower, !manualOverride);
+                robot.dashboard.displayPrintf(
+                    3, "Turret: pow=%.2f,pos=%.1f,limitSW=%s/%s,sensor=%.1f,aligned=%s",
+                    turretPower, robot.turret.getPosition(),
+                    robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive(),
+                    robot.turret.getSensorValue(), robot.turret.detectedTarget());
             }
-            else
+
+            if (robot.elevator != null)
             {
-                robot.robotDrive.driveBase.arcadeDrive(inputs[1], inputs[2]);
+                double elevatorPower = operatorGamepad.getRightStickY(true);
+
+                if (elevatorPower < 0.0)
+                {
+                    // Elevator is going down, gravity is helping here so we can scale the down power way down.
+                    elevatorPower *= RobotParams.ELEVATOR_DOWN_POWER_SCALE;
+                }
+
+                if (manualOverride)
+                {
+                    robot.elevator.setPower(elevatorPower);
+                }
+                else
+                {
+                    // Actively holding the elevator or it will fall by gravity.
+                    robot.elevator.setPidPower(elevatorPower, true);
+                }
+
+                robot.dashboard.displayPrintf(
+                    4, "Elevator: pow=%.2f,pos=%.1f,limitSW=%s,current=%.1f",
+                    elevatorPower, robot.elevator.getPosition(), robot.elevator.isLowerLimitSwitchActive(),
+                    robot.elevator.getMotor().getCurrent());
             }
-            robot.dashboard.displayPrintf(
-                2, "Pose:%s,x=%.2f,y=%.2f,rot=%.2f",
-                robot.robotDrive.driveBase.getFieldPosition(), inputs[0], inputs[1], inputs[2]);
+
+            if (robot.arm != null)
+            {
+                double armPower = -operatorGamepad.getLeftStickY(true);
+                if (manualOverride)
+                {
+                    robot.arm.setPower(armPower);
+                }
+                else
+                {
+                    // Arm is on worm-drive, so no need to hold it.
+                    robot.arm.setPidPower(armPower, false);
+                }
+                robot.dashboard.displayPrintf(
+                    5, "Arm: pow=%.2f,pos=%.1f,limitSW=%s",
+                    armPower, robot.arm.getPosition(), robot.arm.isLowerLimitSwitchActive());
+            }
+
+            if (robot.grabber != null)
+            {
+                robot.dashboard.displayPrintf(
+                    6, "Grabber: pos=%.2f,sensor=%.2f", robot.grabber.getPosition(), robot.grabber.getSensorValue());
+            }
         }
-        //
-        // Other subsystems.
-        //
-        if (robot.turret != null)
-        {
-            double turretPower = -operatorGamepad.getTrigger(true) * RobotParams.TURRET_POWER_SCALE_TELEOP;
-
-            robot.turret.setPower(turretPower, !manualOverride);
-            robot.dashboard.displayPrintf(
-                3, "Turret: pow=%.2f,pos=%.1f,limitSW=%s/%s,sensor=%.1f,aligned=%s",
-                turretPower, robot.turret.getPosition(),
-                robot.turret.isZeroPosSwitchActive(), robot.turret.isCalDirSwitchActive(),
-                robot.turret.getSensorValue(), robot.turret.detectedTarget());
-        }
-
-        if (robot.elevator != null)
-        {
-            double elevatorPower = operatorGamepad.getRightStickY(true);
-
-            if (elevatorPower < 0.0)
-            {
-                // Elevator is going down, gravity is helping here so we can scale the down power way down.
-                elevatorPower *= RobotParams.ELEVATOR_DOWN_POWER_SCALE;
-            }
-
-            if (manualOverride)
-            {
-                robot.elevator.setPower(elevatorPower);
-            }
-            else
-            {
-                // Actively holding the elevator or it will fall by gravity.
-                robot.elevator.setPidPower(elevatorPower, true);
-            }
-
-            robot.dashboard.displayPrintf(
-                4, "Elevator: pow=%.2f,pos=%.1f,limitSW=%s,current=%.1f",
-                elevatorPower, robot.elevator.getPosition(), robot.elevator.isLowerLimitSwitchActive(),
-                robot.elevator.getMotor().getCurrent());
-        }
-
-        if (robot.arm != null)
-        {
-            double armPower = -operatorGamepad.getLeftStickY(true);
-            if (manualOverride)
-            {
-                robot.arm.setPower(armPower);
-            }
-            else
-            {
-                // Arm is on worm-drive, so no need to hold it.
-                robot.arm.setPidPower(armPower, false);
-            }
-            robot.dashboard.displayPrintf(
-                5, "Arm: pow=%.2f,pos=%.1f,limitSW=%s",
-                armPower, robot.arm.getPosition(), robot.arm.isLowerLimitSwitchActive());
-        }
-
-        if (robot.grabber != null)
-        {
-            robot.dashboard.displayPrintf(
-                6, "Grabber: pos=%.2f,sensor=%.2f", robot.grabber.getPosition(), robot.grabber.getSensorValue());
-        }
-    }   //slowPeriodic
+    }   //periodic
 
     /**
      * This method updates the blinkin LEDs to show the drive orientation mode.
