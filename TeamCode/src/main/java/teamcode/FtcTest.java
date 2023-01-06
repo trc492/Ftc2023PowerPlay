@@ -349,9 +349,9 @@ public class FtcTest extends FtcTeleOp
     }   //stopMode
 
     /**
-     * This method is called periodically at a fast rate. Typically, you put code that requires servicing at a
-     * high frequency here. To make the robot as responsive and as accurate as possible especially in autonomous
-     * mode, you will typically put that code here.
+     * This method is called periodically on the main robot thread. Typically, you put TeleOp control code here that
+     * doesn't require frequent update For example, TeleOp joystick code or status display code can be put here since
+     * human responses are considered slow.
      *
      * @param elapsedTime specifies the elapsed time since the mode started.
      * @param slowPeriodicLoop specifies true if it is running the slow periodic loop on the main robot thread,
