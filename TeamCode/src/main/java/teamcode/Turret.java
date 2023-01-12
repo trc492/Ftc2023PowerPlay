@@ -181,6 +181,16 @@ public class Turret
     }   //getSensorValue
 
     /**
+     * This method returns the minimum value recorded during the trigger settling period.
+     *
+     * @return minimum value.
+     */
+    public Double getMinValue()
+    {
+        return thresholdTrigger.getMinimumValue();
+    }   //getMinValue
+
+    /**
      * This method enables/disables the threshold trigger.
      *
      * @param enabled specifies true to enable, false to disable.

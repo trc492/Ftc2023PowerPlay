@@ -317,7 +317,7 @@ public class Robot
             if (vision.eocvVision != null)
             {
                 globalTracer.traceInfo(funcName, "Disabling EocvVision.");
-                vision.eocvVision.setEnabled(false);
+                vision.eocvVision.setPipeline(null);
             }
        }
 
@@ -441,23 +441,10 @@ public class Robot
             // Compare the current sensor value to the settling data and get the minimum value. That's the most
             // accurate pole distance.
             double sensorValue = turret.getSensorValue();
-            double poleDistance = sensorValue;
-            Double[] triggerSettlingData = turret.getTriggerSettlingData();
+            Double minValue = turret.getMinValue();
+            double poleDistance = minValue == null? sensorValue: Math.min(sensorValue, minValue);
 
-            if (triggerSettlingData != null)
-            {
-                for (double value: triggerSettlingData)
-                {
-                    if (value < poleDistance)
-                    {
-                        poleDistance = value;
-                    }
-                }
-                globalTracer.traceInfo(
-                    funcName, "sensorValue=%.2f, minDistance=%.2f, triggerSettlingData=%s",
-                    sensorValue, poleDistance, Arrays.toString(triggerSettlingData));
-            }
-
+            globalTracer.traceInfo(funcName, "sensorValue=%.2f, minValue=%.2f", sensorValue, minValue);
             poleDistance += RobotParams.CLAW_DISTANCE_ADUSTMENT;
             if (poleDistance < RobotParams.ARM_JOINT_LENGTH)
             {
