@@ -25,7 +25,6 @@ package teamcode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.opencv.core.Rect;
-import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -168,7 +167,7 @@ public class Vision
                 label = ((TrcVisionTargetInfo<FtcTensorFlow.DetectedObject>) targets[0]).detectedObj.label;
             }
         }
-        else if (eocvVision != null && eocvVision.isEnabled() &&
+        else if (eocvVision != null && eocvVision.getPipeline() != null &&
                  eocvVision.getDetectObjectType() == EocvVision.ObjectType.APRIL_TAG)
         {
             targets = eocvVision.getDetectedTargetsInfo(
@@ -176,7 +175,7 @@ public class Vision
             if (targets != null)
             {
                 label = TARGET_LABELS[
-                    ((FtcEocvAprilTagPipeline.DetectedObject) targets[0].detectedObj).object.id];
+                    ((FtcEocvAprilTagPipeline.DetectedObject) targets[0].detectedObj).object.id - 1];
             }
         }
         updateVisionLEDs(label);
@@ -284,7 +283,7 @@ public class Vision
     {
         TrcVisionTargetInfo<?>[] targets = null;
 
-        if (eocvVision != null && eocvVision.isEnabled())
+        if (eocvVision != null && eocvVision.getPipeline() != null)
         {
             EocvVision.ObjectType detectObjType = eocvVision.getDetectObjectType();
 

@@ -277,7 +277,7 @@ public class FtcTest extends FtcTeleOp
                     if (robot.vision.eocvVision != null)
                     {
                         robot.globalTracer.traceInfo(funcName, "Enabling EocvVision.");
-                        robot.vision.eocvVision.setEnabled(true);
+                        robot.vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.APRIL_TAG);
                     }
                     else if (robot.vision.tensorFlowVision != null)
                     {
@@ -564,7 +564,7 @@ public class FtcTest extends FtcTeleOp
                     {
                         if (pressed && robot.vision != null && robot.vision.eocvVision != null)
                         {
-                            robot.vision.eocvVision.toggleColorFilterOutput();
+                            robot.vision.eocvVision.setNextVideoOutput();
                         }
                         processed = true;
                     }
