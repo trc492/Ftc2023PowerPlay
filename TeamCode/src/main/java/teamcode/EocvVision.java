@@ -40,7 +40,7 @@ import TrcFtcLib.ftclib.FtcEocvDetector;
  */
 public class EocvVision extends FtcEocvDetector
 {
-    private static final int colorConversion = Imgproc.COLOR_RGBA2RGB;
+    private static final int colorConversion = Imgproc.COLOR_BGRA2BGR;
     private static final double[] colorThresholdsRedCone = {100.0, 255.0, 0.0, 100.0, 0.0, 60.0};
     private static final double[] colorThresholdsBlueCone = {0.0, 60.0, 0.0, 100.0, 100, 255.0};
     private static final double[] colorThresholdsYellowPole = {128.0, 255.0, 128.0, 255.0, 0.0, 120.0};
@@ -135,16 +135,16 @@ public class EocvVision extends FtcEocvDetector
         aprilTagPipeline = new FtcEocvAprilTagPipeline(
             AprilTagDetectorJNI.TagFamily.TAG_36h11, RobotParams.APRILTAG_SIZE,
             RobotParams.WEBCAM_FX, RobotParams.WEBCAM_FY, RobotParams.WEBCAM_CX, RobotParams.WEBCAM_CY, tracer);
-        aprilTagPipeline.setVideoOutput(1, true);
+        aprilTagPipeline.setVideoOutput(0, true);
         redConePipeline = new FtcEocvColorBlobPipeline(
             "redConePipeline", colorConversion, colorThresholdsRedCone, redConeFilterContourParams, tracer);
-        redConePipeline.setVideoOutput(1, true);
+        redConePipeline.setVideoOutput(0, true);
         blueConePipeline = new FtcEocvColorBlobPipeline(
             "blueConePipeline", colorConversion, colorThresholdsBlueCone, blueConeFilterContourParams, tracer);
-        blueConePipeline.setVideoOutput(1, true);
+        blueConePipeline.setVideoOutput(0, true);
         yellowPolePipeline = new FtcEocvColorBlobPipeline(
             "yellowPolePipeline", colorConversion, colorThresholdsYellowPole, poleFilterContourParams, tracer);
-        yellowPolePipeline.setVideoOutput(1, true);
+        yellowPolePipeline.setVideoOutput(0, true);
         // Set default pipeline and enable it.
         setDetectObjectType(ObjectType.APRIL_TAG);
     }   //EocvVision
