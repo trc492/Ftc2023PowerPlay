@@ -317,7 +317,7 @@ public class Robot
             if (vision.eocvVision != null)
             {
                 globalTracer.traceInfo(funcName, "Disabling EocvVision.");
-                vision.eocvVision.setPipeline(null);
+                vision.eocvVision.setDetectObjectType(EocvVision.ObjectType.NONE);
             }
        }
 

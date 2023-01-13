@@ -47,7 +47,7 @@ public class EocvVision extends FtcEocvDetector
 
     public enum ObjectType
     {
-        APRIL_TAG, RED_CONE, BLUE_CONE, YELLOW_POLE;
+        APRIL_TAG, RED_CONE, BLUE_CONE, YELLOW_POLE, NONE;
 
         static ObjectType nextObjectType(ObjectType objType)
         {
@@ -67,8 +67,12 @@ public class EocvVision extends FtcEocvDetector
                     nextObjType = YELLOW_POLE;
                     break;
 
-                default:
                 case YELLOW_POLE:
+                    nextObjType = NONE;
+                    break;
+
+                default:
+                case NONE:
                     nextObjType = APRIL_TAG;
                     break;
             }
@@ -175,6 +179,10 @@ public class EocvVision extends FtcEocvDetector
 
             case YELLOW_POLE:
                 setPipeline(yellowPolePipeline);
+                break;
+
+            case NONE:
+                setPipeline(null);
                 break;
         }
     }   //updatePipeline
