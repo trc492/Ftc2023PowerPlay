@@ -52,8 +52,6 @@ public class RobotDrive
     public FtcDcMotor lfDriveMotor, lbDriveMotor, rfDriveMotor, rbDriveMotor;
     // Drive Base.
     public TrcDriveBase driveBase;
-    // PID Coefficients and Controllers.
-    public TrcPidController xPosPidCtrl, yPosPidCtrl, turnPidCtrl;
     // Drive Controllers.
     public TrcPidDrive pidDrive;
     public TrcPurePursuitDrive purePursuitDrive;

@@ -73,7 +73,7 @@ public class Turret
             .resetPositionOnLowerLimit(false)
             .setPidParams(new TrcPidController.PidParameters(
                 RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
-                RobotParams.TURRET_TOLERANCE))
+                RobotParams.TURRET_TOLERANCE, null))
             .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
             .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
 

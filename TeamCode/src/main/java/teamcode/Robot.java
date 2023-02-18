@@ -150,7 +150,7 @@ public class Robot
                         .setScaleOffset(RobotParams.ELEVATOR_INCHES_PER_COUNT, RobotParams.ELEVATOR_OFFSET)
                         .setPidParams(new TrcPidController.PidParameters(
                             RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
-                            RobotParams.ELEVATOR_TOLERANCE))
+                            RobotParams.ELEVATOR_TOLERANCE, null))
                         .setPowerCompensation(this::getElevatorPowerCompensation)
 //                        .setStallProtectionParams(
 //                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
@@ -175,7 +175,8 @@ public class Robot
                         .setPosRange(RobotParams.ARM_MIN_POS, RobotParams.ARM_MAX_POS)
                         .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
                         .setPidParams(new TrcPidController.PidParameters(
-                            RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE))
+                            RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE,
+                            null))
                         .resetPositionOnLowerLimit(true)
 //                        .setStallProtectionParams(
 //                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,

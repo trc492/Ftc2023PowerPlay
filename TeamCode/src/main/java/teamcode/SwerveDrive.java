@@ -153,18 +153,24 @@ public class SwerveDrive extends RobotDrive
         //
         // Create and initialize PID controllers.
         //
-        xPosPidCtrl = new TrcPidController(
-            "xPosPidCtrl", RobotParams.xPosPidCoeff, RobotParams.XPOS_TOLERANCE, driveBase::getXPosition);
-        yPosPidCtrl = new TrcPidController(
-            "yPosPidCtrl", RobotParams.yPosPidCoeff, RobotParams.YPOS_TOLERANCE, driveBase::getYPosition);
-        turnPidCtrl = new TrcPidController(
-            "turnPidCtrl", RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, driveBase::getHeading);
-        turnPidCtrl.setAbsoluteSetPoint(true);
+        TrcPidController.PidParameters xPosPidParams = new TrcPidController.PidParameters(
+            RobotParams.xPosPidCoeff, RobotParams.XPOS_TOLERANCE, driveBase::getXPosition);
+        TrcPidController.PidParameters yPosPidParams = new TrcPidController.PidParameters(
+            RobotParams.yPosPidCoeff, RobotParams.YPOS_TOLERANCE, driveBase::getYPosition);
+        TrcPidController.PidParameters turnPidParams = new TrcPidController.PidParameters(
+            RobotParams.turnPidCoeff, RobotParams.TURN_TOLERANCE, RobotParams.TURN_SETTLING,
+            RobotParams.TURN_STEADY_STATE_ERR, RobotParams.TURN_STALL_ERRRATE_THRESHOLD, driveBase::getHeading, null);
+
+        pidDrive = new TrcPidDrive("pidDrive", driveBase, xPosPidParams, yPosPidParams, turnPidParams);
+
+        pidDrive.getXPidCtrl().setRampRate(RobotParams.X_RAMP_RATE);
+        pidDrive.getYPidCtrl().setRampRate(RobotParams.Y_RAMP_RATE);
+        pidDrive.getTurnPidCtrl().setRampRate(RobotParams.TURN_RAMP_RATE);
+        pidDrive.getTurnPidCtrl().setAbsoluteSetPoint(true);
         // FTC robots generally have USB performance issues where the sampling rate of the gyro is not high enough.
         // If the robot turns too fast, PID will cause oscillation. By limiting turn power, the robot turns slower.
-        turnPidCtrl.setOutputLimit(RobotParams.TURN_POWER_LIMIT);
+        pidDrive.getTurnPidCtrl().setOutputLimit(RobotParams.TURN_POWER_LIMIT);
 
-        pidDrive = new TrcPidDrive("pidDrive", driveBase, xPosPidCtrl, yPosPidCtrl, turnPidCtrl);
         // AbsoluteTargetMode eliminates cumulative errors on multi-segment runs because drive base is keeping track
         // of the absolute target position.
         pidDrive.setAbsoluteTargetModeEnabled(true);

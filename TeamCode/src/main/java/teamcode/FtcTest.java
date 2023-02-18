@@ -427,36 +427,38 @@ public class FtcTest extends FtcTeleOp
                 // Intentionally falling through.
                 //
             case PID_DRIVE:
-                if (!RobotParams.Preferences.noRobot)
-                {
-                    robot.dashboard.displayPrintf(
-                        8, "RobotPose=%s,rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
-                        robot.robotDrive.driveBase.getFieldPosition(),
-                        robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
-                        robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
-                    if (robot.robotDrive.xPosPidCtrl != null)
-                    {
-                        robot.robotDrive.xPosPidCtrl.displayPidInfo(9);
-                    }
-                    if (robot.robotDrive.yPosPidCtrl != null)
-                    {
-                        robot.robotDrive.yPosPidCtrl.displayPidInfo(11);
-                    }
-                    if (robot.robotDrive.turnPidCtrl != null)
-                    {
-                        robot.robotDrive.turnPidCtrl.displayPidInfo(13);
-                    }
-                }
-                break;
-
             case PURE_PURSUIT_DRIVE:
                 if (!RobotParams.Preferences.noRobot)
                 {
+                    TrcPidController xPidCtrl, yPidCtrl, turnPidCtrl;
+                    int lineNum = 9;
+
+                    if (testChoices.test == Test.PURE_PURSUIT_DRIVE)
+                    {
+                        xPidCtrl = robot.robotDrive.purePursuitDrive.getXPosPidCtrl();
+                        yPidCtrl = robot.robotDrive.purePursuitDrive.getYPosPidCtrl();
+                        turnPidCtrl = robot.robotDrive.purePursuitDrive.getTurnPidCtrl();
+                    }
+                    else
+                    {
+                        xPidCtrl = robot.robotDrive.pidDrive.getXPidCtrl();
+                        yPidCtrl = robot.robotDrive.pidDrive.getYPidCtrl();
+                        turnPidCtrl = robot.robotDrive.pidDrive.getTurnPidCtrl();
+                    }
+
                     robot.dashboard.displayPrintf(
                         8, "RobotPose=%s,rawEnc=lf:%.0f,rf:%.0f,lb:%.0f,rb:%.0f",
                         robot.robotDrive.driveBase.getFieldPosition(),
                         robot.robotDrive.lfDriveMotor.getPosition(), robot.robotDrive.rfDriveMotor.getPosition(),
                         robot.robotDrive.lbDriveMotor.getPosition(), robot.robotDrive.rbDriveMotor.getPosition());
+                    if (xPidCtrl != null)
+                    {
+                        xPidCtrl.displayPidInfo(lineNum);
+                        lineNum += 2;
+                    }
+                    yPidCtrl.displayPidInfo(lineNum);
+                    lineNum += 2;
+                    turnPidCtrl.displayPidInfo(lineNum);
                 }
                 break;
         }
@@ -803,15 +805,15 @@ public class FtcTest extends FtcTeleOp
         switch (test)
         {
             case TUNE_X_PID:
-                pidCtrl = robot.robotDrive.xPosPidCtrl;
+                pidCtrl = robot.robotDrive.pidDrive.getXPidCtrl();
                 break;
 
             case TUNE_Y_PID:
-                pidCtrl = robot.robotDrive.yPosPidCtrl;
+                pidCtrl = robot.robotDrive.pidDrive.getYPidCtrl();
                 break;
 
             case TUNE_TURN_PID:
-                pidCtrl = robot.robotDrive.turnPidCtrl;
+                pidCtrl = robot.robotDrive.pidDrive.getTurnPidCtrl();
                 break;
 
             default:
