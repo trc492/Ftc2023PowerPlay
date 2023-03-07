@@ -273,7 +273,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case START:
                 if (robot.arm.getPosition() > RobotParams.ARM_SAFE_POS)
                 {
-                    robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
+                    robot.arm.setPosition(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
                     sm.waitForSingleEvent(event, State.GO_TO_START_POS);
                     break;
                 }
@@ -337,7 +337,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                 {
                     // Set the proper elevator height for scoring.
                     // This operation takes about 1.2 sec.
-                    robot.elevator.setTarget(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
+                    robot.elevator.setPosition(currOwner, 0.0, taskParams.scoreHeight, true, 1.0, event, 3.0);
                     sm.waitForSingleEvent(event, State.EXTEND_ARM);
                 }
                 else
@@ -375,7 +375,7 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
                     armTarget = 25.0;
                 }
                 // This operation takes about 1 sec.
-                robot.arm.setTarget(currOwner, 0.0, armTarget, false, 1.0, event, 2.0);
+                robot.arm.setPosition(currOwner, 0.0, armTarget, false, 1.0, event, 2.0);
                 sm.waitForSingleEvent(event, State.CAP_POLE);
                 break;
 
@@ -388,8 +388,8 @@ public class TaskScoreCone extends TrcAutoTask<TaskScoreCone.State>
             case SCORE_CONE:
                 // Release the cone to score it and retract the elevator and arm.
                 robot.grabber.open();
-                robot.arm.setTarget(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
-                robot.elevator.setTarget(currOwner, 0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
+                robot.arm.setPosition(currOwner, 0.5, RobotParams.ARM_UP_POS, false, 1.0, null, 0.0);
+                robot.elevator.setPosition(currOwner, 0.5, RobotParams.ELEVATOR_MIN_POS, false, 1.0, null, 0.0);
                 robot.turret.setTarget(currOwner, 0.5, RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                 //
                 // Intentionally fall to the DONE state.

@@ -29,7 +29,7 @@ import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcPidActuator;
 import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcSensor;
-import TrcCommonLib.trclib.TrcThresholdTrigger;
+import TrcCommonLib.trclib.TrcTriggerThresholdRange;
 import TrcFtcLib.ftclib.FtcDcMotor;
 import TrcFtcLib.ftclib.FtcDigitalInput;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
@@ -49,7 +49,7 @@ public class Turret
     private final TrcPidActuator pidTurret;
     private final FtcDigitalInput calDirectionSwitch;
     private final FtcDistanceSensor sensor;
-    private final TrcThresholdTrigger thresholdTrigger;
+    private final TrcTriggerThresholdRange thresholdTrigger;
     private double prevTurretPower = 0.0;
     private String currOwner = null;
     public double rawMotorPosition;
@@ -69,13 +69,12 @@ public class Turret
             RobotParams.TURRET_HAS_UPPER_LIMIT_SWITCH, RobotParams.TURRET_UPPER_LIMIT_INVERTED, true);
         final TrcPidActuator.Parameters turretParams = new TrcPidActuator.Parameters()
             .setPosRange(RobotParams.TURRET_MIN_POS, RobotParams.TURRET_MAX_POS)
-            .setScaleOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
+            .setScaleAndOffset(RobotParams.TURRET_DEG_PER_COUNT, RobotParams.TURRET_OFFSET)
             .resetPositionOnLowerLimit(false)
             .setPidParams(new TrcPidController.PidParameters(
                 RobotParams.TURRET_KP, RobotParams.TURRET_KI, RobotParams.TURRET_KD,
                 RobotParams.TURRET_TOLERANCE, null))
-            .setPresetTolerance(RobotParams.TURRET_PRESET_TOLERANCE)
-            .setPosPresets(RobotParams.TURRET_PRESET_LEVELS);
+            .setPosPresets(RobotParams.TURRET_PRESET_TOLERANCE, RobotParams.TURRET_PRESET_LEVELS);
 
         this.msgTracer = msgTracer;
         FtcMotorActuator motorActuator = new FtcMotorActuator(instanceName, motorParams, turretParams);
@@ -86,12 +85,12 @@ public class Turret
             pidTurret.setMsgTracer(msgTracer, tracePidInfo);
         }
 
-        calDirectionSwitch = new FtcDigitalInput(
-            instanceName + ".dirSwitch", RobotParams.TURRET_DIR_SWITCH_INVERTED);
+        calDirectionSwitch = new FtcDigitalInput(instanceName + ".dirSwitch");
+        calDirectionSwitch.setInverted(RobotParams.TURRET_DIR_SWITCH_INVERTED);
         if (RobotParams.Preferences.hasTurretSensor)
         {
             sensor = new FtcDistanceSensor(instanceName + ".sensor");
-            thresholdTrigger = new TrcThresholdTrigger(
+            thresholdTrigger = new TrcTriggerThresholdRange(
                 instanceName + ".thresholdTrigger", this::getSensorValue, this::thresholdTriggerEvent);
             thresholdTrigger.setTrigger(
                 RobotParams.TURRET_SENSOR_LOWER_THRESHOLD, RobotParams.TURRET_SENSOR_UPPER_THRESHOLD,
@@ -323,7 +322,7 @@ public class Turret
         String owner, double delay, double target, boolean holdTarget, double powerLimit, TrcEvent event,
         double timeout)
     {
-        pidTurret.setTarget(owner, delay, target, holdTarget, powerLimit, event, timeout);
+        pidTurret.setPosition(owner, delay, target, holdTarget, powerLimit, event, timeout);
     }   //setTarget
 
     /**
@@ -340,7 +339,7 @@ public class Turret
         String owner, double target, boolean holdTarget, double powerLimit, TrcEvent event,
         double timeout)
     {
-        pidTurret.setTarget(owner, 0.0, target, holdTarget, powerLimit, event, timeout);
+        pidTurret.setPosition(owner, 0.0, target, holdTarget, powerLimit, event, timeout);
     }   //setTarget
 
     /**
@@ -356,7 +355,7 @@ public class Turret
     public void setTarget(
         double delay, double target, boolean holdTarget, double powerLimit, TrcEvent event, double timeout)
     {
-        pidTurret.setTarget(null, delay, target, holdTarget, powerLimit, event, timeout);
+        pidTurret.setPosition(null, delay, target, holdTarget, powerLimit, event, timeout);
     }   //setTarget
 
     /**
@@ -370,7 +369,7 @@ public class Turret
      */
     public void setTarget(double target, boolean holdTarget, double powerLimit, TrcEvent event, double timeout)
     {
-        pidTurret.setTarget(null, 0.0, target, holdTarget, powerLimit, event, timeout);
+        pidTurret.setPosition(null, 0.0, target, holdTarget, powerLimit, event, timeout);
     }   //setTarget
 
     /**
@@ -382,7 +381,7 @@ public class Turret
      */
     public void setTarget(double target, boolean holdTarget, double powerLimit)
     {
-        pidTurret.setTarget(null, 0.0, target, holdTarget, powerLimit, null, 0.0);
+        pidTurret.setPosition(null, 0.0, target, holdTarget, powerLimit, null, 0.0);
     }   //setTarget
 
     /**
@@ -393,7 +392,7 @@ public class Turret
      */
     public void setTarget(double target, boolean holdTarget)
     {
-        pidTurret.setTarget(null, 0.0, target, holdTarget, 1.0, null, 0.0);
+        pidTurret.setPosition(null, 0.0, target, holdTarget, 1.0, null, 0.0);
     }   //setTarget
 
     /**

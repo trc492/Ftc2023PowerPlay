@@ -147,7 +147,7 @@ public class Robot
                         RobotParams.ELEVATOR_HAS_UPPER_LIMIT_SWITCH, RobotParams.ELEVATOR_UPPER_LIMIT_INVERTED);
                     final TrcPidActuator.Parameters elevatorParams = new TrcPidActuator.Parameters()
                         .setPosRange(RobotParams.ELEVATOR_MIN_POS, RobotParams.ELEVATOR_MAX_POS)
-                        .setScaleOffset(RobotParams.ELEVATOR_INCHES_PER_COUNT, RobotParams.ELEVATOR_OFFSET)
+                        .setScaleAndOffset(RobotParams.ELEVATOR_INCHES_PER_COUNT, RobotParams.ELEVATOR_OFFSET)
                         .setPidParams(new TrcPidController.PidParameters(
                             RobotParams.ELEVATOR_KP, RobotParams.ELEVATOR_KI, RobotParams.ELEVATOR_KD,
                             RobotParams.ELEVATOR_TOLERANCE, null))
@@ -156,8 +156,7 @@ public class Robot
 //                            RobotParams.ELEVATOR_STALL_MIN_POWER, RobotParams.ELEVATOR_STALL_TOLERANCE,
 //                            RobotParams.ELEVATOR_STALL_TIMEOUT, RobotParams.ELEVATOR_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ELEVATOR_CAL_POWER)
-                        .setPresetTolerance(RobotParams.ELEVATOR_PRESET_TOLERANCE)
-                        .setPosPresets(RobotParams.ELEVATOR_PRESET_LEVELS);
+                        .setPosPresets(RobotParams.ELEVATOR_PRESET_TOLERANCE, RobotParams.ELEVATOR_PRESET_LEVELS);
                     elevator = new FtcMotorActuator(
                         RobotParams.HWNAME_ELEVATOR, motorParams, elevatorParams).getPidActuator();
                     // Set asymmetric power limits so down power is smaller since it's helped by gravity.
@@ -173,7 +172,7 @@ public class Robot
                         RobotParams.ARM_HAS_UPPER_LIMIT_SWITCH, RobotParams.ARM_UPPER_LIMIT_INVERTED);
                     final TrcPidActuator.Parameters armParams = new TrcPidActuator.Parameters()
                         .setPosRange(RobotParams.ARM_MIN_POS, RobotParams.ARM_MAX_POS)
-                        .setScaleOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
+                        .setScaleAndOffset(RobotParams.ARM_DEG_PER_COUNT, RobotParams.ARM_OFFSET)
                         .setPidParams(new TrcPidController.PidParameters(
                             RobotParams.ARM_KP, RobotParams.ARM_KI, RobotParams.ARM_KD, RobotParams.ARM_TOLERANCE,
                             null))
@@ -182,8 +181,7 @@ public class Robot
 //                            RobotParams.ARM_STALL_MIN_POWER, RobotParams.ARM_STALL_TOLERANCE,
 //                            RobotParams.ARM_STALL_TIMEOUT, RobotParams.ARM_RESET_TIMEOUT)
                         .setZeroCalibratePower(RobotParams.ARM_CAL_POWER)
-                        .setPresetTolerance(RobotParams.ARM_PRESET_TOLERANCE)
-                        .setPosPresets(RobotParams.ARM_PICKUP_PRESETS);
+                        .setPosPresets(RobotParams.ARM_PRESET_TOLERANCE, RobotParams.ARM_PICKUP_PRESETS);
                     arm = new FtcMotorActuator(RobotParams.HWNAME_ARM, motorParams, armParams).getPidActuator();
                     arm.setMsgTracer(globalTracer);
                 }

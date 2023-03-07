@@ -269,7 +269,7 @@ public class FtcTeleOp extends FtcOpMode
                 robot.dashboard.displayPrintf(
                     4, "Elevator: pow=%.2f,pos=%.1f,limitSW=%s,current=%.1f",
                     elevatorPower, robot.elevator.getPosition(), robot.elevator.isLowerLimitSwitchActive(),
-                    robot.elevator.getMotor().getCurrent());
+                    robot.elevator.getMotor().getMotorCurrent());
             }
 
             if (robot.arm != null)
@@ -511,14 +511,14 @@ public class FtcTeleOp extends FtcOpMode
                     {
                         // We don't have a cone, prepare all subsystems to pick up one.
                         robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
-                        robot.arm.setTarget(0.5, RobotParams.ARM_MAX_POS - 2.0, false, 1.0, null, 0.0);
-                        robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
+                        robot.arm.setPosition(0.5, RobotParams.ARM_MAX_POS - 2.0, false, 1.0, null, 0.0);
+                        robot.elevator.setPosition(RobotParams.ELEVATOR_MIN_POS);
                         robot.setGrabberAutoAssistOn(true);
                     }
                     else
                     {
                         // We have a cone, prepare to score it on medium or low poles.
-                        robot.arm.setTarget(30);
+                        robot.arm.setPosition(30);
                     }
                 }
                 break;
@@ -544,7 +544,7 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.elevator != null)
                 {
                     // Do elevator preset up.
-                    robot.elevator.presetPositionUp();
+                    robot.elevator.presetPositionUp(moduleName, 1.0);
                 }
                 break;
 
@@ -552,7 +552,7 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed && robot.elevator != null)
                 {
                     // Do elevator preset down.
-                    robot.elevator.presetPositionDown();
+                    robot.elevator.presetPositionDown(moduleName, 1.0);
                 }
                 break;
 

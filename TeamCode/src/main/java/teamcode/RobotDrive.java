@@ -27,7 +27,6 @@ import org.opencv.core.Point;
 import TrcCommonLib.trclib.TrcDriveBase;
 import TrcCommonLib.trclib.TrcGridDrive;
 import TrcCommonLib.trclib.TrcGyro;
-import TrcCommonLib.trclib.TrcPidController;
 import TrcCommonLib.trclib.TrcPidDrive;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcPurePursuitDrive;
@@ -97,7 +96,7 @@ public class RobotDrive
 
         driveMotor.motor.setMode(RobotParams.DRIVE_MOTOR_MODE);
         driveMotor.setBrakeModeEnabled(RobotParams.DRIVE_WHEEL_BRAKE_MODE_ON);
-        driveMotor.setInverted(inverted);
+        driveMotor.setMotorInverted(inverted);
 
         if (RobotParams.Preferences.useVelocityControl)
         {

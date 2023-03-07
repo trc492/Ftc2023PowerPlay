@@ -183,7 +183,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                         // Prepare all subsystems for pre-conditions of autoScoreCone: arm up, turret at start scan
                         // position.
                         // This operation takes about 5 sec.
-                        robot.arm.setTarget(RobotParams.ARM_UP_POS, false);
+                        robot.arm.setPosition(RobotParams.ARM_UP_POS, false);
                         turretStartPos = autoChoices.startPos == FtcAuto.StartPos.LEFT?
                             RobotParams.TURRET_RIGHT: RobotParams.TURRET_LEFT;
                         robot.turret.setTarget(turretStartPos - RobotParams.TURRET_SCAN_OFFSET, true, 0.8, null, 0.0);
@@ -224,8 +224,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                 case GO_TO_CONE_STACK:
                     // Setup preconditions for auto-pickup: arm at top cone, elevator down, turret front.
                     // This operation takes about 3 sec.
-                    robot.arm.setTarget(RobotParams.ARM_PICKUP_PRESETS[5]);
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
+                    robot.arm.setPosition(RobotParams.ARM_PICKUP_PRESETS[5]);
+                    robot.elevator.setPosition(RobotParams.ELEVATOR_MIN_POS);
                     robot.turret.setTarget(RobotParams.TURRET_FRONT, true, 0.8, null, 0.0);
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false,
@@ -272,7 +272,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
                     break;
 
                 case PARK:
-                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
+                    robot.arm.setPosition(RobotParams.ARM_UP_POS);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     if (autoChoices.parking == FtcAuto.Parking.NO_PARKING)
                     {
@@ -313,8 +313,8 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
 
                 case DONE:
                 default:
-                    robot.arm.setTarget(RobotParams.ARM_UP_POS);
-                    robot.elevator.setTarget(RobotParams.ELEVATOR_MIN_POS);
+                    robot.arm.setPosition(RobotParams.ARM_UP_POS);
+                    robot.elevator.setPosition(RobotParams.ELEVATOR_MIN_POS);
                     cancel();
                     break;
             }

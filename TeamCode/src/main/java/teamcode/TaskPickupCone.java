@@ -299,7 +299,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 break;
 
             case DRIVE_TO_CONE:
-                robot.arm.setTarget(
+                robot.arm.setPosition(
                     currOwner, RobotParams.ARM_PICKUP_PRESETS[taskParams.conesRemaining], false, 1.0, null, 0.0);
                 robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                 if (targetLocation != null)
@@ -375,7 +375,7 @@ public class TaskPickupCone extends TrcAutoTask<TaskPickupCone.State>
                 break;
 
             case LIFT_CONE:
-                robot.arm.setTarget(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
+                robot.arm.setPosition(currOwner, RobotParams.ARM_UP_POS, false, 1.0, event, 0.0);
                 sm.waitForSingleEvent(event, State.DONE);
                 break;
 

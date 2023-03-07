@@ -22,8 +22,9 @@
 
 package teamcode;
 
-import TrcCommonLib.trclib.TrcAnalogSensorTrigger;
 import TrcCommonLib.trclib.TrcDbgTrace;
+import TrcCommonLib.trclib.TrcSensor;
+import TrcCommonLib.trclib.TrcTriggerThresholdZones;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcCommonLib.trclib.TrcServoGrabber;
 import TrcFtcLib.ftclib.FtcServo;
@@ -31,6 +32,7 @@ import TrcFtcLib.ftclib.FtcServo;
 public class Grabber
 {
     private final TrcDbgTrace msgTracer;
+    private final FtcDistanceSensor sensor;
     private final TrcServoGrabber grabber;
 
     /**
@@ -54,14 +56,18 @@ public class Grabber
         this.msgTracer = msgTracer;
         FtcServo leftServo = new FtcServo(instanceName + ".left");
         FtcServo rightServo = new FtcServo(instanceName + ".right");
-        TrcAnalogSensorTrigger<FtcDistanceSensor.DataType> analogTrigger = null;
+        TrcTriggerThresholdZones analogTrigger = null;
 
         if (RobotParams.Preferences.hasGrabberSensor)
         {
-            FtcDistanceSensor sensor = new FtcDistanceSensor(instanceName + ".sensor");
-            analogTrigger = new TrcAnalogSensorTrigger<>(
-                instanceName + ".analogTrigger", sensor, 0, FtcDistanceSensor.DataType.DISTANCE_INCH,
-                new double[]{grabberParams.triggerThreshold}, false, this::analogTriggerEvent);
+            sensor = new FtcDistanceSensor(instanceName + ".sensor");
+            analogTrigger = new TrcTriggerThresholdZones(
+                instanceName + ".analogTrigger", this::getDistance,
+                new double[]{grabberParams.triggerThreshold}, false, this::analogTriggerCallback);
+        }
+        else
+        {
+            sensor = null;
         }
 
         grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, grabberParams, analogTrigger);
@@ -83,10 +89,10 @@ public class Grabber
      *
      * @param context specifies the callback context.
      */
-    private void analogTriggerEvent(Object context)
+    private void analogTriggerCallback(Object context)
     {
         final String funcName = "analogTriggerEvent";
-        TrcAnalogSensorTrigger.CallbackContext callbackContext = (TrcAnalogSensorTrigger.CallbackContext) context;
+        TrcTriggerThresholdZones.CallbackContext callbackContext = (TrcTriggerThresholdZones.CallbackContext) context;
 
         if (msgTracer != null)
         {
@@ -109,6 +115,17 @@ public class Grabber
                 grabber.close();
             }
         }
-    }   //analogTriggerEvent
+    }   //analogTriggerCallback
+
+    /**
+     * This method is called the TrcTriggerThresholdZones to get the sensor data.
+     *
+     * @return distance to detected object in inches.
+     */
+    private double getDistance()
+    {
+        TrcSensor.SensorData<Double> data = sensor.getProcessedData(0, FtcDistanceSensor.DataType.DISTANCE_INCH);
+        return data != null && data.value != null? data.value: 0.0;
+    }   //getDistance
 
 }   //class Grabber
