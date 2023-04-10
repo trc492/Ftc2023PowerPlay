@@ -62,15 +62,16 @@ public class Grabber
         {
             sensor = new FtcDistanceSensor(instanceName + ".sensor");
             analogTrigger = new TrcTriggerThresholdZones(
-                instanceName + ".analogTrigger", this::getDistance,
-                new double[]{grabberParams.triggerThreshold}, false, this::analogTriggerCallback);
+                instanceName + ".analogTrigger", this::getDistance, new double[]{grabberParams.triggerThreshold},
+                false);
         }
         else
         {
             sensor = null;
         }
 
-        grabber = new TrcServoGrabber(instanceName, leftServo, rightServo, grabberParams, analogTrigger);
+        grabber = new TrcServoGrabber(
+            instanceName, leftServo, rightServo, grabberParams, analogTrigger, this::analogTriggerCallback);
         grabber.close();
     }   //Grabber
 

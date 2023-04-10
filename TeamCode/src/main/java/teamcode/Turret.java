@@ -91,7 +91,7 @@ public class Turret
         {
             sensor = new FtcDistanceSensor(instanceName + ".sensor");
             thresholdTrigger = new TrcTriggerThresholdRange(
-                instanceName + ".thresholdTrigger", this::getSensorValue, this::thresholdTriggerEvent);
+                instanceName + ".thresholdTrigger", this::getSensorValue);
             thresholdTrigger.setTrigger(
                 RobotParams.TURRET_SENSOR_LOWER_THRESHOLD, RobotParams.TURRET_SENSOR_UPPER_THRESHOLD,
                 RobotParams.TURRET_SENSOR_SETTLING_PERIOD);
@@ -203,7 +203,7 @@ public class Turret
             globalTracer.traceInfo(funcName, "enabled=%s", enabled);
         }
 
-        thresholdTrigger.setEnabled(enabled);
+        thresholdTrigger.enableTrigger(this::thresholdTriggerEvent);
     }   //setTriggerEnabled
 
     /**
@@ -295,7 +295,7 @@ public class Turret
         if (owner == null || owner.equals(currOwner))
         {
             pidTurret.cancel(owner);
-            thresholdTrigger.setEnabled(false);
+            thresholdTrigger.disableTrigger();
         }
     }   //cancel
 
