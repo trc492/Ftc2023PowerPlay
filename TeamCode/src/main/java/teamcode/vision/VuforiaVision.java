@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.vision;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -36,6 +36,8 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcUtil;
 import TrcFtcLib.ftclib.FtcRevBlinkin;
 import TrcFtcLib.ftclib.FtcVuforia;
+import teamcode.RobotParams;
+import teamcode.subsysstems.BlinkinLEDs;
 
 /**
  * This class implements Vuforia Vision that provides the capability of using images to locate the robot position

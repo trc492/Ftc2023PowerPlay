@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.subsysstems;
 
 import TrcCommonLib.trclib.TrcDbgTrace;
 import TrcCommonLib.trclib.TrcSensor;
@@ -28,6 +28,7 @@ import TrcCommonLib.trclib.TrcTriggerThresholdZones;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcCommonLib.trclib.TrcServoGrabber;
 import TrcFtcLib.ftclib.FtcServo;
+import teamcode.RobotParams;
 
 public class Grabber
 {

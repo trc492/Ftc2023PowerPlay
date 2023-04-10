@@ -46,6 +46,8 @@ import TrcFtcLib.ftclib.FtcGamepad;
 import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcPidCoeffCache;
 import TrcFtcLib.ftclib.FtcValueMenu;
+import teamcode.drivebases.SwerveDrive;
+import teamcode.vision.EocvVision;
 
 /**
  * This class contains the Test Mode program. It extends FtcTeleOp so that we can teleop control the robot for

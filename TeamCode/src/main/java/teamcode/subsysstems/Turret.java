@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.subsysstems;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +34,7 @@ import TrcFtcLib.ftclib.FtcDcMotor;
 import TrcFtcLib.ftclib.FtcDigitalInput;
 import TrcFtcLib.ftclib.FtcDistanceSensor;
 import TrcFtcLib.ftclib.FtcMotorActuator;
+import teamcode.RobotParams;
 
 /**
  * This class encapsulates a PID Actuator as the Turret. The turret has additional capabilities over a PID actuator.

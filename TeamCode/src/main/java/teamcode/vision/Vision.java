@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.vision;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -36,6 +36,9 @@ import TrcFtcLib.ftclib.FtcEocvAprilTagPipeline;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcTensorFlow;
 import TrcFtcLib.ftclib.FtcVuforia;
+import teamcode.Robot;
+import teamcode.RobotParams;
+import teamcode.subsysstems.BlinkinLEDs;
 
 /**
  * This class implements Vuforia/TensorFlow/Grip/Eocv Vision for the game season. It creates and initializes all the

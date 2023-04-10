@@ -345,88 +345,89 @@ public class RobotParams
     // Turret subsystem.
     //
     // Motor parameters.
-    static final boolean TURRET_MOTOR_INVERTED                  = true;
-    static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH          = true;
-    static final boolean TURRET_LOWER_LIMIT_INVERTED            = true;
-    static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH          = false;
-    static final boolean TURRET_UPPER_LIMIT_INVERTED            = false;
-    static final boolean TURRET_DIR_SWITCH_INVERTED             = false;
+    public static final boolean TURRET_MOTOR_INVERTED           = true;
+    public static final boolean TURRET_HAS_LOWER_LIMIT_SWITCH   = true;
+    public static final boolean TURRET_LOWER_LIMIT_INVERTED     = true;
+    public static final boolean TURRET_HAS_UPPER_LIMIT_SWITCH   = false;
+    public static final boolean TURRET_UPPER_LIMIT_INVERTED     = false;
+    public static final boolean TURRET_DIR_SWITCH_INVERTED      = false;
     // PID Actuator parameters.
-    static final double TURRET_KP                               = 0.04;
-    static final double TURRET_KI                               = 0.0;
-    static final double TURRET_KD                               = 0.0;
-    static final double TURRET_TOLERANCE                        = 1.0;
+    public static final double TURRET_KP                        = 0.04;
+    public static final double TURRET_KI                        = 0.0;
+    public static final double TURRET_KD                        = 0.0;
+    public static final double TURRET_TOLERANCE                 = 1.0;
     // Rev Core Hex Motor (https://www.revrobotics.com/rev-41-1300/)
-    static final double TURRET_ENCODER_PPR                      = 288.0;
-    static final double TURRET_GEAR_RATIO                       = 100.0/60.0;
-    static final double TURRET_DEG_PER_COUNT                    = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
-    static final double TURRET_OFFSET                           = 0.0;
-    static final double TURRET_MIN_POS                          = 0.0;
-    static final double TURRET_MAX_POS                          = 325.0;
-    static final double TURRET_STALL_MIN_POWER                  = 0.5;
-    static final double TURRET_STALL_TOLERANCE                  = 1.0;
-    static final double TURRET_STALL_TIMEOUT                    = 1.0;
-    static final double TURRET_RESET_TIMEOUT                    = 0.5;
+    public static final double TURRET_ENCODER_PPR               = 288.0;
+    public static final double TURRET_GEAR_RATIO                = 100.0/60.0;
+    public static final double TURRET_DEG_PER_COUNT             = 360.0/(TURRET_ENCODER_PPR*TURRET_GEAR_RATIO);
+    public static final double TURRET_OFFSET                    = 0.0;
+    public static final double TURRET_MIN_POS                   = 0.0;
+    public static final double TURRET_MAX_POS                   = 325.0;
+    public static final double TURRET_STALL_MIN_POWER           = 0.5;
+    public static final double TURRET_STALL_TOLERANCE           = 1.0;
+    public static final double TURRET_STALL_TIMEOUT             = 1.0;
+    public static final double TURRET_RESET_TIMEOUT             = 0.5;
     // Power settings.
-    static final double TURRET_CAL_POWER                        = -0.3;
-    static final double TURRET_POWER_SCALE_TELEOP               = 0.6;
+    public static final double TURRET_CAL_POWER                 = -0.3;
+    public static final double TURRET_POWER_SCALE_TELEOP        = 0.6;
     // Preset positions.
-    static final double TURRET_BACK                             = 0.0;
-    static final double TURRET_RIGHT                            = 90.0;
-    static final double TURRET_FRONT                            = 180.0;
-    static final double TURRET_LEFT                             = 270.0;
-    static final double TURRET_PRESET_TOLERANCE                 = 10.0;
-    static final double[] TURRET_PRESET_LEVELS                  = new double[] {
+    public static final double TURRET_BACK                      = 0.0;
+    public static final double TURRET_RIGHT                     = 90.0;
+    public static final double TURRET_FRONT                     = 180.0;
+    public static final double TURRET_LEFT                      = 270.0;
+    public static final double TURRET_PRESET_TOLERANCE          = 10.0;
+    public static final double[] TURRET_PRESET_LEVELS           = new double[] {
         TURRET_BACK,    // Slot 0
         TURRET_RIGHT,   // Slot 1
         TURRET_FRONT,   // Slot 2
         TURRET_LEFT     // Slot 3
     };
     // Distance sensor parameters.
-    static final double TURRET_SENSOR_LOWER_THRESHOLD           = 4.0;  // in inches
-    static final double TURRET_SENSOR_UPPER_THRESHOLD           = 12.0; // in inches
-    static final double TURRET_SENSOR_SETTLING_PERIOD           = 0.20; // in seconds
+    public static final double TURRET_SENSOR_LOWER_THRESHOLD    = 4.0;  // in inches
+    public static final double TURRET_SENSOR_UPPER_THRESHOLD    = 12.0; // in inches
+    public static final double TURRET_SENSOR_SETTLING_PERIOD    = 0.20; // in seconds
     // Auto-Assist Scoring parameters
-    static final double TURRET_SCAN_OFFSET                      = 20.0;
-    static final double TURRET_SCAN_POWER                       = 0.30;
-    static final double TURRET_TELEOP_SCAN_POWER                = 0.30;
-    static final double TURRET_SCAN_DURATION                    = 5.0;
+    public static final double TURRET_SCAN_OFFSET               = 20.0;
+    public static final double TURRET_SCAN_POWER                = 0.30;
+    public static final double TURRET_TELEOP_SCAN_POWER         = 0.30;
+    public static final double TURRET_SCAN_DURATION             = 5.0;
     //
     // Elevator Subsystem
     //
     // Motor parameters.
-    static final boolean ELEVATOR_MOTOR_INVERTED                = false;
-    static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH        = true;
-    static final boolean ELEVATOR_LOWER_LIMIT_INVERTED          = false;
-    static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH        = false;
-    static final boolean ELEVATOR_UPPER_LIMIT_INVERTED          = false;
+    public static final boolean ELEVATOR_MOTOR_INVERTED         = false;
+    public static final boolean ELEVATOR_HAS_LOWER_LIMIT_SWITCH = true;
+    public static final boolean ELEVATOR_LOWER_LIMIT_INVERTED   = false;
+    public static final boolean ELEVATOR_HAS_UPPER_LIMIT_SWITCH = false;
+    public static final boolean ELEVATOR_UPPER_LIMIT_INVERTED   = false;
     // PID Actuator parameters.
-    static final double ELEVATOR_KP                             = 0.30;
-    static final double ELEVATOR_KI                             = 0;//0.5;
-    static final double ELEVATOR_KD                             = 0.025;
-    static final double ELEVATOR_TOLERANCE                      = 2.0;
-    static final double ELEVATOR_IZONE                          = 10.0;
-    static final double ELEVATOR_ENCODER_PPR                    = GOBILDA_5203_435_ENCODER_PPR;
-    static final double ELEVATOR_PULLEY_DIAMETER                = 1.5*1.0465;       // in inches
-    static final double ELEVATOR_PULLEY_CIRCUMFERENCE           = Math.PI*ELEVATOR_PULLEY_DIAMETER;
-    static final double ELEVATOR_INCHES_PER_COUNT               = ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
-    static final double ELEVATOR_OFFSET                         = 7.8;              // in inches
-    static final double ELEVATOR_MIN_POS                        = ELEVATOR_OFFSET;
-    static final double ELEVATOR_MAX_POS                        = 34.0;
-    static final double ELEVATOR_STALL_MIN_POWER                = 0.75;
-    static final double ELEVATOR_STALL_TOLERANCE                = 0.0;
-    static final double ELEVATOR_STALL_TIMEOUT                  = 1.0;
-    static final double ELEVATOR_RESET_TIMEOUT                  = 0.5;
+    public static final double ELEVATOR_KP                      = 0.30;
+    public static final double ELEVATOR_KI                      = 0;//0.5;
+    public static final double ELEVATOR_KD                      = 0.025;
+    public static final double ELEVATOR_TOLERANCE               = 2.0;
+    public static final double ELEVATOR_IZONE                   = 10.0;
+    public static final double ELEVATOR_ENCODER_PPR             = GOBILDA_5203_435_ENCODER_PPR;
+    public static final double ELEVATOR_PULLEY_DIAMETER         = 1.5*1.0465;       // in inches
+    public static final double ELEVATOR_PULLEY_CIRCUMFERENCE    = Math.PI*ELEVATOR_PULLEY_DIAMETER;
+    public static final double ELEVATOR_INCHES_PER_COUNT        =
+    ELEVATOR_PULLEY_CIRCUMFERENCE/ELEVATOR_ENCODER_PPR;
+    public static final double ELEVATOR_OFFSET                  = 7.8;              // in inches
+    public static final double ELEVATOR_MIN_POS                 = ELEVATOR_OFFSET;
+    public static final double ELEVATOR_MAX_POS                 = 34.0;
+    public static final double ELEVATOR_STALL_MIN_POWER         = 0.75;
+    public static final double ELEVATOR_STALL_TOLERANCE         = 0.0;
+    public static final double ELEVATOR_STALL_TIMEOUT           = 1.0;
+    public static final double ELEVATOR_RESET_TIMEOUT           = 0.5;
     // Power settings.
-    static final double ELEVATOR_CAL_POWER                      = -0.1;
-    static final double ELEVATOR_POWER_COMPENSATION             = 0.1;
-    static final double ELEVATOR_DOWN_POWER_SCALE               = 0.3;
+    public static final double ELEVATOR_CAL_POWER               = -0.1;
+    public static final double ELEVATOR_POWER_COMPENSATION      = 0.1;
+    public static final double ELEVATOR_DOWN_POWER_SCALE        = 0.3;
     // Preset positions.
-    static final double LOW_JUNCTION_SCORING_HEIGHT             = 10.8;
-    static final double MID_JUNCTION_SCORING_HEIGHT             = 21.0;
-    static final double HIGH_JUNCTION_SCORING_HEIGHT            = 32.5;
-    static final double ELEVATOR_PRESET_TOLERANCE               = 2.0;
-    static final double[] ELEVATOR_PRESET_LEVELS                = new double[] {
+    public static final double LOW_JUNCTION_SCORING_HEIGHT      = 10.8;
+    public static final double MID_JUNCTION_SCORING_HEIGHT      = 21.0;
+    public static final double HIGH_JUNCTION_SCORING_HEIGHT     = 32.5;
+    public static final double ELEVATOR_PRESET_TOLERANCE        = 2.0;
+    public static final double[] ELEVATOR_PRESET_LEVELS         = new double[] {
         ELEVATOR_MIN_POS,
         LOW_JUNCTION_SCORING_HEIGHT,
         MID_JUNCTION_SCORING_HEIGHT,
@@ -436,41 +437,41 @@ public class RobotParams
     // Arm subsystem.
     //
     // Motor parameters.
-    static final boolean ARM_MOTOR_INVERTED                     = false;
-    static final boolean ARM_HAS_LOWER_LIMIT_SWITCH             = true;
-    static final boolean ARM_LOWER_LIMIT_INVERTED               = false;
-    static final boolean ARM_HAS_UPPER_LIMIT_SWITCH             = false;
-    static final boolean ARM_UPPER_LIMIT_INVERTED               = false;
+    public static final boolean ARM_MOTOR_INVERTED              = false;
+    public static final boolean ARM_HAS_LOWER_LIMIT_SWITCH      = true;
+    public static final boolean ARM_LOWER_LIMIT_INVERTED        = false;
+    public static final boolean ARM_HAS_UPPER_LIMIT_SWITCH      = false;
+    public static final boolean ARM_UPPER_LIMIT_INVERTED        = false;
     // PID Actuator parameters.
-    static final double ARM_KP                                  = 0.1;
-    static final double ARM_KI                                  = 0.0;
-    static final double ARM_KD                                  = 0.0;
-    static final double ARM_TOLERANCE                           = 0.5;
-    static final double ARM_ENCODER_PPR                         = GOBILDA_5203_435_ENCODER_PPR;
+    public static final double ARM_KP                           = 0.1;
+    public static final double ARM_KI                           = 0.0;
+    public static final double ARM_KD                           = 0.0;
+    public static final double ARM_TOLERANCE                    = 0.5;
+    public static final double ARM_ENCODER_PPR                  = GOBILDA_5203_435_ENCODER_PPR;
     // https://www.gobilda.com/super-duty-worm-drive-pan-kit-28-1-ratio/
-    static final double ARM_GEAR_RATIO                          = 28.0;
-    static final double ARM_DEG_PER_COUNT                       = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
-    static final double ARM_OFFSET                              = -8.0;
+    public static final double ARM_GEAR_RATIO                   = 28.0;
+    public static final double ARM_DEG_PER_COUNT                = (360.0/(ARM_ENCODER_PPR*ARM_GEAR_RATIO));
+    public static final double ARM_OFFSET                       = -8.0;
     // Arm Zero-Calibrated to Up Position. Arm Max Position is Down.
-    static final double ARM_MIN_POS                             = ARM_OFFSET;
-    static final double ARM_MAX_POS                             = 140.0;
-    static final double ARM_STALL_MIN_POWER                     = 0.75;
-    static final double ARM_STALL_TOLERANCE                     = 0.0;
-    static final double ARM_STALL_TIMEOUT                       = 1.0;
-    static final double ARM_RESET_TIMEOUT                       = 0.5;
+    public static final double ARM_MIN_POS                      = ARM_OFFSET;
+    public static final double ARM_MAX_POS                      = 140.0;
+    public static final double ARM_STALL_MIN_POWER              = 0.75;
+    public static final double ARM_STALL_TOLERANCE              = 0.0;
+    public static final double ARM_STALL_TIMEOUT                = 1.0;
+    public static final double ARM_RESET_TIMEOUT                = 0.5;
     // Power settings.
-    static final double ARM_CAL_POWER                           = -0.5;
+    public static final double ARM_CAL_POWER                    = -0.5;
     // Preset positions.
-    static final double ARM_UP_POS                              = 0.0;
-    static final double ARM_SAFE_POS                            = 10.0;
-    static final double ARM_SINGLE_CONE_POS                     = 135.0;
-    static final double ARM_STACK_2_POS                         = 120.0;
-    static final double ARM_STACK_3_CONES_POS                   = 100.0;
-    static final double ARM_STACK_4_CONES_POS                   = 90.0;
-    static final double ARM_STACK_5_CONES_POS                   = 85.0;
-    static final double ARM_PRESET_TOLERANCE                    = 2.0;
+    public static final double ARM_UP_POS                       = 0.0;
+    public static final double ARM_SAFE_POS                     = 10.0;
+    public static final double ARM_SINGLE_CONE_POS              = 135.0;
+    public static final double ARM_STACK_2_POS                  = 120.0;
+    public static final double ARM_STACK_3_CONES_POS            = 100.0;
+    public static final double ARM_STACK_4_CONES_POS            = 90.0;
+    public static final double ARM_STACK_5_CONES_POS            = 85.0;
+    public static final double ARM_PRESET_TOLERANCE             = 2.0;
     // Index 0 is a placeholder so index 1 is 1 cone, 2 is 2 cones, etc.
-    static final double[] ARM_PICKUP_PRESETS                    = new double[] {
+    public static final double[] ARM_PICKUP_PRESETS             = new double[] {
         0.0,
         ARM_SINGLE_CONE_POS,
         ARM_STACK_2_POS,
@@ -479,30 +480,30 @@ public class RobotParams
         ARM_STACK_5_CONES_POS
     };
     // Parameters for calculating angle for aligning grabber on top of the pole.
-    static final double ARM_JOINT_LENGTH                        = 7.098;    // in inches
-    static final double ARM_ANGLE_OFFSET                        = -11.94;   // in degrees
-    static final double CLAW_DISTANCE_ADUSTMENT                 = -2.7;    // in inches
+    public static final double ARM_JOINT_LENGTH                 = 7.098;    // in inches
+    public static final double ARM_ANGLE_OFFSET                 = -11.94;   // in degrees
+    public static final double CLAW_DISTANCE_ADUSTMENT          = -2.7;    // in inches
     //
     // Grabber subsystem.
     //
     // Servo Grabber parameters.
-    static final double GRABBER_MAX_STEPRATE                    = 1.0;
-    static final double GRABBER_MIN_POS                         = 0.0;
-    static final double GRABBER_MAX_POS                         = 0.2;
-    static final boolean GRABBER_LSERVO_INVERTED                = false;
-    static final boolean GRABBER_RSERVO_INVERTED                = true;
-    static final boolean GRABBER_TRIGGER_INVERTED               = true;
-    static final double GRABBER_TRIGGER_THRESHOLD               = 1.5;  // in inches
-    static final double GRABBER_HAS_OBJECT_THRESHOLD            = 2.5;  // in inches
-    static final double GRABBER_OPEN_POS                        = GRABBER_MAX_POS;
-    static final double GRABBER_OPEN_TIME                       = 0.5;
-    static final double GRABBER_CLOSE_POS                       = GRABBER_MIN_POS;
-    static final double GRABBER_CLOSE_TIME                      = 0.5;
-    static final double GRABBER_DEF_CONE_DISTANCE               = 8.0;
+    public static final double GRABBER_MAX_STEPRATE             = 1.0;
+    public static final double GRABBER_MIN_POS                  = 0.0;
+    public static final double GRABBER_MAX_POS                  = 0.2;
+    public static final boolean GRABBER_LSERVO_INVERTED         = false;
+    public static final boolean GRABBER_RSERVO_INVERTED         = true;
+    public static final boolean GRABBER_TRIGGER_INVERTED        = true;
+    public static final double GRABBER_TRIGGER_THRESHOLD        = 1.5;  // in inches
+    public static final double GRABBER_HAS_OBJECT_THRESHOLD     = 2.5;  // in inches
+    public static final double GRABBER_OPEN_POS                 = GRABBER_MAX_POS;
+    public static final double GRABBER_OPEN_TIME                = 0.5;
+    public static final double GRABBER_CLOSE_POS                = GRABBER_MIN_POS;
+    public static final double GRABBER_CLOSE_TIME               = 0.5;
+    public static final double GRABBER_DEF_CONE_DISTANCE        = 8.0;
     //
     // Miscellaneous.
     //
-    static final double CYCLE_TIME                              = 10.0; // in seconds
-    static final double PARK_TIME                               = 1.0;  // in seconds
+    public static final double CYCLE_TIME                       = 10.0; // in seconds
+    public static final double PARK_TIME                        = 1.0;  // in seconds
 
 }   //class RobotParams

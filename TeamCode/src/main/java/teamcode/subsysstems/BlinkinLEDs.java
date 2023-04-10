@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.subsysstems;
 
 import TrcCommonLib.trclib.TrcRevBlinkin;
 import TrcFtcLib.ftclib.FtcRevBlinkin;
@@ -29,7 +29,7 @@ import TrcFtcLib.ftclib.FtcRevBlinkin;
  * This class encapsulates the REV Blinkin LED controller to provide a priority indicator showing the status of the
  * robot.
  */
-class BlinkinLEDs extends FtcRevBlinkin
+public class BlinkinLEDs extends FtcRevBlinkin
 {
     // LED pattern names.
     public static final String LABEL_BOLT = "1 Bolt";

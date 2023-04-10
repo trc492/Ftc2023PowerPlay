@@ -35,6 +35,8 @@ import TrcFtcLib.ftclib.FtcMatchInfo;
 import TrcFtcLib.ftclib.FtcMenu;
 import TrcFtcLib.ftclib.FtcOpMode;
 import TrcFtcLib.ftclib.FtcValueMenu;
+import teamcode.autocommands.CmdAutoHigh;
+import teamcode.vision.EocvVision;
 
 /**
  * This class contains the Autonomous Mode program.

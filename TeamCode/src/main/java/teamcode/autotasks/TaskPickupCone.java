@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.autotasks;
 
 import TrcCommonLib.trclib.TrcAutoTask;
 import TrcCommonLib.trclib.TrcDbgTrace;
@@ -32,6 +32,10 @@ import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcTimer;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
+import teamcode.FtcAuto;
+import teamcode.Robot;
+import teamcode.RobotParams;
+import teamcode.vision.EocvVision;
 
 /**
  * This class implements auto-assist task to pickup a cone.

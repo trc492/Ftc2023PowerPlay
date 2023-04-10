@@ -20,15 +20,18 @@
 * SOFTWARE.
 */
 
-package teamcode;
+package teamcode.autocommands;
 
 import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcStateMachine;
 import TrcCommonLib.trclib.TrcTimer;
+import teamcode.FtcAuto;
+import teamcode.Robot;
+import teamcode.RobotParams;
 
-class CmdAutoHigh implements TrcRobot.RobotCommand
+public class CmdAutoHigh implements TrcRobot.RobotCommand
 {
     private static final String moduleName = "CmdAutoHigh";
     private static final boolean visionAssist = true;
@@ -61,7 +64,7 @@ class CmdAutoHigh implements TrcRobot.RobotCommand
      * @param robot specifies the robot object for providing access to various global objects.
      * @param autoChoices specifies all the choices from the autonomous menus.
      */
-    CmdAutoHigh(Robot robot, FtcAuto.AutoChoices autoChoices)
+    public CmdAutoHigh(Robot robot, FtcAuto.AutoChoices autoChoices)
     {
         robot.globalTracer.traceInfo(moduleName, ">>> robot=%s, choices=%s", robot, autoChoices);
 

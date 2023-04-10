@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.vision;
 
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetectorJNI;
@@ -33,6 +33,7 @@ import TrcCommonLib.trclib.TrcOpenCvColorBlobPipeline;
 import TrcFtcLib.ftclib.FtcEocvAprilTagPipeline;
 import TrcFtcLib.ftclib.FtcEocvColorBlobPipeline;
 import TrcFtcLib.ftclib.FtcEocvDetector;
+import teamcode.RobotParams;
 
 /**
  * This class implements EOCV Vision that provides the capability to detect AprilTag or color blobs and return their

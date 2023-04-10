@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.drivebases;
 
 import org.opencv.core.Point;
 
@@ -32,6 +32,8 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcPurePursuitDrive;
 import TrcFtcLib.ftclib.FtcBNO055Imu;
 import TrcFtcLib.ftclib.FtcDcMotor;
+import teamcode.FtcAuto;
+import teamcode.RobotParams;
 
 /**
  * This class is intended to be extended by subclasses implementing different robot drive bases.

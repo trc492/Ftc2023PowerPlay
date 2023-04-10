@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package teamcode;
+package teamcode.autotasks;
 
 import TrcCommonLib.trclib.TrcAutoTask;
 import TrcCommonLib.trclib.TrcDbgTrace;
@@ -28,6 +28,9 @@ import TrcCommonLib.trclib.TrcEvent;
 import TrcCommonLib.trclib.TrcOwnershipMgr;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcTaskMgr;
+import teamcode.Robot;
+import teamcode.RobotParams;
+import teamcode.subsysstems.BlinkinLEDs;
 
 /**
  * This class implements auto-assist task to score a cone.
