@@ -76,7 +76,7 @@ public class FtcDemoMode extends FtcOpMode
     protected FtcGamepad driverGamepad;
     protected FtcGamepad operatorGamepad;
     private TrcDriveBase.DriveOrientation driveOrientation = TrcDriveBase.DriveOrientation.ROBOT;
-    private double drivePowerScale = 0.5;
+    private double drivePowerScale = 0.75;
     private boolean pivotTurnMode = false;
     private boolean manualOverride = false;
     private boolean autoNavigate = false;
@@ -129,6 +129,8 @@ public class FtcDemoMode extends FtcOpMode
                     EocvVision.ObjectType.RED_CONE: EocvVision.ObjectType.BLUE_CONE);
         }
 
+        robot.blinkin.setPatternState(BlinkinLEDs.RAINBOW_RGB, true);
+
     }   //initRobot
 
     //
@@ -156,7 +158,6 @@ public class FtcDemoMode extends FtcOpMode
         // Tell robot object opmode is about to start so it can do the necessary start initialization for the mode.
         //
         robot.startMode(nextMode);
-        updateDriveModeLEDs();
     }   //startMode
 
     /**
@@ -301,33 +302,6 @@ public class FtcDemoMode extends FtcOpMode
         }
     }   //periodic
 
-    /**
-     * This method updates the blinkin LEDs to show the drive orientation mode.
-     */
-    private void updateDriveModeLEDs()
-    {
-        if (robot.blinkin != null)
-        {
-            robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_FIELD, false);
-            robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_ROBOT, false);
-            robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_INVERTED, false);
-            switch (driveOrientation)
-            {
-                case FIELD:
-                    robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_FIELD, true);
-                    break;
-
-                case ROBOT:
-                    robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_ROBOT, true);
-                    break;
-
-                case INVERTED:
-                    robot.blinkin.setPatternState(BlinkinLEDs.DRIVE_ORIENTATION_INVERTED, true);
-                    break;
-            }
-        }
-    }   //updateDriveModeLEDs
-
     //
     // Implements TrcGameController.ButtonHandler interface.
     //
@@ -387,7 +361,6 @@ public class FtcDemoMode extends FtcOpMode
                 {
                     // Cycle through different Drive Modes.
                     driveOrientation = TrcDriveBase.DriveOrientation.nextDriveOrientation(driveOrientation);
-                    updateDriveModeLEDs();
                 }
                 break;
 
@@ -472,13 +445,22 @@ public class FtcDemoMode extends FtcOpMode
             case FtcGamepad.GAMEPAD_A:
                 if (robot.grabber != null)
                 {
-                    if (pressed)
+                    if (manualOverride)
                     {
-                        robot.grabber.close();
+                        // Manual open/close grabber.
+                        if (pressed)
+                        {
+                            robot.grabber.close();
+                        }
+                        else
+                        {
+                            robot.grabber.open();
+                        }
                     }
-                    else
+                    else if (pressed)
                     {
-                        robot.grabber.open();
+                        // Toggle auto-assist grabber ON/OFF.
+                        robot.setGrabberAutoAssistOn(!robot.grabber.isAutoAssistActive());
                     }
                 }
                 break;
@@ -513,7 +495,7 @@ public class FtcDemoMode extends FtcOpMode
                     {
                         // We don't have a cone, prepare all subsystems to pick up one.
                         robot.turret.setTarget(0.0, RobotParams.TURRET_FRONT, true, 0.75, null, 0.0);
-                        robot.arm.setPosition(0.5, RobotParams.ARM_MAX_POS - 2.0, false, 1.0, null, 0.0);
+                        robot.arm.setPosition(0.5, RobotParams.ARM_MAX_POS, false, 1.0, null, 0.0);
                         robot.elevator.setPosition(RobotParams.ELEVATOR_MIN_POS);
                         robot.setGrabberAutoAssistOn(true);
                     }

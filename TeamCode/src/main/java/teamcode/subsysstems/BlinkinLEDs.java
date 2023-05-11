@@ -47,6 +47,8 @@ public class BlinkinLEDs extends FtcRevBlinkin
     public static final String DRIVE_ORIENTATION_ROBOT = "RobotMode";
     public static final String DRIVE_ORIENTATION_INVERTED = "InvertedMode";
 
+    public static final String RAINBOW_RGB = "RainbowRGB";
+
     /**
      * Constructor: Create an instance of the object.
      *
@@ -71,7 +73,8 @@ public class BlinkinLEDs extends FtcRevBlinkin
             new TrcRevBlinkin.Pattern(IMAGE4_NAME, RevLedPattern.FixedBreathBlue),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, TrcRevBlinkin.RevLedPattern.SolidViolet),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, TrcRevBlinkin.RevLedPattern.SolidWhite),
-            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray)
+            new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_INVERTED, TrcRevBlinkin.RevLedPattern.SolidGray),
+            new TrcRevBlinkin.Pattern(RAINBOW_RGB, RevLedPattern.FixedColorWavesRainbow)
             // Lowest priority.
         };
         setPatternPriorities(ledPatternPriorities);

@@ -405,18 +405,18 @@ public class Robot
         if (enabled)
         {
             grabber.enableAutoAssist(null, 0.0, null, 0.0);
-            if (blinkin != null)
+            /*if (blinkin != null)
             {
                 blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, true);
-            }
+            }*/
         }
         else
         {
             grabber.cancelAutoAssist();
-            if (blinkin != null)
+            /*if (blinkin != null)
             {
                 blinkin.setPatternState(BlinkinLEDs.AUTOASSIST_GRABBER_ON, false);
-            }
+            }*/
         }
     }   //setGrabberAutoAssistOn
 
