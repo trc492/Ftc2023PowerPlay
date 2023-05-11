@@ -454,7 +454,7 @@ public class RobotParams
     public static final double ARM_OFFSET                       = -8.0;
     // Arm Zero-Calibrated to Up Position. Arm Max Position is Down.
     public static final double ARM_MIN_POS                      = ARM_OFFSET;
-    public static final double ARM_MAX_POS                      = 140.0;
+    public static final double ARM_MAX_POS                      = 145.0;
     public static final double ARM_STALL_MIN_POWER              = 0.75;
     public static final double ARM_STALL_TOLERANCE              = 0.0;
     public static final double ARM_STALL_TIMEOUT                = 1.0;
